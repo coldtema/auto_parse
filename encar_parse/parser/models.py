@@ -39,8 +39,6 @@ class Car(models.Model):
     sell_type = models.CharField(max_length=128)
     updated = models.DateTimeField()
     city = models.CharField(max_length=128)
-    showroom_name = models.CharField(max_length=256)
-    dealer_name = models.CharField(max_length=256)
 
 
 class Truck(models.Model):
