@@ -15,7 +15,7 @@ photos = 'https://ci.encar.com/carpicture/carpicture03/pic4003/40034021_001.jpg?
 
 class AsyncCarParser():
     def __init__(self):
-        self.batch_size = 1000
+        self.batch_size = 100
         self.session = requests.Session()
         self.encar_api_url = 'https://api.encar.com/v1/readside/vehicle/'
         self.car_count = Car.objects.all().count()
@@ -27,6 +27,7 @@ class AsyncCarParser():
         }
         self.batch = []
         self.results = []
+        self.counter = 1
 
     def run(self):
         self.get_cookies()
@@ -47,7 +48,8 @@ class AsyncCarParser():
         list_api_urls = []
         for car in self.batch:
             list_api_urls.append(f'{self.encar_api_url}{car.encar_id}')
-        print('Запуск')
+        print(f'Запуск {self.counter}')
+        self.counter += 1
         self.results = asyncio.run(self.get_info(list_api_urls))
         
     
@@ -55,7 +57,9 @@ class AsyncCarParser():
     async def fetch(self, session, url):
         async with session.get(url, timeout=10) as response:
             response = await response.json()
-            photos_list = response['photos']
+            photos_list = list(map(lambda x: int(x['code']), response['photos']))
+            if not photos_list: number_of_photos = 0
+            else: number_of_photos = max(photos_list)
             detail_dict = {
                 'encar_id': url.split('/')[-1], 
                 'manufacturer': response['category']['manufacturerEnglishName'],
@@ -65,7 +69,7 @@ class AsyncCarParser():
                 'options': response['options']['standard'],
                 'color': response['spec']['colorName'],
                 'engine_capacity': response['spec']['displacement'],
-                'number_of_photos': max(map(lambda x: int(x['code']), photos_list))
+                'number_of_photos': number_of_photos
             }
             return detail_dict
 
