@@ -15,8 +15,8 @@ class CarParser():
         self.current_page = 0
         self.url_dict = {
             'electro_url': ['https://api.encar.com/search/car/list/premium?count=True&q=(And.Hidden.N._.CarType.A._.GreenType.Y._.(Or.Separation.A._.Separation.B.)_.Mileage.range(', '0', '..', '10000', ').)&sr=%7CModifiedDate%7C', '0', '%7C1000'],
-            #'import_url': ['https://api.encar.com/search/car/list/premium?count=True&q=(And.Hidden.N._.CarType.N._.(Or.Separation.A._.Separation.F._.Separation.B.)_.SellType.%EC%9D%BC%EB%B0%98._.Mileage.range(', '0', '..', '10000', ').)&sr=%7CModifiedDate%7C', '0', '%7C1000'],
-            #'native_url': ['https://api.encar.com/search/car/list/premium?count=True&q=(And.Hidden.N._.CarType.Y._.(Or.Separation.A._.Separation.B.)_.SellType.%EC%9D%BC%EB%B0%98._.Mileage.range(', '0', '..', '10000', ').)&sr=%7CModifiedDate%7C', '0', '%7C1000']
+            'import_url': ['https://api.encar.com/search/car/list/premium?count=True&q=(And.Hidden.N._.CarType.N._.(Or.Separation.A._.Separation.F._.Separation.B.)_.SellType.%EC%9D%BC%EB%B0%98._.Mileage.range(', '0', '..', '10000', ').)&sr=%7CModifiedDate%7C', '0', '%7C1000'],
+            'native_url': ['https://api.encar.com/search/car/list/premium?count=True&q=(And.Hidden.N._.CarType.Y._.(Or.Separation.A._.Separation.B.)_.SellType.%EC%9D%BC%EB%B0%98._.Mileage.range(', '0', '..', '10000', ').)&sr=%7CModifiedDate%7C', '0', '%7C1000']
         }
         self.current_api_url_list = []
         self.session = requests.Session()
@@ -108,7 +108,6 @@ class CarParser():
         return self.session.get(''.join(self.current_api_url_list), headers=self.headers).json()['Count']
 
     def save_to_db(self):
-        self.new_elems = self.new_elems[:100]
         Car.objects.bulk_create(self.new_elems, ignore_conflicts=True)
         self.new_elems = []
 
