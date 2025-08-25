@@ -60,11 +60,13 @@ def vechile(request):
             truck = Truck.objects.get(encar_id=artikul)
             all_truck_options = OptionCategory.objects.filter(vechile='TRUCK').prefetch_related('truckoption_set')
             current_truck_options = list(map(lambda x: TruckOption.objects.get(encar_id=x).id, eval(truck.options)))
+            photo_list = []
+            for i in range(1, truck.number_of_photos+1):
+                if i < 10: photo_list.append(f'{truck.photo_url}00{i}.jpg{photo_url_params}')
+                else: photo_list.append(f'{truck.photo_url}0{i}.jpg{photo_url_params}') 
             return render(request, 'parser/vechile.html', context={'all_options_list': all_truck_options,
                                                                    'current_options_list': current_truck_options,
                                                                    'full_name': f'{truck.manufacturer} {truck.model} {truck.version}',
-                                                                   'number_of_photos': truck.number_of_photos,
-                                                                   'photo_url': truck.photo_url,
                                                                    'encar_id': truck.encar_id,
                                                                    'category': truck.version_details,
                                                                    'kind': 'TRUCK',
@@ -76,6 +78,7 @@ def vechile(request):
                                                                    'engine_capacity': f'{truck.engine_capacity} см²',
                                                                    'release_date': f'{str(truck.release_date)[4:]}.{str(truck.release_date)[:-2]}',
                                                                    'encar_url': truck.url,
+                                                                   'photo_list': photo_list,
                                                                    })
         if kind == 'car':
             car = Car.objects.get(encar_id=artikul)
@@ -85,7 +88,6 @@ def vechile(request):
             for i in range(1, car.number_of_photos+1):
                 if i < 10: photo_list.append(f'{car.photo_url}00{i}.jpg{photo_url_params}')
                 else: photo_list.append(f'{car.photo_url}0{i}.jpg{photo_url_params}')  
-            print(photo_list)
             return render(request, 'parser/vechile.html', context={'all_options_list': all_car_options,
                                                                    'current_options_list': current_car_options,
                                                                    'full_name': f'{car.manufacturer} {car.model} {car.version}',
