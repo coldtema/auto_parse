@@ -192,8 +192,12 @@ class TruckParser():
             ru_cities = truck_korean_dict['CITIES'].get(elem.get('OfficeCityState', ''), elem.get('OfficeCityState', ''))
             ru_version_details = truck_korean_dict['VERSION_DETAILS'].get(elem.get('FormDetail', ''), elem.get('FormDetail', ''))
             ru_usage = truck_korean_dict['USAGES'].get(elem.get('Use', ''), elem.get('Use', ''))
-            if elem.get('Capacity', '') != '': ru_capacity = f'{elem.get('Capacity', '')[:-1]}т.' 
-            else: ru_capacity = ''
+            if '기' in elem.get('Capacity', ''): #прочее/другое
+                ru_capacity = ''
+            elif '이상' in elem.get('Capacity', ''): # более 톤
+                ru_capacity = f'{elem.get('Capacity', '')[:-3]}+ т.'
+            else:
+                ru_capacity = f'{elem.get('Capacity', '')[:-1]}т.'
             self.new_elems.append(Truck(encar_id=elem['Id'],
                                         url=f'https://fem.encar.com/cars/detail/{elem['Id']}',
                                         category=elem.get('Separation', ''),
