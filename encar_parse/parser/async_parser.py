@@ -62,7 +62,7 @@ class AsyncCarParser():
             if not photos_list: number_of_photos = 0
             else: number_of_photos = max(photos_list)
             detail_dict = {
-                'encar_id': url.split('/')[-1], 
+                'encar_id': int(url.split('/'))[-1], 
                 'manufacturer': response['category']['manufacturerEnglishName'],
                 'model': response['category']['modelGroupEnglishName'],
                 'version': response['category']['gradeEnglishName'],
@@ -159,7 +159,7 @@ class AsyncTruckParser():
             if not photos_list: number_of_photos = 0
             else: number_of_photos = max(photos_list)
             detail_dict = {
-                'encar_id': url.split('/')[-1],
+                'encar_id': int(url.split('/')[-1]),
                 'options': response['options']['standard'],
                 'color': response['spec']['colorName'],
                 'engine_capacity': response['spec']['displacement'],
