@@ -5,34 +5,77 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Результат</title>
 <style>
-body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 24px; }
-.card { max-width: 520px; padding: 20px; border: 1px solid #e5e7eb; border-radius: 14px; }
+body {
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  margin: 24px;
+}
+.wrapper {
+  display: flex;
+  align-items: flex-start; /* чтобы оба блока выравнивались сверху */
+  gap: 24px;              /* расстояние между карточкой и фотками */
+}
+.card {
+  max-width: 520px;
+  padding: 20px;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+}
+.photos {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.photos img {
+  max-width: 300px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+}
 .dim { color: #6b7280; }
 </style>
 </head>
-    <body>
-        <div class="card">
-            <h1>Результат запроса</h1>
-            <p>Название: <strong>{{ full_name }}</strong></p>
-            <p>Категория: <strong>{{ category }}</strong></p>
-            <p>Артикул: <strong>{{ encar_id }}</strong></p>
-            {%for category in all_options_list%}
-                <h2>{{category.name}}</h2>
-                {%if kind == 'TRUCK'%}
-                    {%for option in category.truckoption_set.all%}
-                        {%if option.id in current_options_list%}
-                            <p><strong>{{option.name}}</strong></p>
-                        {%endif%}
-                    {%endfor%}
-                {%else%}
-                    {%for option in category.caroption_set.all%}
-                        {%if option.id in current_options_list%}
-                            <p><strong>{{option.name}}</strong></p>
-                        {%endif%}
-                    {%endfor%}
-                {%endif%}
-            {%endfor%}
-            <p><a href="{% url 'index' %}">Назад к поиску</a></p>
-        </div>
-    </body>
+<body>
+  <div class="wrapper">
+    <!-- Левая колонка -->
+    <div class="card">
+      <h1>Результат запроса</h1>
+      <p>Название: <a href="{{encar_url}}" target="_blank"><strong>{{ full_name }}</strong></a></p>
+      <p>Категория: <strong>{{ category }}</strong></p>
+      <p>Артикул (Encar): <strong>{{ encar_id }}</strong></p>
+      <p>Коробка передач: <strong>{{ transmission }}</strong></p>
+      <p>Пробег: <strong>{{ mileage }}</strong></p>
+      <p>Цена: <strong>{{ price }}</strong></p>
+      <p>Тип двигателя: <strong>{{ fuel_type }}</strong></p>
+      <p>Дата выпуска: <strong>{{ release_date }}</strong></p>
+      <p>Модельный год: <strong>{{ model_year }}</strong></p>
+      <p>Цвет: <strong>{{ color }}</strong></p>
+      <p>Объем двигателя: <strong>{{ engine_capacity }}</strong></p>
+
+      {% for category in all_options_list %}
+        <h2>{{category.name}}</h2>
+        {% if kind == 'TRUCK' %}
+          {% for option in category.truckoption_set.all %}
+            {% if option.id in current_options_list %}
+              <p><strong>{{option.name}}</strong></p>
+            {% endif %}
+          {% endfor %}
+        {% else %}
+          {% for option in category.caroption_set.all %}
+            {% if option.id in current_options_list %}
+              <p><strong>{{option.name}}</strong></p>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      {% endfor %}
+
+      <p><a href="{% url 'index' %}">Назад к поиску</a></p>
+    </div>
+
+    <!-- Правая колонка -->
+    <div class="photos">
+      {% for photo in photo_list%}
+        <img src="{{ img_url }}" alt="Фото автомобиля">
+      {% endfor %}
+    </div>
+  </div>
+</body>
 </html>
