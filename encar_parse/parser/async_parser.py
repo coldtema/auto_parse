@@ -3,6 +3,7 @@ import math
 from .models import Car, Truck
 import asyncio
 import aiohttp
+from parser.raw_parser import car_korean_dict
 
 diagnosis = 'https://api.encar.com/v1/readside/diagnosis/vehicle/40286929'
 
@@ -94,7 +95,7 @@ class AsyncCarParser():
             car_to_update.version = result['version']
             car_to_update.version_details = result['version_details']
             car_to_update.options = result['options']
-            car_to_update.color = result['color']
+            car_to_update.color = car_korean_dict['COLOR'].get(result['color'], result['color'])
             car_to_update.engine_capacity = result['engine_capacity']
             car_to_update.number_of_photos = result['number_of_photos']
             self.updated_batch.append(car_to_update)
