@@ -65,9 +65,21 @@ def vechile(request):
                                                                    'number_of_photos': truck.number_of_photos,
                                                                    'photo_url': truck.photo_url,
                                                                    'encar_id': truck.encar_id,
-                                                                   'category': truck.version_details
+                                                                   'category': truck.version_details,
+                                                                   'kind': 'TRUCK'
                                                                    })
         if kind == 'car':
             car = Car.objects.get(encar_id=artikul)
+            all_car_options = OptionCategory.objects.filter(vechile='CAR').prefetch_related('caroption_set')
+            current_car_options = list(map(lambda x: CarOption.objects.get(encar_id=x).id, eval(car.options)))
+            return render(request, 'parser/vechile.html', context={'all_options_list': all_car_options,
+                                                                   'current_options_list': current_car_options,
+                                                                   'full_name': f'{car.manufacturer} {car.model} {car.version}',
+                                                                   'number_of_photos': car.number_of_photos,
+                                                                   'photo_url': car.photo_url,
+                                                                   'encar_id': car.encar_id,
+                                                                   'category': car.version_details,
+                                                                   'kind': 'CAR',
+                                                                   })
         return render(request, 'parser/vechile.html')
     return render(request, 'parser/vechile.html')
