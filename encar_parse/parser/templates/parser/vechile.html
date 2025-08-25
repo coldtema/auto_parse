@@ -18,11 +18,19 @@ body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; marg
             <p>Артикул: <strong>{{ encar_id }}</strong></p>
             {%for category in all_options_list%}
                 <h2>{{category.name}}</h2>
-                {%for option in category.truckoption_set.all%}
-                    {%if option.id in current_options_list%}
-                        <p><strong>{{option.name}}</strong></p>
-                    {%endif%}
-                {%endfor%}
+                {%if kind == 'TRUCK'%}
+                    {%for option in category.truckoption_set.all%}
+                        {%if option.id in current_options_list%}
+                            <p><strong>{{option.name}}</strong></p>
+                        {%endif%}
+                    {%endfor%}
+                {%else%}
+                    {%for option in category.caroption_set.all%}
+                        {%if option.id in current_options_list%}
+                            <p><strong>{{option.name}}</strong></p>
+                        {%endif%}
+                    {%endfor%}
+                {%endif%}
             {%endfor%}
             <p><a href="{% url 'index' %}">Назад к поиску</a></p>
         </div>
