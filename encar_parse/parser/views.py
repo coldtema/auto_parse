@@ -31,3 +31,17 @@ def async_car(request):
     c_p.run()
     del c_p
     return HttpResponse('oks')
+def index(request):
+    if request.method == 'POST':
+        form = CarArtikulForm(request.POST)
+        if form.is_valid():
+            artikul = form.cleaned_data['artikul']
+            kind = form.cleaned_data['kind']
+            context = {
+            'artikul': artikul,
+            'kind': kind,
+            }
+        return render(request, 'parser/index.html', context)
+    else:
+        form = CarArtikulForm()
+    return render(request, 'parser/index.html', {'form': form})
