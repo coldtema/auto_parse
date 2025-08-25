@@ -7,7 +7,7 @@ from parser.raw_parser import car_korean_dict
 
 diagnosis = 'https://api.encar.com/v1/readside/diagnosis/vehicle/40286929'
 
-car_info = 'https://api.encar.com/v1/readside/vehicle/39752647'
+car_info = 'https://api.encar.com/v1/readside/vehicle/38877922'
 
 photos = 'https://ci.encar.com/carpicture/carpicture03/pic4003/40034021_001.jpg?impolicy=heightRate&rh=696&cw=1160&ch=696&cg=Center&wtmk=https://ci.encar.com/wt_mark/w_mark_04.png'
 
@@ -106,6 +106,11 @@ class AsyncCarParser():
 
 
 
+
+
+
+
+
 class AsyncTruckParser():
     def __init__(self):
         self.batch_size = 100
@@ -132,7 +137,7 @@ class AsyncTruckParser():
     def batching_query(self):
         '''Функция прохода через все батчи легковых машин'''
         for i in range(math.ceil(self.truck_count/self.batch_size)):
-            self.batch = Car.objects.filter(encar_id__in=self.encar_ids[i*self.batch_size:(i+1)*self.batch_size], manufacturer=None, model=None, version=None, version_details=None)
+            self.batch = Truck.objects.filter(encar_id__in=self.encar_ids[i*self.batch_size:(i+1)*self.batch_size], color=None, horse_power=None, options=None, engine_capacity=None)
             self.go_through_batch()
             self.save_to_db()
 
@@ -154,15 +159,12 @@ class AsyncTruckParser():
             if not photos_list: number_of_photos = 0
             else: number_of_photos = max(photos_list)
             detail_dict = {
-                'encar_id': url.split('/')[-1], 
-                'manufacturer': response['category']['manufacturerEnglishName'],
-                'model': response['category']['modelGroupEnglishName'],
-                'version': response['category']['gradeEnglishName'],
-                'version_details': response['category']['gradeDetailEnglishName'],
+                'encar_id': url.split('/')[-1],
                 'options': response['options']['standard'],
                 'color': response['spec']['colorName'],
                 'engine_capacity': response['spec']['displacement'],
-                'number_of_photos': number_of_photos
+                'number_of_photos': number_of_photos,
+                'horse_power': response['spec']['horsePower']
             }
             return detail_dict
 
@@ -181,15 +183,12 @@ class AsyncTruckParser():
     def save_to_db(self):
         self.updated_batch = []
         for result in self.results:
-            car_to_update = self.batch.get(encar_id=result['encar_id'])
-            car_to_update.manufacturer = result['manufacturer']
-            car_to_update.model = result['model']
-            car_to_update.version = result['version']
-            car_to_update.version_details = result['version_details']
-            car_to_update.options = result['options']
-            car_to_update.color = car_korean_dict['COLOR'].get(result['color'], result['color'])
-            car_to_update.engine_capacity = result['engine_capacity']
-            car_to_update.number_of_photos = result['number_of_photos']
-            self.updated_batch.append(car_to_update)
-        Car.objects.bulk_update(fields=['manufacturer', 'model', 'version', 'version_details', 'engine_capacity', 'color', 'options', 'number_of_photos'], objs=self.updated_batch)
+            truck_to_update = self.batch.get(encar_id=result['encar_id'])
+            truck_to_update.options = result['options']
+            truck_to_update.color = car_korean_dict['COLOR'].get(result['color'], result['color'])
+            truck_to_update.engine_capacity = result['engine_capacity']
+            truck_to_update.number_of_photos = result['number_of_photos']
+            truck_to_update.horse_power = result['horse_power']
+            self.updated_batch.append(truck_to_update)
+        Truck.objects.bulk_update(fields=['horse_power', 'engine_capacity', 'color', 'options', 'number_of_photos'], objs=self.updated_batch)
         self.results = []
