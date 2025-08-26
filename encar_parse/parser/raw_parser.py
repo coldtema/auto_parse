@@ -4,7 +4,7 @@ from .models import Car, Truck
 
 diagnosis = 'https://api.encar.com/v1/readside/diagnosis/vehicle/40286929'
 
-car_info = 'https://api.encar.com/v1/readside/vehicle/40165677'
+car_info = 'https://api.encar.com/v1/readside/vehicle/39475708'
 
 photos = 'https://ci.encar.com/carpicture/carpicture03/pic4003/40034021_001.jpg?impolicy=heightRate&rh=696&cw=1160&ch=696&cg=Center&wtmk=https://ci.encar.com/wt_mark/w_mark_04.png'
 
@@ -87,7 +87,6 @@ class CarParser():
                                         record=flag_record,
                                         resume=flag_resume,
                                         photo_url=f'https://ci.encar.com/carpicture{elem.get('Photo', '')}',
-                                        number_of_photos=0,
                                         # manufacturer=elem.get('Manufacturer', ''),
                                         # model=elem.get('Model', ''),
                                         # version=elem.get('Badge', ''),
@@ -206,7 +205,6 @@ class TruckParser():
                                         record=flag_record,
                                         resume=flag_resume,
                                         photo_url=f'https://ci.encar.com/carpicture{elem.get('Photo', '')}',
-                                        number_of_photos=0,
                                         manufacturer=eng_manufacturer,
                                         model=eng_model,
                                         version=eng_version,
