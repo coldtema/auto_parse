@@ -58,7 +58,7 @@ class AsyncCarParser():
     async def fetch(self, session, url):
         async with session.get(url, timeout=10) as response:
             response = await response.json()
-            photos_codes = list(map(lambda x: int(x['code']), response['photos']))
+            photos_codes = list(map(lambda x: x['path'][-7:-4], response['photos']))
             detail_dict = {
                 'encar_id': int(url.split('/')[-1]), 
                 'manufacturer': response['category']['manufacturerEnglishName'],
@@ -99,7 +99,7 @@ class AsyncCarParser():
             car_to_update.photos_codes = result['photos_codes']
             car_to_update.korean_number = result['korean_number']
             self.updated_batch.append(car_to_update)
-        Car.objects.bulk_update(fields=['manufacturer', 'model', 'version', 'version_details', 'engine_capacity', 'color', 'options', 'korean_number'], objs=self.updated_batch)
+        Car.objects.bulk_update(fields=['manufacturer', 'model', 'version', 'version_details', 'engine_capacity', 'color', 'options', 'korean_number', 'photos_codes'], objs=self.updated_batch)
         self.results = []
 
 
@@ -155,7 +155,7 @@ class AsyncTruckParser():
     async def fetch(self, session, url):
         async with session.get(url, timeout=10) as response:
             response = await response.json()
-            photos_codes = list(map(lambda x: int(x['code']), response['photos']))
+            photos_codes = list(map(lambda x: x['path'][-7:-4], response['photos']))
             detail_dict = {
                 'encar_id': int(url.split('/')[-1]),
                 'options': response['options']['standard'],
@@ -190,5 +190,5 @@ class AsyncTruckParser():
             # truck_to_update.horse_power = result['horse_power'],
             truck_to_update.korean_number = result['korean_number']
             self.updated_batch.append(truck_to_update)
-        Truck.objects.bulk_update(fields=['horse_power', 'engine_capacity', 'color', 'options', 'korean_number'], objs=self.updated_batch)
+        Truck.objects.bulk_update(fields=['horse_power', 'engine_capacity', 'color', 'options', 'korean_number', 'photos_codes'], objs=self.updated_batch)
         self.results = []
