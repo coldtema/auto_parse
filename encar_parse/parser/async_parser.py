@@ -68,7 +68,8 @@ class AsyncCarParser():
                 'options': response['options']['standard'],
                 'color': response['spec']['colorName'],
                 'engine_capacity': response['spec']['displacement'],
-                'photos_codes': str(photos_codes)
+                'photos_codes': str(photos_codes),
+                'korean_number': response['vehicleNo']
             }
             return detail_dict
 
@@ -96,8 +97,9 @@ class AsyncCarParser():
             car_to_update.color = car_korean_dict['COLOR'].get(result['color'], result['color'])
             car_to_update.engine_capacity = result['engine_capacity']
             car_to_update.photos_codes = result['photos_codes']
+            car_to_update.korean_number = result['korean_number']
             self.updated_batch.append(car_to_update)
-        Car.objects.bulk_update(fields=['manufacturer', 'model', 'version', 'version_details', 'engine_capacity', 'color', 'options', 'number_of_photos'], objs=self.updated_batch)
+        Car.objects.bulk_update(fields=['manufacturer', 'model', 'version', 'version_details', 'engine_capacity', 'color', 'options', 'number_of_photos', 'korean_number'], objs=self.updated_batch)
         self.results = []
 
 
@@ -160,7 +162,8 @@ class AsyncTruckParser():
                 'color': response['spec']['colorName'],
                 'engine_capacity': response['spec']['displacement'],
                 'photos_codes': str(photos_codes),
-                'horse_power': response['spec']['horsePower']
+                'horse_power': response['spec']['horsePower'],
+                'korean_number': response['vehicleNo']
             }
             return detail_dict
 
@@ -184,7 +187,8 @@ class AsyncTruckParser():
             truck_to_update.color = car_korean_dict['COLOR'].get(result['color'], result['color'])
             truck_to_update.engine_capacity = result['engine_capacity']
             truck_to_update.photos_codes = result['photos_codes']
-            truck_to_update.horse_power = result['horse_power']
+            truck_to_update.horse_power = result['horse_power'],
+            truck_to_update.korean_number = result['korean_number']
             self.updated_batch.append(truck_to_update)
-        Truck.objects.bulk_update(fields=['horse_power', 'engine_capacity', 'color', 'options', 'number_of_photos'], objs=self.updated_batch)
+        Truck.objects.bulk_update(fields=['horse_power', 'engine_capacity', 'color', 'options', 'number_of_photos', 'korean_number'], objs=self.updated_batch)
         self.results = []
