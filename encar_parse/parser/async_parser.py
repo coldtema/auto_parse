@@ -58,9 +58,7 @@ class AsyncCarParser():
     async def fetch(self, session, url):
         async with session.get(url, timeout=10) as response:
             response = await response.json()
-            photos_list = list(map(lambda x: int(x['code']), response['photos']))
-            if not photos_list: number_of_photos = 0
-            else: number_of_photos = max(photos_list)
+            photos_codes = list(map(lambda x: int(x['code']), response['photos']))
             detail_dict = {
                 'encar_id': int(url.split('/')[-1]), 
                 'manufacturer': response['category']['manufacturerEnglishName'],
@@ -70,7 +68,7 @@ class AsyncCarParser():
                 'options': response['options']['standard'],
                 'color': response['spec']['colorName'],
                 'engine_capacity': response['spec']['displacement'],
-                'number_of_photos': number_of_photos
+                'photos_codes': str(photos_codes)
             }
             return detail_dict
 
@@ -97,7 +95,7 @@ class AsyncCarParser():
             car_to_update.options = result['options']
             car_to_update.color = car_korean_dict['COLOR'].get(result['color'], result['color'])
             car_to_update.engine_capacity = result['engine_capacity']
-            car_to_update.number_of_photos = result['number_of_photos']
+            car_to_update.photos_codes = result['photos_codes']
             self.updated_batch.append(car_to_update)
         Car.objects.bulk_update(fields=['manufacturer', 'model', 'version', 'version_details', 'engine_capacity', 'color', 'options', 'number_of_photos'], objs=self.updated_batch)
         self.results = []
@@ -155,15 +153,13 @@ class AsyncTruckParser():
     async def fetch(self, session, url):
         async with session.get(url, timeout=10) as response:
             response = await response.json()
-            photos_list = list(map(lambda x: int(x['code']), response['photos']))
-            if not photos_list: number_of_photos = 0
-            else: number_of_photos = max(photos_list)
+            photos_codes = list(map(lambda x: int(x['code']), response['photos']))
             detail_dict = {
                 'encar_id': int(url.split('/')[-1]),
                 'options': response['options']['standard'],
                 'color': response['spec']['colorName'],
                 'engine_capacity': response['spec']['displacement'],
-                'number_of_photos': number_of_photos,
+                'photos_codes': str(photos_codes),
                 'horse_power': response['spec']['horsePower']
             }
             return detail_dict
@@ -187,7 +183,7 @@ class AsyncTruckParser():
             truck_to_update.options = result['options']
             truck_to_update.color = car_korean_dict['COLOR'].get(result['color'], result['color'])
             truck_to_update.engine_capacity = result['engine_capacity']
-            truck_to_update.number_of_photos = result['number_of_photos']
+            truck_to_update.photos_codes = result['photos_codes']
             truck_to_update.horse_power = result['horse_power']
             self.updated_batch.append(truck_to_update)
         Truck.objects.bulk_update(fields=['horse_power', 'engine_capacity', 'color', 'options', 'number_of_photos'], objs=self.updated_batch)
