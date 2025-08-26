@@ -61,8 +61,10 @@ def vechile(request):
             all_truck_options = OptionCategory.objects.filter(vechile='TRUCK').prefetch_related('truckoption_set')
             current_truck_options = list(map(lambda x: TruckOption.objects.get(encar_id=x).id, eval(truck.options)))
             photo_list = []
-            for code in eval(truck.photos_codes):
-                photo_list.append(f'{truck.photo_url}{code}.jpg{photo_url_params}')
+            sorted_codes = sorted(set(map(lambda x: int(x), eval(truck.photos_codes))))
+            for i in sorted_codes:
+                if i < 10: photo_list.append(f'{truck.photo_url}00{i}.jpg{photo_url_params}')
+                else: photo_list.append(f'{truck.photo_url}0{i}.jpg{photo_url_params}') 
             return render(request, 'parser/vechile.html', context={'all_options_list': all_truck_options,
                                                                    'current_options_list': current_truck_options,
                                                                    'full_name': f'{truck.manufacturer} {truck.model} {truck.version}',
@@ -84,8 +86,10 @@ def vechile(request):
             all_car_options = OptionCategory.objects.filter(vechile='CAR').prefetch_related('caroption_set')
             current_car_options = list(map(lambda x: CarOption.objects.get(encar_id=x).id, eval(car.options)))
             photo_list = []
-            for code in eval(car.photos_codes):
-                photo_list.append(f'{truck.photo_url}{code}.jpg{photo_url_params}')
+            sorted_codes = sorted(set(map(lambda x: int(x), eval(car.photos_codes))))
+            for i in sorted_codes:
+                if i < 10: photo_list.append(f'{car.photo_url}00{i}.jpg{photo_url_params}')
+                else: photo_list.append(f'{car.photo_url}0{i}.jpg{photo_url_params}') 
             return render(request, 'parser/vechile.html', context={'all_options_list': all_car_options,
                                                                    'current_options_list': current_car_options,
                                                                    'full_name': f'{car.manufacturer} {car.model} {car.version}',
