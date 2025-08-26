@@ -39,6 +39,7 @@ class Car(models.Model):
     sell_type = models.CharField(max_length=128)
     updated = models.DateTimeField()
     city = models.CharField(max_length=128)
+    korean_number = models.CharField(max_length=32, null=True, blank=True)
 
 
 class Truck(models.Model):
@@ -69,6 +70,7 @@ class Truck(models.Model):
     usage = models.CharField(max_length=128)
     updated = models.DateTimeField()
     city = models.CharField(max_length=128)
+    korean_number = models.CharField(max_length=32, null=True, blank=True)
 
 class Vechile(models.TextChoices):
     CAR = 'CAR', 'CAR'
