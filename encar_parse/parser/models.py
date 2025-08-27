@@ -121,3 +121,13 @@ class CarRecord(models.Model):
     driver_accident_cost = models.IntegerField(default=0)
     driver_accident_count = models.IntegerField(default=0)
     car = models.OneToOneField(Car, on_delete=models.CASCADE, related_name='car_record')
+
+
+class Accident(models.Model):
+    type_of_accident = models.CharField(max_length=256)
+    date = models.DateField()
+    insurance_benefit = models.IntegerField(default=0)
+    part_cost = models.IntegerField(default=0)
+    labor_cost = models.IntegerField(default=0)
+    painting_cost = models.IntegerField(default=0)
+    car_record = models.ForeignKey(CarRecord, on_delete=models.CASCADE)
