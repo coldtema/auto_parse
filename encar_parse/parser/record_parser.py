@@ -4,6 +4,7 @@ from .models import Car, CarRecord, Accident
 import asyncio
 import aiohttp
 from parser.raw_parser import car_korean_dict
+from django.db import transaction
 
 
 record1 = 'https://api.encar.com/v1/readside/record/vehicle/40387760/open?vehicleNo='
@@ -80,8 +81,9 @@ class AsyncCarRecordParser():
     def get_cookies(self):
         self.session.get("https://www.encar.com", headers=self.headers) 
 
-
+    @transaction.atomic
     def save_to_db(self):
+        accidents = []
         for result in self.results:
             if result:
                 car_to_update = self.batch.get(dummy_id=result['dummy_id'])
@@ -92,7 +94,6 @@ class AsyncCarRecordParser():
                                 driver_accident_cost = result['driver_accident_cost'],
                                 driver_accident_count = result['driver_accident_count'],
                                 car=car_to_update)
-                accidents = []
                 for accident in result['accidents']:
                     accidents.append(Accident(
                         type_of_accident = accident['type'],
@@ -103,5 +104,5 @@ class AsyncCarRecordParser():
                         painting_cost = accident['paintingCost'],
                         car_record = car_record,
                     ))
-                Accident.objects.bulk_create(accidents)
+        Accident.objects.bulk_create(accidents)
         self.results = []
