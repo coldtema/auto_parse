@@ -10,7 +10,19 @@ from .models import Car, Truck, CarOption, TruckOption, OptionCategory
 
 
 def car(request):
-    c_p = CarParser()
+    # c_p = CarParser()
+    # c_p.run()
+    # del c_p
+    c_p = AsyncCarParser()
+    c_p.run()
+    del c_p
+    d_c = DuplicateClearer()
+    d_c.go_through_unique_dummy_ids()
+    del d_c
+    c_p = AsyncCarDiagParser()
+    c_p.run()
+    del c_p
+    c_p = AsyncCarRecordParser()
     c_p.run()
     del c_p
     return HttpResponse('oks')
@@ -116,6 +128,15 @@ def vechile(request):
                 diagnosis = car.diagnosis
             except:
                 diagnosis = None
+
+            try:
+                record = car.car_record
+            except:
+                record = None
+            accidents = None
+            if record:
+                accidents = enumerate(record.accident_set.all(), 1)
+            print(accidents)
             return render(request, 'parser/vechile.html', context={'all_options_list': all_car_options,
                                                                    'current_options_list': current_car_options,
                                                                    'full_name': f'{car.manufacturer} {car.model} {car.version}',
@@ -132,7 +153,9 @@ def vechile(request):
                                                                    'engine_capacity': f'{car.engine_capacity} см²',
                                                                    'encar_url': car.url,
                                                                    'release_date': f'{str(car.release_date)[4:]}.{str(car.release_date)[:-2]}',
-                                                                   'diagnosis': diagnosis
+                                                                   'diagnosis': diagnosis,
+                                                                   'record': record,
+                                                                   'accidents': accidents
                                                                    })
         return render(request, 'parser/vechile.html')
     return render(request, 'parser/vechile.html')
