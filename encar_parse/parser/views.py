@@ -95,6 +95,7 @@ def vechile(request):
             try:
                 car = Car.objects.get(encar_id=artikul)
             except:
+                print('Ищет по dummy')
                 car = Car.objects.get(dummy_id=artikul)
             all_car_options = OptionCategory.objects.filter(vechile='CAR').prefetch_related('caroption_set')
             current_car_options = list(map(lambda x: CarOption.objects.get(encar_id=x).id, eval(car.options)))
@@ -103,6 +104,10 @@ def vechile(request):
             for i in sorted_codes:
                 if i < 10: photo_list.append(f'{car.photo_url}00{i}.jpg{photo_url_params}')
                 else: photo_list.append(f'{car.photo_url}0{i}.jpg{photo_url_params}') 
+            try:
+                diagnosis = car.diagnosis
+            except:
+                diagnosis = None
             return render(request, 'parser/vechile.html', context={'all_options_list': all_car_options,
                                                                    'current_options_list': current_car_options,
                                                                    'full_name': f'{car.manufacturer} {car.model} {car.version}',
@@ -118,7 +123,8 @@ def vechile(request):
                                                                    'color': car.color,
                                                                    'engine_capacity': f'{car.engine_capacity} см²',
                                                                    'encar_url': car.url,
-                                                                   'release_date': f'{str(car.release_date)[4:]}.{str(car.release_date)[:-2]}'
+                                                                   'release_date': f'{str(car.release_date)[4:]}.{str(car.release_date)[:-2]}',
+                                                                   'diagnosis': diagnosis
                                                                    })
         return render(request, 'parser/vechile.html')
     return render(request, 'parser/vechile.html')
