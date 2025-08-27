@@ -4,6 +4,7 @@ from .models import Car, Truck
 import asyncio
 import aiohttp
 from parser.raw_parser import car_korean_dict
+from django.db import transaction
 
 diagnosis = 'https://api.encar.com/v1/readside/diagnosis/vehicle/40286929'
 
@@ -88,7 +89,7 @@ class AsyncCarParser():
     def get_cookies(self):
         self.session.get("https://www.encar.com", headers=self.headers) 
 
-
+    @transaction.atomic
     def save_to_db(self):
         self.updated_batch = []
         for result in self.results:
@@ -140,7 +141,8 @@ class DuplicateClearer():
                 self.encar_ids_to_delete.append(duplicates[0]['encar_id'])
             elif len(duplicates) != 1 and duplicates[1]['encar_id'] == dummy_id:
                 self.encar_ids_to_delete.append(duplicates[1]['encar_id'])
-        Car.objects.filter(encar_id__in=self.encar_ids_to_delete).delete()
+        for i in range(math.ceil(len(self.encar_ids_to_delete) / 1000)):
+            Car.objects.filter(encar_id__in=self.encar_ids_to_delete[i*1000:(i+1)*1000]).delete()
 
 
     def get_unique_dummy_ids(self):
