@@ -67,6 +67,18 @@ body {
         {% endif %}
       {% endfor %}
 
+      {%if diagnosis%}
+        <h1>Инспекция:</h1>
+        <p>Передняя левая дверь: <strong>{{ diagnosis.left_front_door }}</strong></p>
+        <p>Задняя левая дверь: <strong>{{ diagnosis.left_back_door }}</strong></p>
+        <p>Крышка багажника: <strong>{{ diagnosis.trunk}}</strong></p>
+        <p>Задняя правая дверь: <strong>{{ diagnosis.right_back_door }}</strong></p>
+        <p>Передняя правая дверь: <strong>{{ diagnosis.right_front_door }}</strong></p>
+        <p>Капот: <strong>{{ diagnosis.hood }}</strong></p>
+        <p>Правое переднее крыло: <strong>{{ diagnosis.front_fender_right }}</strong></p>
+        <p>Левое переднее крыло: <strong>{{ diagnosis.front_fender_left }}</strong></p>
+      {%endif%}
+
       <p><a href="{% url 'index' %}">Назад к поиску</a></p>
     </div>
 
