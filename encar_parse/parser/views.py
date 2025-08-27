@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from parser.raw_parser import CarParser, TruckParser
-from parser.async_parser import AsyncCarParser, AsyncTruckParser
+from parser.async_parser import AsyncCarParser, AsyncTruckParser, DuplicateClearer
+from .diag_parser import AsyncCarDiagParser
 from .forms import CarArtikulForm
 from .models import Car, Truck, CarOption, TruckOption, OptionCategory
 
@@ -32,6 +33,16 @@ def async_car(request):
     c_p = AsyncCarParser()
     c_p.run()
     del c_p
+    d_c = DuplicateClearer()
+    d_c.go_through_unique_dummy_ids()
+    del d_c
+    return HttpResponse('oks')
+
+
+def diag_car(request):
+    c_p = AsyncCarDiagParser()
+    c_p.run()
+    del c_p
     return HttpResponse('oks')
 
 
@@ -57,7 +68,6 @@ def vechile(request):
     kind = request.GET.get('kind')
     if artikul.isdigit():
         if kind == 'truck':
-            truck = Truck.objects.get(encar_id=artikul)
             all_truck_options = OptionCategory.objects.filter(vechile='TRUCK').prefetch_related('truckoption_set')
             current_truck_options = list(map(lambda x: TruckOption.objects.get(encar_id=x).id, eval(truck.options)))
             photo_list = []
@@ -82,7 +92,10 @@ def vechile(request):
                                                                    'photo_list': photo_list,
                                                                    })
         if kind == 'car':
-            car = Car.objects.get(encar_id=artikul)
+            try:
+                car = Car.objects.get(encar_id=artikul)
+            except:
+                car = Car.objects.get(dummy_id=artikul)
             all_car_options = OptionCategory.objects.filter(vechile='CAR').prefetch_related('caroption_set')
             current_car_options = list(map(lambda x: CarOption.objects.get(encar_id=x).id, eval(car.options)))
             photo_list = []
