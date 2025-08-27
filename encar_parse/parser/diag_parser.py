@@ -41,7 +41,6 @@ class AsyncCarDiagParser():
         '''Функция прохода через все батчи легковых машин'''
         for i in range(math.ceil(self.car_count/self.batch_size)):
             self.batch = Car.objects.filter(dummy_id__in=self.dummy_ids[i*self.batch_size:(i+1)*self.batch_size], encar_diag__gt=-1, diagnosis__isnull=True)
-            print(self.batch)
             self.go_through_batch()
             self.save_to_db()
 
