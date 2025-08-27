@@ -59,6 +59,8 @@ class AsyncCarParser():
         async with session.get(url, timeout=10) as response:
             response = await response.json()
             photos_codes = list(map(lambda x: x['path'][-7:-4], response['photos']))
+            if response['manage']['dummy'] == True: dummy_id = response['vehicleId']
+            else: dummy_id = int(url.split('/')[-1])
             detail_dict = {
                 'encar_id': int(url.split('/')[-1]), 
                 'manufacturer': response['category']['manufacturerEnglishName'],
@@ -69,7 +71,9 @@ class AsyncCarParser():
                 'color': response['spec']['colorName'],
                 'engine_capacity': response['spec']['displacement'],
                 'photos_codes': str(photos_codes),
-                'korean_number': response['vehicleNo']
+                'korean_number': response['vehicleNo'],
+                'dummy_id': dummy_id,
+                'encar_diag': response['view']['encarDiagnosis'],
             }
             return detail_dict
 
@@ -98,8 +102,20 @@ class AsyncCarParser():
             car_to_update.engine_capacity = result['engine_capacity']
             car_to_update.photos_codes = result['photos_codes']
             car_to_update.korean_number = result['korean_number']
+            car_to_update.dummy_id = result['dummy_id']
+            car_to_update.encar_diag = result['encar_diag']
             self.updated_batch.append(car_to_update)
-        Car.objects.bulk_update(fields=['manufacturer', 'model', 'version', 'version_details', 'engine_capacity', 'color', 'options', 'korean_number', 'photos_codes'], objs=self.updated_batch)
+        Car.objects.bulk_update(fields=['manufacturer', 
+                                        'model', 
+                                        'version', 
+                                        'version_details', 
+                                        'engine_capacity', 
+                                        'color', 
+                                        'options', 
+                                        'korean_number', 
+                                        'photos_codes', 
+                                        'dummy_id', 
+                                        'encar_diag'], objs=self.updated_batch)
         self.results = []
 
 
