@@ -13,6 +13,11 @@ class FuelType(models.TextChoices):
     HYDROGEN = "HY", "Водород"
 
 
+class Condition(models.TextChoices):
+    NORMAL = 'NORMAL', 'НОРМ.'
+    REPLACEMENT = 'REPLACEMENT', 'ЗАМЕНА'
+
+
 class Car(models.Model):
     encar_id = models.BigIntegerField(verbose_name='Внутреннее id encar', unique=True)
     url = models.URLField()
@@ -40,6 +45,20 @@ class Car(models.Model):
     updated = models.DateTimeField()
     city = models.CharField(max_length=128)
     korean_number = models.CharField(max_length=32, null=True, blank=True)
+    dummy_id = models.IntegerField(null=True, blank=True)
+    encar_diag = models.IntegerField(null=True, blank=True) # -1 - нет, 1 - да
+
+
+class Diagnosis(models.Model):
+    left_front_door = models.CharField(max_length=16, choices=Condition.choices)
+    left_back_door = models.CharField(max_length=16, choices=Condition.choices)
+    right_front_door = models.CharField(max_length=16, choices=Condition.choices)
+    right_back_door = models.CharField(max_length=16, choices=Condition.choices)
+    trunk = models.CharField(max_length=16, choices=Condition.choices)
+    hood = models.CharField(max_length=16, choices=Condition.choices)
+    front_fender_right = models.CharField(max_length=16, choices=Condition.choices)
+    front_fender_left = models.CharField(max_length=16, choices=Condition.choices)
+    car = models.OneToOneField(Car, on_delete=models.CASCADE, null=True, blank=True)
 
 
 class Truck(models.Model):
@@ -93,6 +112,5 @@ class CarOption(models.Model):
     encar_id = models.CharField(max_length=3)
     name = models.CharField(max_length=128)
     category = models.ForeignKey(OptionCategory, on_delete=models.CASCADE)
-
 
 
