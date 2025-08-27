@@ -4,6 +4,7 @@ from .models import Car, Diagnosis
 import asyncio
 import aiohttp
 from parser.raw_parser import car_korean_dict
+from django.db import transaction
 
 diagnosis1 = 'https://api.encar.com/v1/readside/diagnosis/vehicle/40286929'
 
@@ -76,7 +77,7 @@ class AsyncCarDiagParser():
     def get_cookies(self):
         self.session.get("https://www.encar.com", headers=self.headers) 
 
-
+    @transaction.atomic
     def save_to_db(self):
         self.updated_batch = []
         for result in self.results:
