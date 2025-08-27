@@ -110,6 +110,46 @@ class AsyncCarParser():
 
 
 
+class DuplicateClearer():
+    def __init__(self):
+        self.unique_dummy_ids = self.get_unique_dummy_ids()
+        self.all_cars = Car.objects.all().values('dummy_id', 'encar_id')
+        self.encar_ids_to_delete = []
+
+
+    def go_through_unique_dummy_ids(self):
+        for dummy_id in self.unique_dummy_ids:
+            duplicates = self.all_cars.filter(dummy_id=dummy_id).values('encar_id')
+            if len(duplicates) != 1 and duplicates[0]['encar_id'] == dummy_id:
+                self.encar_ids_to_delete.append(duplicates[0]['encar_id'])
+            elif len(duplicates) != 1 and duplicates[1]['encar_id'] == dummy_id:
+                self.encar_ids_to_delete.append(duplicates[1]['encar_id'])
+        Car.objects.filter(encar_id__in=self.encar_ids_to_delete).delete()
+
+
+    def get_unique_dummy_ids(self):
+        c = Car.objects.all().values('dummy_id')
+        set1 = set()
+        for elem in c:
+            set1.add(elem['dummy_id'])
+        print(len(set1))
+        return list(set1)
+        
+    
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
 
 class AsyncTruckParser():
     def __init__(self):
