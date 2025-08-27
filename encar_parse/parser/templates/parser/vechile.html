@@ -68,7 +68,7 @@ body {
       {% endfor %}
 
       {%if diagnosis%}
-        <h1>Инспекция:</h1>
+        <h1>Сост. кузова:</h1>
         <p>Передняя левая дверь: <strong>{{ diagnosis.left_front_door }}</strong></p>
         <p>Задняя левая дверь: <strong>{{ diagnosis.left_back_door }}</strong></p>
         <p>Крышка багажника: <strong>{{ diagnosis.trunk}}</strong></p>
@@ -79,6 +79,27 @@ body {
         <p>Левое переднее крыло: <strong>{{ diagnosis.front_fender_left }}</strong></p>
       {%endif%}
 
+
+      {%if record%}
+        <h1>Страховые случаи:</h1>
+        <p>Кол-во владельцев: <strong>{{ record.owner_count }}</strong></p>
+        <p>Кол-во страховых случаев собственных: <strong>{{ record.driver_accident_count }}</strong></p>
+        <p>Выплаты по собственным страховым случаям: <strong>{{ record.driver_accident_cost }}</strong></p>
+        <p>Кол-во страховых случаев чужих: <strong>{{ record.other_accident_count }}</strong></p>
+        <p>Выплаты по чужим страховым случаям: <strong>{{ record.other_accident_cost }}</strong></p>
+        {%if accidents%}
+        <h2>Данные по происшествиям</h2>
+          {% for number, accident in accidents %}
+            <h3>Происшествие {{ number }}</h3>
+            <p>Тип происшествия: <strong>{{ accident.type_of_accident }}</strong></p>
+            <p>Дата происшествия: <strong>{{ accident.date }}</strong></p>
+            <p>Страховая выплата: <strong>{{ accident.insurance_benefit }}</strong></p>
+            <p>Стоимость запчастей: <strong>{{ accident.part_cost }}</strong></p>
+            <p>Стоимость работ: <strong>{{ accident.labor_cost }}</strong></p>
+            <p>Стоимость покраски: <strong>{{ accident.painting_cost }}</strong></p>
+          {% endfor %}
+        {%endif%}
+      {%endif%}
       <p><a href="{% url 'index' %}">Назад к поиску</a></p>
     </div>
 
