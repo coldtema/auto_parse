@@ -58,7 +58,7 @@ class Diagnosis(models.Model):
     hood = models.CharField(max_length=16, choices=Condition.choices)
     front_fender_right = models.CharField(max_length=16, choices=Condition.choices)
     front_fender_left = models.CharField(max_length=16, choices=Condition.choices)
-    car = models.OneToOneField(Car, on_delete=models.CASCADE, null=True, blank=True)
+    car = models.OneToOneField(Car, on_delete=models.CASCADE, null=True, blank=True, related_name='diagnosis')
 
 
 class Truck(models.Model):
