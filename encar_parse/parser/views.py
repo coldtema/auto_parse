@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from parser.raw_parser import CarParser, TruckParser
 from parser.async_parser import AsyncCarParser, AsyncTruckParser, DuplicateClearer
 from .diag_parser import AsyncCarDiagParser
+from .record_parser import AsyncCarRecordParser
 from .forms import CarArtikulForm
 from .models import Car, Truck, CarOption, TruckOption, OptionCategory
 
@@ -41,6 +42,13 @@ def async_car(request):
 
 def diag_car(request):
     c_p = AsyncCarDiagParser()
+    c_p.run()
+    del c_p
+    return HttpResponse('oks')
+
+
+def record_car(request):
+    c_p = AsyncCarRecordParser()
     c_p.run()
     del c_p
     return HttpResponse('oks')
