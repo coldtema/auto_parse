@@ -114,3 +114,10 @@ class CarOption(models.Model):
     category = models.ForeignKey(OptionCategory, on_delete=models.CASCADE)
 
 
+class CarRecord(models.Model):
+    owner_count = models.IntegerField()
+    other_accident_cost = models.IntegerField(default=0)
+    other_accident_count = models.IntegerField(default=0)
+    driver_accident_cost = models.IntegerField(default=0)
+    driver_accident_count = models.IntegerField(default=0)
+    car = models.OneToOneField(Car, on_delete=models.CASCADE, related_name='car_record')
