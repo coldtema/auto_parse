@@ -143,6 +143,13 @@ class DuplicateClearer():
                 self.encar_ids_to_delete.append(duplicates[1]['encar_id'])
         for i in range(math.ceil(len(self.encar_ids_to_delete) / 1000)):
             Car.objects.filter(encar_id__in=self.encar_ids_to_delete[i*1000:(i+1)*1000]).delete()
+        Car.objects.filter(manufacturer__in=['Others', 'etc']).delete() #удаление неизвестных encar'u машин (others-others-others)
+        Car.objects.filter(sell_type='Лизинг').delete()
+        Car.objects.filter(sell_type='Аренда').delete()
+        Car.objects.filter(engine_capacity__lt=900, fuel_type__in=['Бензин', 'Дизель']).delete()
+        Car.objects.filter(engine_capacity__gt=9999, fuel_type__in=['Бензин', 'Дизель']).delete()
+        Car.objects.filter(fuel_type='Прочее').delete()
+
 
 
     def get_unique_dummy_ids(self):
