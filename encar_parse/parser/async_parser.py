@@ -147,7 +147,7 @@ class DuplicateClearer():
         Car.objects.filter(sell_type='Лизинг').delete()
         Car.objects.filter(sell_type='Аренда').delete()
         Car.objects.filter(engine_capacity__lt=900, fuel_type__in=['Бензин', 'Дизель']).delete()
-        Car.objects.filter(engine_capacity__gt=9999, fuel_type__in=['Бензин', 'Дизель']).delete()
+        Car.objects.filter(engine_capacity__gt=9999).delete()
         Car.objects.filter(fuel_type='Прочее').delete()
 
 
