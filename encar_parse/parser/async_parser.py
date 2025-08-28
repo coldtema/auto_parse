@@ -146,7 +146,7 @@ class DuplicateClearer():
         Car.objects.filter(manufacturer__in=['Others', 'etc']).delete() #удаление неизвестных encar'u машин (others-others-others)
         Car.objects.filter(sell_type='Лизинг').delete()
         Car.objects.filter(sell_type='Аренда').delete()
-        Car.objects.filter(engine_capacity__lt=900, fuel_type__in=['Бензин', 'Дизель']).delete()
+        Car.objects.filter(engine_capacity__lt=900, fuel_type__in=['Бензин', 'Дизель', 'Бензин + Электро', 'Дизель + Электро']).delete()
         Car.objects.filter(engine_capacity__gt=9999).delete()
         Car.objects.filter(fuel_type='Прочее').delete()
         Car.objects.filter(fuel_type__in=["Газ (пропан-бутан) + Электро",
