@@ -52,7 +52,7 @@ class RuPriceCalc:
             customs_clearance_fee = self.get_customs_clearance_fee()
             nds_tax = self.get_nds_tax(excise_tax, price_customs_duty)
             return self.get_final_price(price_customs_duty, excise_tax, recycling_fee, customs_clearance_fee, nds_tax)
-        elif self.current_vechile.fuel_type == 'Дизель' or self.current_vechile.fuel_type == 'Бензин':
+        elif self.current_vechile.fuel_type in ['Дизель', 'Бензин', 'Дизель + Электро', 'Бензин + Электро']:
             price_customs_duty = self.get_customs_duty_gasoline()
             recycling_fee = self.get_recycling_fee_gasoline()
             customs_clearance_fee = self.get_customs_clearance_fee()
