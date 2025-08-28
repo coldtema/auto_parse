@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from parser.views import car, truck, async_car, async_truck, index, vechile, diag_car, record_car
+from parser.views import car, truck, async_car, async_truck, index, vechile, diag_car, record_car, ru_price
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,6 +26,7 @@ urlpatterns = [
     path('async_car/', async_car, name='async_car'),
     path('diag_car/', diag_car, name='diag_car'),
     path('record_car/', record_car, name='record_car'),
+    path('ru_price/', ru_price, name='ru_price'),
     path('', index, name='index'),
     path('vechile/', vechile, name='vechile')
 ]
