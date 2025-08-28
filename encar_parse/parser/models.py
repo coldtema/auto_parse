@@ -41,6 +41,7 @@ class Car(models.Model):
     mileage = models.IntegerField()
     options = models.CharField(max_length=1024, null=True, blank=True)
     price = models.BigIntegerField()
+    ru_price = models.IntegerField(null=True, blank=True)
     sell_type = models.CharField(max_length=128)
     updated = models.DateTimeField()
     city = models.CharField(max_length=128)
