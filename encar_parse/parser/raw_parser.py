@@ -81,8 +81,6 @@ class CarParser():
             ru_sell_type = car_korean_dict['SELL_TYPE'].get(elem.get('SellType', ''), elem.get('SellType', ''))
             self.new_elems.append(Car(encar_id=elem['Id'],
                                         url=f'https://fem.encar.com/cars/detail/{elem['Id']}',
-                                        category=elem.get('Separation', ''),
-                                        trust_service=elem.get('Trust', ''),
                                         inspection=flag_inspection,
                                         record=flag_record,
                                         resume=flag_resume,
