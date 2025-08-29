@@ -39,7 +39,7 @@ body {
     <div class="card">
       <h1>Результат запроса</h1>
       <p>Название: <a href="{{encar_url}}" target="_blank"><strong>{{ full_name }}</strong></a></p>
-      <p>Категория: <strong>{{ category }}</strong></p>
+      {%if category%}<p>Категория: <strong>{{ category }}</strong></p>{%endif%}
       <p>Артикул (Encar): <strong>{{ encar_id }}</strong></p>
       <p>Коробка передач: <strong>{{ transmission }}</strong></p>
       <p>Пробег: <strong>{{ mileage }}</strong></p>
