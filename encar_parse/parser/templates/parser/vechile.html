@@ -91,7 +91,7 @@ body {
         <h2>Данные по происшествиям</h2>
           {% for number, accident in accidents %}
             <h3>Происшествие {{ number }}</h3>
-            <p>Тип происшествия: <strong>{{ accident.type_of_accident }}</strong></p>
+            <p>Тип происшествия: <strong>{{ accident.get_type_of_accident_display }}</strong></p>
             <p>Дата происшествия: <strong>{{ accident.date }}</strong></p>
             <p>Страховая выплата: <strong>{{ accident.insurance_benefit }}</strong></p>
             <p>Стоимость запчастей: <strong>{{ accident.part_cost }}</strong></p>
