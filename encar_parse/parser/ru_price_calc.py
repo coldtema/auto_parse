@@ -9,12 +9,6 @@ one_eur = 1614.69 #(kor w)
 
 class RuPriceCalc:
     def __init__(self):
-        self.one_eur = ...
-        self.customs_duty = 0
-        self.excise_tax = 0
-        self.recycling_fee = 0
-        self.customs_clearance_fee = 0
-        self.delivery_cost = 0
         self.currency_checker_url = 'https://www.cbr-xml-daily.ru/daily_json.js'
         self.currency_dict = dict()
         self.batch_size = 1000
@@ -26,9 +20,9 @@ class RuPriceCalc:
                     "Accept": "application/json, text/plain, */*",
         }
         self.batch = []
-        self.counter = 1
         self.current_vechile = None
         self.current_vechile_age = 0
+        self.current_vechile_ru_price = 0
 
 
     def run(self):
@@ -51,12 +45,12 @@ class RuPriceCalc:
             recycling_fee = self.get_recycling_fee_electro()
             customs_clearance_fee = self.get_customs_clearance_fee()
             nds_tax = self.get_nds_tax(excise_tax, price_customs_duty)
-            return self.get_final_price(price_customs_duty, excise_tax, recycling_fee, customs_clearance_fee, nds_tax)
+            return self.get_final_price(price_customs_duty, excise_tax, customs_clearance_fee, nds_tax), recycling_fee
         elif self.current_vechile.fuel_type in ['Дизель', 'Бензин', 'Дизель + Электро', 'Бензин + Электро']:
             price_customs_duty = self.get_customs_duty_gasoline()
             recycling_fee = self.get_recycling_fee_gasoline()
             customs_clearance_fee = self.get_customs_clearance_fee()
-            return self.get_final_price(price_customs_duty, recycling_fee, customs_clearance_fee)
+            return self.get_final_price(price_customs_duty, customs_clearance_fee), recycling_fee
         return None
 
 
@@ -71,19 +65,19 @@ class RuPriceCalc:
     def go_through_batch(self):
         for car in self.batch:
             self.current_vechile = car
-            car.ru_price = self.fuel_type_dispatcher()
-        self.counter += 1
+            car.customs_duty, car.recycling_fee = self.fuel_type_dispatcher()
+            car.ru_price = self.current_vechile_ru_price
 
 
     def get_customs_duty_electro(self):
-        vechile_price_in_rub = math.ceil(self.currency_dict['krw/rub'] * self.current_vechile.price * 10000)
-        return math.ceil(vechile_price_in_rub * 0.15)
+        self.current_vechile_ru_price = math.ceil(self.currency_dict['krw/rub'] * self.current_vechile.price * 10000 * 0.993)
+        return math.ceil(self.current_vechile_ru_price * 0.15)
 
 
 
     def get_customs_duty_gasoline(self):
-        vechile_price_in_rub = math.ceil(self.currency_dict['krw/rub'] * self.current_vechile.price * 10000)
-        vechile_price_in_eur = math.ceil(vechile_price_in_rub/self.currency_dict['eur/rub'])
+        self.current_vechile_ru_price = math.ceil(self.currency_dict['krw/rub'] * self.current_vechile.price * 10000 * 0.993)
+        vechile_price_in_eur = math.ceil(self.current_vechile_ru_price/self.currency_dict['eur/rub'])
         # print(f'Цена в вонах: {self.current_vechile.price * 10000}')
         # print(f'Цена в рублях: {vechile_price_in_rub}')
         # print(f'Цена в евро: {vechile_price_in_eur}')
@@ -132,13 +126,12 @@ class RuPriceCalc:
 
 
     def get_customs_clearance_fee(self):
-        vechile_price_in_rub = math.ceil(self.currency_dict['krw/rub'] * self.current_vechile.price * 10000)
         for key, value in customs_clearance_fee_dict.items():
-                if key[0] <= vechile_price_in_rub <= key[1]:
+                if key[0] <= self.current_vechile_ru_price <= key[1]:
                     return value
                 
     def get_nds_tax(self, excise_tax, price_customs_duty):
-        return math.ceil((math.ceil(self.currency_dict['krw/rub'] * self.current_vechile.price * 10000) + excise_tax + price_customs_duty) * 0.20)
+        return math.ceil((self.current_vechile_ru_price + excise_tax + price_customs_duty) * 0.20)
 
 
     def get_final_price(self, *args):
@@ -146,7 +139,7 @@ class RuPriceCalc:
 
 
     def save_to_db(self):
-        Car.objects.bulk_update(fields=['ru_price'], objs=self.batch)
+        Car.objects.bulk_update(fields=['ru_price', 'recycling_fee', 'customs_duty'], objs=self.batch)
         self.batch = []
 
 
