@@ -69,14 +69,14 @@ body {
 
       {%if diagnosis%}
         <h1>Сост. кузова:</h1>
-        <p>Передняя левая дверь: <strong>{{ diagnosis.left_front_door }}</strong></p>
-        <p>Задняя левая дверь: <strong>{{ diagnosis.left_back_door }}</strong></p>
-        <p>Крышка багажника: <strong>{{ diagnosis.trunk}}</strong></p>
-        <p>Задняя правая дверь: <strong>{{ diagnosis.right_back_door }}</strong></p>
-        <p>Передняя правая дверь: <strong>{{ diagnosis.right_front_door }}</strong></p>
-        <p>Капот: <strong>{{ diagnosis.hood }}</strong></p>
-        <p>Правое переднее крыло: <strong>{{ diagnosis.front_fender_right }}</strong></p>
-        <p>Левое переднее крыло: <strong>{{ diagnosis.front_fender_left }}</strong></p>
+        <p>Передняя левая дверь: <strong>{{ diagnosis.get_left_front_door_display }}</strong></p>
+        <p>Задняя левая дверь: <strong>{{ diagnosis.get_left_back_door_display }}</strong></p>
+        <p>Крышка багажника: <strong>{{ diagnosis.get_trunk_display}}</strong></p>
+        <p>Задняя правая дверь: <strong>{{ diagnosis.get_right_back_door_display }}</strong></p>
+        <p>Передняя правая дверь: <strong>{{ diagnosis.get_right_front_door_display }}</strong></p>
+        <p>Капот: <strong>{{ diagnosis.get_hood_display }}</strong></p>
+        <p>Правое переднее крыло: <strong>{{ diagnosis.get_front_fender_right_display }}</strong></p>
+        <p>Левое переднее крыло: <strong>{{ diagnosis.get_front_fender_left_display }}</strong></p>
       {%endif%}
 
 
