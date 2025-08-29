@@ -47,6 +47,8 @@ class Car(models.Model):
     options = models.CharField(max_length=1024, null=True, blank=True)
     price = models.BigIntegerField()
     ru_price = models.IntegerField(null=True, blank=True)
+    customs_duty = models.IntegerField(null=True, blank=True)
+    recycling_fee = models.IntegerField(null=True, blank=True)
     sell_type = models.CharField(max_length=128)
     updated = models.DateTimeField()
     city = models.CharField(max_length=128)
