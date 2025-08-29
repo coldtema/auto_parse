@@ -14,8 +14,15 @@ class FuelType(models.TextChoices):
 
 
 class Condition(models.TextChoices):
-    NORMAL = 'N', 'НОРМ.'
-    REPLACEMENT = 'R', 'ЗАМЕНА'
+    NORMAL = 'NORMAL', 'НОРМ.'
+    REPLACEMENT = 'REPLACEMENT', 'ЗАМЕНА'
+
+
+class AccidentType(models.TextChoices):
+    TYPE1 = '1', 'Урегулировано страховой владельца данного авто'
+    TYPE2 = '2', 'Возмещение за счет страховой виновника'
+    TYPE3 = '3', 'С ущербом чужому здоровью или имуществу'
+
 
 
 class Car(models.Model):
