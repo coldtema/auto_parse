@@ -7,9 +7,17 @@ from .record_parser import AsyncCarRecordParser
 from .ru_price_calc import RuPriceCalc
 from .forms import CarArtikulForm
 from .models import Car, Truck, CarOption, TruckOption, OptionCategory
+import time
 
+def time_count(func):
+    def wrapper(*args, **kwargs):
+        start = time.time()
+        f = func(*args, **kwargs)
+        print(f'{time.time()-start} сек')
+        return f
+    return wrapper
 
-
+@time_count
 def car(request):
     c_p = CarParser()
     c_p.run()
@@ -28,21 +36,21 @@ def car(request):
     del c_p
     return HttpResponse('oks')
 
-
+@time_count
 def truck(request):
     t_p = TruckParser()
     t_p.run()
     del t_p
     return HttpResponse('oks')
 
-
+@time_count
 def async_truck(request):
     t_p = AsyncTruckParser()
     t_p.run()
     del t_p
     return HttpResponse('oks')
 
-
+@time_count
 def async_car(request):
     # c_p = AsyncCarParser()
     # c_p.run()
@@ -52,20 +60,21 @@ def async_car(request):
     del d_c
     return HttpResponse('oks')
 
-
+@time_count
 def diag_car(request):
     c_p = AsyncCarDiagParser()
     c_p.run()
     del c_p
     return HttpResponse('oks')
 
-
+@time_count
 def record_car(request):
     c_p = AsyncCarRecordParser()
     c_p.run()
     del c_p
     return HttpResponse('oks')
 
+@time_count
 def ru_price(request):
     c_p = RuPriceCalc()
     c_p.run()
@@ -88,7 +97,7 @@ def index(request):
         form = CarArtikulForm()
     return render(request, 'parser/index.html', {'form': form})
 
-
+@time_count
 def vechile(request):
     photo_url_params = '?impolicy=heightRate&rh=696&cw=1160&ch=696&cg=Center&wtmk=https://ci.encar.com/wt_mark/w_mark_04.png'
     artikul = request.GET.get('artikul')
@@ -152,7 +161,9 @@ def vechile(request):
                                                                    'kind': 'CAR',
                                                                    'transmission': car.transmission,
                                                                    'mileage': f'{car.mileage} км',
-                                                                   'price': f'{car.price/100} млн Вон',
+                                                                   'ru_price': f'{car.ru_price} ₽',
+                                                                   'customs_duty': f'{car.customs_duty} ₽',
+                                                                   'recycling_fee': f'{car.recycling_fee} ₽',
                                                                    'fuel_type': car.fuel_type,
                                                                    'model_year': car.model_year,
                                                                    'color': car.color,
@@ -161,7 +172,8 @@ def vechile(request):
                                                                    'release_date': f'{str(car.release_date)[4:]}.{str(car.release_date)[:-2]}',
                                                                    'diagnosis': diagnosis,
                                                                    'record': record,
-                                                                   'accidents': accidents
+                                                                   'accidents': accidents,
+                                                                   'final_price': f'{car.recycling_fee + car.customs_duty + car.ru_price + 95000 + 20000} ₽',
                                                                    })
         return render(request, 'parser/vechile.html')
     return render(request, 'parser/vechile.html')
