@@ -14,8 +14,8 @@ class FuelType(models.TextChoices):
 
 
 class Condition(models.TextChoices):
-    NORMAL = 'NORMAL', 'НОРМ.'
-    REPLACEMENT = 'REPLACEMENT', 'ЗАМЕНА'
+    NORMAL = 'N', 'НОРМ.'
+    REPLACEMENT = 'R', 'ЗАМЕНА'
 
 
 class Car(models.Model):
