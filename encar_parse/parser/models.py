@@ -28,8 +28,6 @@ class AccidentType(models.TextChoices):
 class Car(models.Model):
     encar_id = models.BigIntegerField(verbose_name='Внутреннее id encar', unique=True)
     url = models.URLField()
-    category = models.CharField(max_length=1)
-    trust_service = models.CharField(max_length=50)
     inspection = models.BooleanField(default=False)
     record = models.BooleanField(default=False)
     resume = models.BooleanField(default=False)
@@ -132,7 +130,7 @@ class CarRecord(models.Model):
 
 
 class Accident(models.Model):
-    type_of_accident = models.CharField(max_length=256)
+    type_of_accident = models.CharField(max_length=1, choices=AccidentType.choices)
     date = models.DateField()
     insurance_benefit = models.IntegerField(default=0)
     part_cost = models.IntegerField(default=0)
