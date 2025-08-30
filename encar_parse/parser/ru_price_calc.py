@@ -23,6 +23,7 @@ class RuPriceCalc:
         self.current_vechile = None
         self.current_vechile_age = 0
         self.current_vechile_ru_price = 0
+        self.price_shift = 0.989
 
 
     def run(self):
@@ -70,13 +71,13 @@ class RuPriceCalc:
 
 
     def get_customs_duty_electro(self):
-        self.current_vechile_ru_price = math.ceil(self.currency_dict['krw/rub'] * self.current_vechile.price * 10000 * 0.993)
+        self.current_vechile_ru_price = math.ceil(self.currency_dict['krw/rub'] * self.current_vechile.price * 10000 * self.price_shift)
         return math.ceil(self.current_vechile_ru_price * 0.15)
 
 
 
     def get_customs_duty_gasoline(self):
-        self.current_vechile_ru_price = math.ceil(self.currency_dict['krw/rub'] * self.current_vechile.price * 10000 * 0.993)
+        self.current_vechile_ru_price = math.ceil(self.currency_dict['krw/rub'] * self.current_vechile.price * 10000 * self.price_shift)
         vechile_price_in_eur = math.ceil(self.current_vechile_ru_price/self.currency_dict['eur/rub'])
         # print(f'Цена в вонах: {self.current_vechile.price * 10000}')
         # print(f'Цена в рублях: {vechile_price_in_rub}')
