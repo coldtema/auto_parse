@@ -43,12 +43,15 @@ body {
       <p>Артикул (Encar): <strong>{{ encar_id }}</strong></p>
       <p>Коробка передач: <strong>{{ transmission }}</strong></p>
       <p>Пробег: <strong>{{ mileage }}</strong></p>
-      <p>Цена: <strong>{{ price }}</strong></p>
       <p>Тип двигателя: <strong>{{ fuel_type }}</strong></p>
       <p>Дата выпуска: <strong>{{ release_date }}</strong></p>
       <p>Модельный год: <strong>{{ model_year }}</strong></p>
       <p>Цвет: <strong>{{ color }}</strong></p>
       <p>Объем двигателя: <strong>{{ engine_capacity }}</strong></p>
+      <p>Цена в Корее: <strong>{{ ru_price }}</strong></p>
+      <p>Таможенные платежи: <strong>{{ customs_duty }}</strong></p>
+      <p>Утильсбор: <strong>{{ recycling_fee }}</strong></p>
+      <p>Цена под ключ до Владивостока: <strong>{{ final_price }}</strong></p>
 
       {% for category in all_options_list %}
         <h2>{{category.name}}</h2>
