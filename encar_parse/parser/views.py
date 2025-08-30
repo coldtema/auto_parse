@@ -1,10 +1,4 @@
 from django.shortcuts import render
-from django.http import HttpResponse
-from parser.raw_parser import CarParser, TruckParser
-from parser.async_parser import AsyncCarParser, AsyncTruckParser, DuplicateClearer
-from .diag_parser import AsyncCarDiagParser
-from .record_parser import AsyncCarRecordParser
-from .ru_price_calc import RuPriceCalc
 from .forms import CarArtikulForm
 from .models import Car, Truck, CarOption, TruckOption, OptionCategory
 import time
@@ -16,70 +10,6 @@ def time_count(func):
         print(f'{time.time()-start} сек')
         return f
     return wrapper
-
-@time_count
-def car(request):
-    c_p = CarParser()
-    c_p.run()
-    del c_p
-    c_p = AsyncCarParser()
-    c_p.run()
-    del c_p
-    d_c = DuplicateClearer()
-    d_c.go_through_unique_dummy_ids()
-    del d_c
-    c_p = AsyncCarDiagParser()
-    c_p.run()
-    del c_p
-    c_p = AsyncCarRecordParser()
-    c_p.run()
-    del c_p
-    return HttpResponse('oks')
-
-@time_count
-def truck(request):
-    t_p = TruckParser()
-    t_p.run()
-    del t_p
-    return HttpResponse('oks')
-
-@time_count
-def async_truck(request):
-    t_p = AsyncTruckParser()
-    t_p.run()
-    del t_p
-    return HttpResponse('oks')
-
-@time_count
-def async_car(request):
-    # c_p = AsyncCarParser()
-    # c_p.run()
-    # del c_p
-    d_c = DuplicateClearer()
-    d_c.go_through_unique_dummy_ids()
-    del d_c
-    return HttpResponse('oks')
-
-@time_count
-def diag_car(request):
-    c_p = AsyncCarDiagParser()
-    c_p.run()
-    del c_p
-    return HttpResponse('oks')
-
-@time_count
-def record_car(request):
-    c_p = AsyncCarRecordParser()
-    c_p.run()
-    del c_p
-    return HttpResponse('oks')
-
-@time_count
-def ru_price(request):
-    c_p = RuPriceCalc()
-    c_p.run()
-    del c_p
-    return HttpResponse('oks')
 
 
 def index(request):
@@ -104,6 +34,11 @@ def vechile(request):
     kind = request.GET.get('kind')
     if artikul.isdigit():
         if kind == 'truck':
+            try:
+                truck = Truck.objects.get(encar_id=artikul)
+            except:
+                print('Ищет по dummy')
+                truck = Truck.objects.get(dummy_id=artikul)
             all_truck_options = OptionCategory.objects.filter(vechile='TRUCK').prefetch_related('truckoption_set')
             current_truck_options = list(map(lambda x: TruckOption.objects.get(encar_id=x).id, eval(truck.options)))
             photo_list = []
@@ -173,7 +108,7 @@ def vechile(request):
                                                                    'diagnosis': diagnosis,
                                                                    'record': record,
                                                                    'accidents': accidents,
-                                                                   'final_price': f'{car.recycling_fee + car.customs_duty + car.ru_price + 95000 + 20000} ₽',
+                                                                   'final_price': f'{car.recycling_fee + car.customs_duty + car.ru_price + 95000 + 20000 + 97000} ₽',
                                                                    })
         return render(request, 'parser/vechile.html')
     return render(request, 'parser/vechile.html')
