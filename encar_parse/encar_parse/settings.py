@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 from dotenv import load_dotenv
 import os
+from datetime import timedelta
 
 
 load_dotenv()
@@ -43,7 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'parser.apps.ParserConfig',
-    'django_extensions'
+    'django_extensions',
+    'django_celery_results',
 
 ]
 
@@ -128,3 +130,22 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
+# CELERY_BROKER_URL = 'redis://redis:6379/0' 
+# CELERY_RESULT_BACKEND = 'redis://localhost:6379/0' #'django-db'
+# CELERY_ACCEPT_CONTENT = ['json']
+# CELERY_TASK_SERIALIZER = 'json'
+# CELERY_RESULT_EXTENDED = True
+# CELERY_BEAT_SCHEDULE = {
+#     #wb_checker
+#     'thirty_mins_update_single_prods_plus_make_notif':{
+#         'task': 'apps.wb_checker.tasks.update_single_prods_plus_make_notif',
+#         'schedule': 1800,
+#         },
+#     'one_day_update_menu_categories':{
+#         'task': 'apps.wb_checker.tasks.update_menu_categories',
+#         'schedule': timedelta(hours=24),
+#         },
+# }
