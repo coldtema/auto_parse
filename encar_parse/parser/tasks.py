@@ -101,7 +101,7 @@ def main_task_car():
 def easy_task_car():
     '''Удаляет неактуальные объявления + пересчитывает таможенные сборы и ру цену (раз в час)'''
     chain(
-        delete_not_avaliable(),
+        delete_not_avaliable.si(),
         count_duties_and_ru_price.si(),
     )()
     return True
