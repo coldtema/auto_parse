@@ -138,14 +138,13 @@ CELERY_RESULT_BACKEND = 'redis://localhost:6379/0' #'django-db'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_EXTENDED = True
-# CELERY_BEAT_SCHEDULE = {
-#     #wb_checker
-#     'thirty_mins_update_single_prods_plus_make_notif':{
-#         'task': 'apps.wb_checker.tasks.update_single_prods_plus_make_notif',
-#         'schedule': 1800,
-#         },
-#     'one_day_update_menu_categories':{
-#         'task': 'apps.wb_checker.tasks.update_menu_categories',
-#         'schedule': timedelta(hours=24),
-#         },
-# }
+CELERY_BEAT_SCHEDULE = {
+    'one_hour_easy_task_car':{
+        'task': 'parser.tasks.easy_task_car',
+        'schedule': timedelta(hours=1),
+        },
+    'three_hours_main_task_car':{
+        'task': 'parser.tasks.main_task_car',
+        'schedule': timedelta(hours=3),
+        },
+}
