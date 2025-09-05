@@ -32,7 +32,7 @@ def vechile(request):
     photo_url_params = '?impolicy=heightRate&rh=696&cw=1160&ch=696&cg=Center&wtmk=https://ci.encar.com/wt_mark/w_mark_04.png'
     artikul = request.GET.get('artikul')
     kind = request.GET.get('kind')
-    if artikul.isdigit():
+    if artikul.isdigit(): 
         if kind == 'truck':
             try:
                 truck = Truck.objects.get(encar_id=artikul)
