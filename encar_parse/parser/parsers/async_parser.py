@@ -258,3 +258,38 @@ class AsyncTruckParser():
             self.updated_batch.append(truck_to_update)
         Truck.objects.bulk_update(fields=['horse_power', 'engine_capacity', 'color', 'options', 'korean_number', 'photos_codes'], objs=self.updated_batch)
         self.results = []
+
+
+
+class TruckDuplicateClearer():
+    def __init__(self):
+        self.unique_dummy_ids = self.get_unique_dummy_ids()
+        self.all_cars = Truck.objects.all().values('dummy_id', 'encar_id')
+        self.encar_ids_to_delete = []
+
+
+    def go_through_unique_dummy_ids(self):
+        for dummy_id in self.unique_dummy_ids:
+            duplicates = self.all_cars.filter(dummy_id=dummy_id).values('encar_id')
+            if len(duplicates) != 1 and duplicates[0]['encar_id'] == dummy_id:
+                self.encar_ids_to_delete.append(duplicates[0]['encar_id'])
+            elif len(duplicates) != 1 and duplicates[1]['encar_id'] == dummy_id:
+                self.encar_ids_to_delete.append(duplicates[1]['encar_id'])
+        for i in range(math.ceil(len(self.encar_ids_to_delete) / 1000)):
+            Truck.objects.filter(encar_id__in=self.encar_ids_to_delete[i*1000:(i+1)*1000]).delete()
+        Truck.objects.filter(manufacturer__in=['Others', 'etc']).delete() #удаление неизвестных encar'u машин (others-others-others)
+        Truck.objects.filter(engine_capacity__lt=900, fuel_type__in=['Бензин', 'Дизель']).delete()
+        Truck.objects.filter(engine_capacity__gt=9999).delete()
+        Truck.objects.filter(fuel_type__in=["Пропан-бутан (Газ)",
+                                          'Метан (Газ)',
+                                          'Другое']).delete()
+
+
+
+    def get_unique_dummy_ids(self):
+        c = Truck.objects.all().values('dummy_id')
+        set1 = set()
+        for elem in c:
+            set1.add(elem['dummy_id'])
+        print(len(set1))
+        return list(set1)
