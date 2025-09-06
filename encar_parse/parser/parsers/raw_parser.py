@@ -197,8 +197,6 @@ class TruckParser():
                 ru_capacity = f'{elem.get('Capacity', '')[:-1]}т.'
             self.new_elems.append(Truck(encar_id=elem['Id'],
                                         url=f'https://fem.encar.com/cars/detail/{elem['Id']}',
-                                        category=elem.get('Separation', ''),
-                                        trust_service=elem.get('Trust', ''),
                                         inspection=flag_inspection,
                                         record=flag_record,
                                         resume=flag_resume,
