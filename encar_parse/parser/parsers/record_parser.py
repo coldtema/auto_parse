@@ -1,6 +1,6 @@
 import requests
 import math
-from ..models import Car, CarRecord, Accident
+from ..models import Car, CarRecord, CarAccident
 import asyncio
 import aiohttp
 from django.db import transaction
@@ -94,7 +94,7 @@ class AsyncCarRecordParser():
                                 driver_accident_count = result['driver_accident_count'],
                                 car=car_to_update)
                 for accident in result['accidents']:
-                    accidents.append(Accident(
+                    accidents.append(CarAccident(
                         type_of_accident = accident['type'],
                         date = accident['date'],
                         insurance_benefit = accident['insuranceBenefit'],
@@ -103,5 +103,5 @@ class AsyncCarRecordParser():
                         painting_cost = accident['paintingCost'],
                         car_record = car_record,
                     ))
-        Accident.objects.bulk_create(accidents)
+        CarAccident.objects.bulk_create(accidents)
         self.results = []
