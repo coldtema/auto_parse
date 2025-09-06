@@ -39,9 +39,19 @@ def get_full_truck_info():
     return True
 
 
+@shared_task
 def delete_fake_cars():
     '''Удаляем машины не для продажи в рф + дубли'''
-    p = async_parser.DuplicateClearer()
+    p = async_parser.CarDuplicateClearer()
+    p.go_through_unique_dummy_ids()
+    del p
+    return True
+
+
+@shared_task
+def delete_fake_trucks():
+    '''Удаляем траки не для продажи в рф + дубли'''
+    p = async_parser.TruckDuplicateClearer()
     p.go_through_unique_dummy_ids()
     del p
     return True
@@ -51,6 +61,15 @@ def delete_fake_cars():
 def get_car_diagnosis():
     '''Собираем инфу о состоянии кузова всех машин'''
     p = diag_parser.AsyncCarDiagParser()
+    p.run()
+    del p
+    return True
+
+
+@shared_task
+def get_truck_diagnosis():
+    '''Собираем инфу о состоянии кузова всех траков'''
+    p = diag_parser.AsyncTruckDiagParser()
     p.run()
     del p
     return True
@@ -75,9 +94,18 @@ def count_duties_and_ru_price():
 
 
 @shared_task
-def delete_not_avaliable():
-    '''Удаление неактуальных объявлений'''
+def delete_not_avaliable_cars():
+    '''Удаление неактуальных объявлений машин'''
     p = async_clearer.AsyncCarClearer()
+    p.run()
+    del p
+    return True
+
+
+@shared_task
+def delete_not_avaliable_trucks():
+    '''Удаление неактуальных объявлений траков'''
+    p = async_clearer.AsyncTruckClearer()
     p.run()
     del p
     return True
@@ -99,9 +127,30 @@ def main_task_car():
 
 @shared_task
 def easy_task_car():
-    '''Удаляет неактуальные объявления + пересчитывает таможенные сборы и ру цену (раз в час)'''
+    '''Удаляет неактуальные объявления + пересчитывает таможенные сборы и ру цену (раз в час)у легковых машин'''
     chain(
-        delete_not_avaliable.si(),
+        delete_not_avaliable_cars.si(),
         count_duties_and_ru_price.si(),
+    )()
+    return True
+
+
+@shared_task
+def main_task_truck():
+    '''Полностью добавляет новые траки со всей подробной инфой в бд (раз в 3 часа)'''
+    chain(
+        get_raw_truck_info.si(),
+        get_full_truck_info.si(),
+        delete_fake_trucks.si(),
+        get_truck_diagnosis.si(),
+    )()
+    return True
+
+
+@shared_task
+def easy_task_truck():
+    '''Удаляет неактуальные объявления (раз в час) у траков'''
+    chain(
+        delete_not_avaliable_trucks.si(),
     )()
     return True
