@@ -57,7 +57,7 @@ class Car(models.Model):
     encar_diag = models.IntegerField(null=True, blank=True) # -1 - нет, 1 - да
 
 
-class Diagnosis(models.Model):
+class CarDiagnosis(models.Model):
     left_front_door = models.CharField(max_length=16, choices=Condition.choices)
     left_back_door = models.CharField(max_length=16, choices=Condition.choices)
     right_front_door = models.CharField(max_length=16, choices=Condition.choices)
@@ -72,8 +72,6 @@ class Diagnosis(models.Model):
 class Truck(models.Model):
     encar_id = models.BigIntegerField(verbose_name='Внутреннее id encar', unique=True)
     url = models.URLField()
-    category = models.CharField(max_length=1)
-    trust_service = models.CharField(max_length=50)
     inspection = models.BooleanField(default=False)
     record = models.BooleanField(default=False)
     resume = models.BooleanField(default=False)
@@ -100,6 +98,19 @@ class Truck(models.Model):
     korean_number = models.CharField(max_length=32, null=True, blank=True)
     dummy_id = models.IntegerField(null=True, blank=True, db_index=True)
     encar_diag = models.IntegerField(null=True, blank=True) # -1 - нет, 1 - да
+
+
+
+class TruckDiagnosis(models.Model):
+    left_front_door = models.CharField(max_length=16, choices=Condition.choices)
+    left_back_door = models.CharField(max_length=16, choices=Condition.choices)
+    right_front_door = models.CharField(max_length=16, choices=Condition.choices)
+    right_back_door = models.CharField(max_length=16, choices=Condition.choices)
+    trunk = models.CharField(max_length=16, choices=Condition.choices)
+    hood = models.CharField(max_length=16, choices=Condition.choices)
+    front_fender_right = models.CharField(max_length=16, choices=Condition.choices)
+    front_fender_left = models.CharField(max_length=16, choices=Condition.choices)
+    car = models.OneToOneField(Truck, on_delete=models.CASCADE, null=True, blank=True, related_name='diagnosis')
 
 class Vechile(models.TextChoices):
     CAR = 'CAR', 'CAR'
@@ -133,7 +144,7 @@ class CarRecord(models.Model):
     car = models.OneToOneField(Car, on_delete=models.CASCADE, related_name='car_record')
 
 
-class Accident(models.Model):
+class CarAccident(models.Model):
     type_of_accident = models.CharField(max_length=1, choices=AccidentType.choices)
     date = models.DateField()
     insurance_benefit = models.IntegerField(default=0)
