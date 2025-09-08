@@ -227,24 +227,27 @@ class AsyncTruckParser():
     
 
     async def fetch(self, session, url):
-        async with session.get(url, timeout=10) as response:
-            response = await response.json()
-            photos_codes = list(map(lambda x: x['path'][-7:-4], response['photos']))
-            if response['manage']['dummy'] == True: dummy_id = response['vehicleId']
-            else: dummy_id = int(url.split('/')[-1])
-            detail_dict = {
-                'encar_id': int(url.split('/')[-1]),
-                'options': response['options']['standard'],
-                'color': response['spec']['colorName'],
-                'engine_capacity': response['spec']['displacement'],
-                'photos_codes': str(photos_codes),
-                'horse_power': response['spec']['horsePower'],
-                'korean_number': response['vehicleNo'],
-                'dummy_id': dummy_id,
-                'encar_diag': response['view']['encarDiagnosis'],
-                
-            }
-            return detail_dict
+        try:
+            async with session.get(url, timeout=10) as response:
+                response = await response.json()
+                photos_codes = list(map(lambda x: x['path'][-7:-4], response['photos']))
+                if response['manage']['dummy'] == True: dummy_id = response['vehicleId']
+                else: dummy_id = int(url.split('/')[-1])
+                detail_dict = {
+                    'encar_id': int(url.split('/')[-1]),
+                    'options': response['options']['standard'],
+                    'color': response['spec']['colorName'],
+                    'engine_capacity': response['spec']['displacement'],
+                    'photos_codes': str(photos_codes),
+                    'horse_power': response['spec']['horsePower'],
+                    'korean_number': response['vehicleNo'],
+                    'dummy_id': dummy_id,
+                    'encar_diag': response['view']['encarDiagnosis'],
+                    
+                }
+                return detail_dict
+        except:
+            return None
 
 
     async def get_info(self, batch):
@@ -261,17 +264,20 @@ class AsyncTruckParser():
     def save_to_db(self):
         self.updated_batch = []
         for result in self.results:
-            truck_to_update = self.batch.get(encar_id=result['encar_id'])
-            truck_to_update.options = result['options']
-            truck_to_update.color = car_korean_dict['COLOR'].get(result['color'], result['color'])
-            truck_to_update.engine_capacity = result['engine_capacity']
-            truck_to_update.photos_codes = result['photos_codes']
-            truck_to_update.horse_power = result['horse_power']
-            truck_to_update.korean_number = result['korean_number']
-            truck_to_update.encar_id = result['encar_id']
-            truck_to_update.encar_diag = result['encar_diag']
-            truck_to_update.dummy_id = result['dummy_id']
-            self.updated_batch.append(truck_to_update)
+            if result:
+                truck_to_update = self.batch.get(encar_id=result['encar_id'])
+                truck_to_update.options = result['options']
+                truck_to_update.color = car_korean_dict['COLOR'].get(result['color'], result['color'])
+                truck_to_update.engine_capacity = result['engine_capacity']
+                truck_to_update.photos_codes = result['photos_codes']
+                truck_to_update.horse_power = result['horse_power']
+                truck_to_update.korean_number = result['korean_number']
+                truck_to_update.encar_id = result['encar_id']
+                truck_to_update.encar_diag = result['encar_diag']
+                truck_to_update.dummy_id = result['dummy_id']
+                self.updated_batch.append(truck_to_update)
+            else:
+                print('нет машины')
         Truck.objects.bulk_update(fields=['encar_id', 'encar_diag', 'dummy_id', 'horse_power', 'engine_capacity', 'color', 'options', 'korean_number', 'photos_codes'], objs=self.updated_batch)
         self.results = []
 
