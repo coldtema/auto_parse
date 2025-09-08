@@ -20,7 +20,7 @@ class AsyncCarClearer():
         self.session = requests.Session()
         self.encar_api_url = 'https://api.encar.com/v1/readside/vehicle/'
         self.car_count = Car.objects.all().count()
-        self.encar_ids = Car.objects.all().values('encar_id')
+        self.encar_ids = list(map(lambda x: x['encar_id'], Car.objects.all().values('encar_id')))
         self.headers = {
                     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
                     "Referer": "https://www.encar.com/",
@@ -98,7 +98,7 @@ class AsyncTruckClearer():
         self.session = requests.Session()
         self.encar_api_url = 'https://api.encar.com/v1/readside/vehicle/'
         self.car_count = Truck.objects.all().count()
-        self.encar_ids = Truck.objects.all().values('encar_id')
+        self.encar_ids = list(map(lambda x: x['encar_id'], Truck.objects.all().values('encar_id')))
         self.headers = {
                     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
                     "Referer": "https://www.encar.com/",
