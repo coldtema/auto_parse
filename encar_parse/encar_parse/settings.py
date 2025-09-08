@@ -31,7 +31,7 @@ SECRET_KEY = os.getenv('SECRET_KEY_PROJ')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = [] #['....ru', 'www.....ru']
+ALLOWED_HOSTS = ['undergroundstarcar.online', 'www.undergroundstarcar.online']
 
 
 # Application definition
@@ -96,7 +96,7 @@ DATABASES = {
         'NAME': os.getenv('DB_NAME'),
         'USER': os.getenv('DB_USER'),
         'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': 'localhost',
+        'HOST': 'db',
         'PORT': '5432',
     }
 }
@@ -174,4 +174,4 @@ SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 USE_X_FORWARDED_HOST = True
-CSRF_TRUSTED_ORIGINS = ['https:/.ru', 'https://www..ru']
+CSRF_TRUSTED_ORIGINS = ['https://undergroundstarcar.online', 'https://www.undergroundstarcar.online']
