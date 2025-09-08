@@ -1,6 +1,7 @@
 import requests
 import math
 from ..models import Car, Truck
+from parser import cookie_grabber
 
 diagnosis = 'https://api.encar.com/v1/readside/diagnosis/vehicle/40286929'
 
@@ -222,7 +223,14 @@ class TruckParser():
         self.session.get("https://www.encar.com", headers=self.headers) 
 
     def get_number_of_results(self): #он может найти больше 23 тысяч результатов, но в query никогда их не выдаст, потолок - 10000
-        return self.session.get(''.join(self.current_api_url_list), headers=self.headers).json()['Count']
+        try:
+            number_of_cars = self.session.get(''.join(self.current_api_url_list), headers=self.headers).json()['Count']
+        except:
+            cookies = cookie_grabber.get_new_encar_cookies()
+            for c in cookies:
+                self.session.cookies.set(c['name'], c['value'])
+            number_of_cars = self.session.get(''.join(self.current_api_url_list), headers=self.headers).json()['Count']
+        return number_of_cars
 
     def save_to_db(self):
         Truck.objects.bulk_create(self.new_elems, ignore_conflicts=True)
