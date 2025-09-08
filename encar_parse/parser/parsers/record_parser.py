@@ -66,7 +66,6 @@ class AsyncCarRecordParser():
                 record_dict['accidents'] = response['accidents']
                 return record_dict
         except:
-            print(url)
             return None
 
 
@@ -103,5 +102,7 @@ class AsyncCarRecordParser():
                         painting_cost = accident['paintingCost'],
                         car_record = car_record,
                     ))
+            else:
+                print('нет машины')
         CarAccident.objects.bulk_create(accidents)
         self.results = []
