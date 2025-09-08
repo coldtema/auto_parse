@@ -5,6 +5,7 @@ services:
       sh -c "python manage.py migrate &&
              gunicorn encar_parse.wsgi:application --bind 0.0.0.0:8000 --workers 3"
     volumes:
+      - .:/code 
       - static:/code/staticfiles
     ports:
       - "9002:8000"
