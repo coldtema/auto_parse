@@ -270,6 +270,7 @@ truck_korean_dict = {
         "르노삼성": "Renault Samsung"
     },
     'MODELS': {
+        "마이티 ": "Mighty",
         "유로카고": "Eurocargo",
         "엘프": "Elf",
         "바인스버그": "Weinsberg",
@@ -378,6 +379,12 @@ truck_korean_dict = {
         "익스프레스밴": "Express Van"
     },
     'VERSIONS': {
+        '표준형 DLX 15인승': 'Standard DLX 15-seater',
+        '휠체어 리프 트': 'Wheelchair Lift',
+        '디젤 39인승': 'Diesel 39-seater',
+        '롱바디 GOLD 25인승 ': 'Long Body GOLD 25-seater',
+        '롱바디 GOLD 21인승': 'Long Body GOLD 21-seater',
+        '터보 일반캡 ': 'Turbo Standard Cab',
         "090 25인승": "090 25-seater",
         "럭셔리": "Luxury",
         "롱바디 GOLD 25인승": "Long Body GOLD 25-seater",
@@ -588,6 +595,7 @@ truck_korean_dict = {
     },
 
     'VERSION_DETAILS' : {
+        'LPG/LNG탱크로리': 'Цистерна для LPG/LNG',
         "음식물수거": "Мусоровоз для пищевых отходов",
         "특수/케미컬(VOC,테플론)탱크로리": "Спецтехника / химический (VOC, тефлон) танкер",
         "오가크레인": "Автокран (O.G.A. кран)",
