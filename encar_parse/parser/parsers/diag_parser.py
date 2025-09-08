@@ -56,14 +56,17 @@ class AsyncCarDiagParser():
     
 
     async def fetch(self, session, url):
-        async with session.get(url, timeout=10) as response:
-            response = await response.json()
-            items = response['items']
-            diag_dict = dict()
-            for item in items:
-                diag_dict.setdefault(item['name'], item['resultCode'])
-            diag_dict['dummy_id'] = response['vehicleId']
-            return diag_dict
+        try:
+            async with session.get(url, timeout=10) as response:
+                response = await response.json()
+                items = response['items']
+                diag_dict = dict()
+                for item in items:
+                    diag_dict.setdefault(item['name'], item['resultCode'])
+                diag_dict['dummy_id'] = response['vehicleId']
+                return diag_dict
+        except:
+            return None
 
 
     async def get_info(self, batch):
@@ -80,17 +83,20 @@ class AsyncCarDiagParser():
     def save_to_db(self):
         self.updated_batch = []
         for result in self.results:
-            car_to_update = self.batch.get(dummy_id=result['dummy_id'])
-            self.updated_batch.append(CarDiagnosis(
-                left_front_door=result['FRONT_DOOR_LEFT'],
-                left_back_door=result['BACK_DOOR_LEFT'],
-                right_front_door=result['FRONT_DOOR_RIGHT'],
-                right_back_door=result['BACK_DOOR_RIGHT'],
-                trunk=result['TRUNK_LID'],
-                hood=result['HOOD'],
-                front_fender_right=result['FRONT_FENDER_RIGHT'],
-                front_fender_left=result['FRONT_FENDER_LEFT'],
-                car=car_to_update))
+            if result:
+                car_to_update = self.batch.get(dummy_id=result['dummy_id'])
+                self.updated_batch.append(CarDiagnosis(
+                    left_front_door=result['FRONT_DOOR_LEFT'],
+                    left_back_door=result['BACK_DOOR_LEFT'],
+                    right_front_door=result['FRONT_DOOR_RIGHT'],
+                    right_back_door=result['BACK_DOOR_RIGHT'],
+                    trunk=result['TRUNK_LID'],
+                    hood=result['HOOD'],
+                    front_fender_right=result['FRONT_FENDER_RIGHT'],
+                    front_fender_left=result['FRONT_FENDER_LEFT'],
+                    car=car_to_update))
+            else:
+                print('нет машины')
         CarDiagnosis.objects.bulk_create(self.updated_batch)
         self.results = []
 
@@ -138,14 +144,17 @@ class AsyncTruckDiagParser():
     
 
     async def fetch(self, session, url):
-        async with session.get(url, timeout=10) as response:
-            response = await response.json()
-            items = response['items']
-            diag_dict = dict()
-            for item in items:
-                diag_dict.setdefault(item['name'], item['resultCode'])
-            diag_dict['dummy_id'] = response['vehicleId']
-            return diag_dict
+        try:
+            async with session.get(url, timeout=10) as response:
+                response = await response.json()
+                items = response['items']
+                diag_dict = dict()
+                for item in items:
+                    diag_dict.setdefault(item['name'], item['resultCode'])
+                diag_dict['dummy_id'] = response['vehicleId']
+                return diag_dict
+        except:
+            return None
 
 
     async def get_info(self, batch):
@@ -162,16 +171,19 @@ class AsyncTruckDiagParser():
     def save_to_db(self):
         self.updated_batch = []
         for result in self.results:
-            car_to_update = self.batch.get(dummy_id=result['dummy_id'])
-            self.updated_batch.append(TruckDiagnosis(
-                left_front_door=result['FRONT_DOOR_LEFT'],
-                left_back_door=result['BACK_DOOR_LEFT'],
-                right_front_door=result['FRONT_DOOR_RIGHT'],
-                right_back_door=result['BACK_DOOR_RIGHT'],
-                trunk=result['TRUNK_LID'],
-                hood=result['HOOD'],
-                front_fender_right=result['FRONT_FENDER_RIGHT'],
-                front_fender_left=result['FRONT_FENDER_LEFT'],
-                car=car_to_update))
+            if result:
+                car_to_update = self.batch.get(dummy_id=result['dummy_id'])
+                self.updated_batch.append(TruckDiagnosis(
+                    left_front_door=result['FRONT_DOOR_LEFT'],
+                    left_back_door=result['BACK_DOOR_LEFT'],
+                    right_front_door=result['FRONT_DOOR_RIGHT'],
+                    right_back_door=result['BACK_DOOR_RIGHT'],
+                    trunk=result['TRUNK_LID'],
+                    hood=result['HOOD'],
+                    front_fender_right=result['FRONT_FENDER_RIGHT'],
+                    front_fender_left=result['FRONT_FENDER_LEFT'],
+                    car=car_to_update))
+            else:
+                print('нет машины')
         TruckDiagnosis.objects.bulk_create(self.updated_batch)
         self.results = []
