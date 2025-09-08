@@ -57,26 +57,29 @@ class AsyncCarParser():
     
 
     async def fetch(self, session, url):
-        async with session.get(url, timeout=10) as response:
-            response = await response.json()
-            photos_codes = list(map(lambda x: x['path'][-7:-4], response['photos']))
-            if response['manage']['dummy'] == True: dummy_id = response['vehicleId']
-            else: dummy_id = int(url.split('/')[-1])
-            detail_dict = {
-                'encar_id': int(url.split('/')[-1]), 
-                'manufacturer': response['category']['manufacturerEnglishName'],
-                'model': response['category']['modelGroupEnglishName'],
-                'version': response['category']['gradeEnglishName'],
-                'version_details': response['category']['gradeDetailEnglishName'],
-                'options': response['options']['standard'],
-                'color': response['spec']['colorName'],
-                'engine_capacity': response['spec']['displacement'],
-                'photos_codes': str(photos_codes),
-                'korean_number': response['vehicleNo'],
-                'dummy_id': dummy_id,
-                'encar_diag': response['view']['encarDiagnosis'],
-            }
-            return detail_dict
+        try:
+            async with session.get(url, timeout=10) as response:
+                response = await response.json()
+                photos_codes = list(map(lambda x: x['path'][-7:-4], response['photos']))
+                if response['manage']['dummy'] == True: dummy_id = response['vehicleId']
+                else: dummy_id = int(url.split('/')[-1])
+                detail_dict = {
+                    'encar_id': int(url.split('/')[-1]), 
+                    'manufacturer': response['category']['manufacturerEnglishName'],
+                    'model': response['category']['modelGroupEnglishName'],
+                    'version': response['category']['gradeEnglishName'],
+                    'version_details': response['category']['gradeDetailEnglishName'],
+                    'options': response['options']['standard'],
+                    'color': response['spec']['colorName'],
+                    'engine_capacity': response['spec']['displacement'],
+                    'photos_codes': str(photos_codes),
+                    'korean_number': response['vehicleNo'],
+                    'dummy_id': dummy_id,
+                    'encar_diag': response['view']['encarDiagnosis'],
+                }
+                return detail_dict
+        except:
+            return None
 
 
     async def get_info(self, batch):
@@ -93,19 +96,22 @@ class AsyncCarParser():
     def save_to_db(self):
         self.updated_batch = []
         for result in self.results:
-            car_to_update = self.batch.get(encar_id=result['encar_id'])
-            car_to_update.manufacturer = result['manufacturer']
-            car_to_update.model = result['model']
-            car_to_update.version = result['version']
-            car_to_update.version_details = result['version_details']
-            car_to_update.options = result['options']
-            car_to_update.color = car_korean_dict['COLOR'].get(result['color'], result['color'])
-            car_to_update.engine_capacity = result['engine_capacity']
-            car_to_update.photos_codes = result['photos_codes']
-            car_to_update.korean_number = result['korean_number']
-            car_to_update.dummy_id = result['dummy_id']
-            car_to_update.encar_diag = result['encar_diag']
-            self.updated_batch.append(car_to_update)
+            if result:
+                car_to_update = self.batch.get(encar_id=int(result['encar_id']))
+                car_to_update.manufacturer = result['manufacturer']
+                car_to_update.model = result['model']
+                car_to_update.version = result['version']
+                car_to_update.version_details = result['version_details']
+                car_to_update.options = result['options']
+                car_to_update.color = car_korean_dict['COLOR'].get(result['color'], result['color'])
+                car_to_update.engine_capacity = result['engine_capacity']
+                car_to_update.photos_codes = result['photos_codes']
+                car_to_update.korean_number = result['korean_number']
+                car_to_update.dummy_id = result['dummy_id']
+                car_to_update.encar_diag = result['encar_diag']
+                self.updated_batch.append(car_to_update)
+            else:
+                print('нет машины')
         Car.objects.bulk_update(fields=['manufacturer', 
                                         'model', 
                                         'version', 
