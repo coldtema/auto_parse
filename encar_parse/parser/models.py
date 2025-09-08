@@ -56,6 +56,12 @@ class Car(models.Model):
     dummy_id = models.IntegerField(null=True, blank=True, db_index=True)
     encar_diag = models.IntegerField(null=True, blank=True) # -1 - нет, 1 - да
 
+    def __str__(self):
+        return str(self.encar_id)
+    
+    def __repr__(self):
+        return str(self.encar_id)
+
 
 class CarDiagnosis(models.Model):
     left_front_door = models.CharField(max_length=16, choices=Condition.choices)
