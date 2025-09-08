@@ -3,17 +3,17 @@ services:
     build: .
     command: >
       sh -c "python manage.py migrate &&
-             python manage.py collectstatic --noinput &&
-             python manage.py loaddata initial.json &&
-             gunicorn project_x.wsgi:application --bind 0.0.0.0:8000 --workers 3"
+             gunicorn encar_parse.wsgi:application --bind 0.0.0.0:8000 --workers 3"
     volumes:
       - static:/code/staticfiles
+    ports:
+      - "9002:8000"
     env_file:
       - .env
     expose:
       - "8000"
     networks:
-      - app_network
+      - app_network2
     depends_on:
       - db
       - redis
@@ -25,58 +25,44 @@ services:
     env_file:
       - .env
     networks:
-      - app_network
+      - app_network2
 
   redis:
     image: redis:7-alpine
     networks:
-      - app_network
+      - app_network2
 
   celery:
     build: .
-    command: celery -A project_x worker --concurrency=2 --max-tasks-per-child=5 --loglevel=info
+    command: celery -A encar_parse worker --concurrency=2 --max-tasks-per-child=5 --loglevel=info
     volumes:
       - .:/code
     env_file:
       - .env
     networks:
-      - app_network
+      - app_network2
     depends_on:
       - redis
       - db
 
   celery-beat:
     build: .
-    command: celery -A project_x beat --loglevel=info --schedule=/tmp/celerybeat-schedule
+    command: celery -A encar_parse beat --loglevel=info --schedule=/tmp/celerybeat-schedule
     user: "1000:1000"
     volumes:
       - .:/code
     env_file:
     - .env
     networks:
-      - app_network
+      - app_network2
     depends_on:
       - redis
       - db
-
-  nginx:
-    image: nginx:latest
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-      - /etc/letsencrypt/:/etc/letsencrypt/
-      - static:/code/staticfiles
-    networks:
-      - app_network
-    depends_on:
-      - web
 
 volumes:
   static:
   postgres_data:
 
 networks:
-  app_network:
+  app_network2:
     driver: bridge
