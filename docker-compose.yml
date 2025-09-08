@@ -1,5 +1,5 @@
 services:
-  web:
+  web2:
     build: .
     command: >
       sh -c "python manage.py migrate &&
