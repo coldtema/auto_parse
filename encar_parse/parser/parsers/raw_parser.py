@@ -2,6 +2,7 @@ import requests
 import math
 from ..models import Car, Truck
 from parser import cookie_grabber
+from django.db import transaction
 
 diagnosis = 'https://api.encar.com/v1/readside/diagnosis/vehicle/40286929'
 
@@ -15,6 +16,7 @@ class CarParser():
         self.current_mileage = 0
         self.current_page = 0
         self.url_dict = {
+            #'new_electro_url': ['https://api.encar.com/search/car/list/premium?count=true&q=(And.(And.Mileage.range(', '0', '..', '10000', ')._.Hidden.N._.CarType.A._.GreenType.Y._.(Or.Separation.A._.Separation.B.)))&sr=%7CModifiedDate%7C', '0', '%7C1000'],
             'electro_url': ['https://api.encar.com/search/car/list/premium?count=True&q=(And.Hidden.N._.CarType.A._.GreenType.Y._.(Or.Separation.A._.Separation.B.)_.Mileage.range(', '0', '..', '10000', ').)&sr=%7CModifiedDate%7C', '0', '%7C1000'],
             'import_url': ['https://api.encar.com/search/car/list/premium?count=True&q=(And.Hidden.N._.CarType.N._.(Or.Separation.A._.Separation.F._.Separation.B.)_.SellType.%EC%9D%BC%EB%B0%98._.Mileage.range(', '0', '..', '10000', ').)&sr=%7CModifiedDate%7C', '0', '%7C1000'],
             'native_url': ['https://api.encar.com/search/car/list/premium?count=True&q=(And.Hidden.N._.CarType.Y._.(Or.Separation.A._.Separation.B.)_.SellType.%EC%9D%BC%EB%B0%98._.Mileage.range(', '0', '..', '10000', ').)&sr=%7CModifiedDate%7C', '0', '%7C1000']
@@ -69,7 +71,7 @@ class CarParser():
 
 
     def dump_data(self, data):
-         for elem in data:
+        for elem in data:
             flag_inspection = False
             flag_record = False
             flag_resume = False
@@ -101,12 +103,16 @@ class CarParser():
                                         city = ru_cities
                                         ))
 
+
     def get_cookies(self):
         self.session.get("https://www.encar.com", headers=self.headers) 
 
     def get_number_of_results(self): #он может найти больше 23 тысяч результатов, но в query никогда их не выдаст, потолок - 10000
         return self.session.get(''.join(self.current_api_url_list), headers=self.headers).json()['Count']
+    
 
+
+    @transaction.atomic
     def save_to_db(self):
         Car.objects.bulk_create(self.new_elems, ignore_conflicts=True)
         self.new_elems = []
@@ -224,14 +230,26 @@ class TruckParser():
 
     def get_number_of_results(self): #он может найти больше 23 тысяч результатов, но в query никогда их не выдаст, потолок - 10000
         try:
+            print(''.join(self.current_api_url_list))
             number_of_cars = self.session.get(''.join(self.current_api_url_list), headers=self.headers).json()['Count']
         except:
             cookies = cookie_grabber.get_new_encar_cookies()
             for c in cookies:
                 self.session.cookies.set(c['name'], c['value'])
-            number_of_cars = self.session.get(''.join(self.current_api_url_list), headers=self.headers).json()['Count']
+            self.session.headers.update({"User-Agent": (
+                                            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                                            "AppleWebKit/537.36 (KHTML, like Gecko) "
+                                            "Chrome/126.0.6478.127 Safari/537.36"
+                                        )
+                                    })
+        response = self.session.get(''.join(self.current_api_url_list))
+        number_of_cars = response.json()['Count']
+        print('код:', response.status_code)
+        print('текст', response.text)
         return number_of_cars
 
+
+    @transaction.atomic
     def save_to_db(self):
         Truck.objects.bulk_create(self.new_elems, ignore_conflicts=True)
         self.new_elems = []
