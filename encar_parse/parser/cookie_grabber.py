@@ -18,12 +18,31 @@
 
 
 from playwright.sync_api import sync_playwright
+
 def get_new_encar_cookies():
+    user_agent = (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/126.0.6478.127 Safari/537.36"
+    )
+
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)  # тут headless работает
-        page = browser.new_page()
-        page.goto("https://www.encar.com/")
-        cookies = page.context.cookies()
+        browser = p.chromium.launch(headless=True)
+
+        context = browser.new_context(
+            user_agent=user_agent,
+            viewport={"width": 1920, "height": 1080},
+            locale="en-US", 
+            timezone_id="Asia/Seoul", 
+        )
+
+        page = context.new_page()
+        page.goto("https://www.encar.com/", timeout=60000)
+
+        page.wait_for_load_state("networkidle")
+
+        cookies = context.cookies()
+
         browser.close()
-    print(cookies)
+
     return cookies
