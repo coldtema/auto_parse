@@ -45,5 +45,3 @@ USER celeryuser
 RUN playwright install chromium
 
 COPY . .
-
-ENTRYPOINT ["python"]
