@@ -86,7 +86,7 @@ def vechile(request):
                 record = None
             accidents = None
             if record:
-                accidents = enumerate(record.accident_set.all(), 1)
+                accidents = enumerate(record.caraccident_set.all(), 1)
             return render(request, 'parser/vechile.html', context={'all_options_list': all_car_options,
                                                                    'current_options_list': current_car_options,
                                                                    'full_name': f'{car.manufacturer} {car.model} {car.version}',
