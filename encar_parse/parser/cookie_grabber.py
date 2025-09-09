@@ -1,6 +1,6 @@
-# from selenium import webdriver
-# from selenium.webdriver.chrome.options import Options
-# import requests
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+import requests
 
 
 # def get_new_encar_cookies():
@@ -17,6 +17,7 @@
     
 
 
+from pyvirtualdisplay import Display
 from playwright.sync_api import sync_playwright
 
 def get_new_encar_cookies():
@@ -26,23 +27,21 @@ def get_new_encar_cookies():
         "Chrome/126.0.6478.127 Safari/537.36"
     )
 
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
+    # виртуальный дисплей только на время работы браузера
+    with Display(visible=0, size=(1920, 1080)):
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=False) 
+            context = browser.new_context(
+                user_agent=user_agent,
+                viewport={"width": 1920, "height": 1080},
+                locale="en-US",
+                timezone_id="Asia/Seoul",
+            )
 
-        context = browser.new_context(
-            user_agent=user_agent,
-            viewport={"width": 1920, "height": 1080},
-            locale="en-US", 
-            timezone_id="Asia/Seoul", 
-        )
+            page = context.new_page()
+            page.goto("https://www.encar.com/", timeout=60000)
 
-        page = context.new_page()
-        page.goto("https://www.encar.com/", timeout=60000)
-
-        page.wait_for_load_state("networkidle")
-
-        cookies = context.cookies()
-
-        browser.close()
+            cookies = context.cookies()
+            browser.close()
 
     return cookies
