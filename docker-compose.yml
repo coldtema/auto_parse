@@ -16,10 +16,10 @@ services:
     networks:
       - shared_network
     depends_on:
-      - db
-      - redis
+      - db2
+      - redis2
 
-  db:
+  db2:
     image: postgres:16
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -28,12 +28,12 @@ services:
     networks:
       - shared_network
 
-  redis:
+  redis2:
     image: redis:7-alpine
     networks:
       - shared_network
 
-  celery:
+  celery2:
     build: .
     command: celery -A encar_parse worker --concurrency=2 --max-tasks-per-child=5 --loglevel=info
     volumes:
@@ -43,10 +43,10 @@ services:
     networks:
       - shared_network
     depends_on:
-      - redis
-      - db
+      - redis2
+      - db2
 
-  celery-beat:
+  celery-beat2:
     build: .
     command: celery -A encar_parse beat --loglevel=info --schedule=/tmp/celerybeat-schedule
     user: "1000:1000"
@@ -57,8 +57,8 @@ services:
     networks:
       - shared_network
     depends_on:
-      - redis
-      - db
+      - redis2
+      - db2
 
 volumes:
   static:
