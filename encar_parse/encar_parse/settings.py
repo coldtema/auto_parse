@@ -96,7 +96,7 @@ DATABASES = {
         'NAME': os.getenv('POSTGRES_DB'),
         'USER': os.getenv('POSTGRES_USER'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-        'HOST': 'db',
+        'HOST': 'db2',
         'PORT': '5432',
     }
 }
@@ -145,7 +145,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 
-CELERY_BROKER_URL = 'redis://redis:6379/0' #'redis://localhost:6379/0'
+CELERY_BROKER_URL = 'redis://redis2:6379/0' #'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'django-db' #'redis://localhost:6379/0' 
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
