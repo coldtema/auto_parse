@@ -3,7 +3,7 @@ FROM python:3.12-slim
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# системные зависимости для Chromium
+# системные зависимости для Chromium + Xvfb
 RUN apt-get update && apt-get install -y \
     wget \
     curl \
@@ -26,6 +26,7 @@ RUN apt-get update && apt-get install -y \
     libharfbuzz0b \
     libxshmfence1 \
     xdg-utils \
+    xvfb \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /code/encar_parse
@@ -45,3 +46,6 @@ USER celeryuser
 RUN playwright install chromium
 
 COPY . .
+
+# обертка для запуска с виртуальным дисплеем
+ENTRYPOINT ["xvfb-run", "--server-args=-screen 0 1920x1080x24", "python"]
