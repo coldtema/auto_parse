@@ -63,7 +63,9 @@ class CarParser():
         number_of_results = self.get_number_of_results()
         for page in range(math.ceil(number_of_results/1000)):
             self.current_api_url_list[-2] = str(page*1000)
-            response = self.session.get(''.join(self.current_api_url_list))    
+            response = self.session.get(''.join(self.current_api_url_list))
+            print('код:', response.status_code)
+            print('текст', response.text[:20]) 
             data = response.json()['SearchResults']
             print(f'Всего - {response.json()['Count']} Страница {page}. Количество элементов - {len(data)}')
             self.dump_data(data)
@@ -124,7 +126,7 @@ class CarParser():
         response = self.session.get(''.join(self.current_api_url_list))
         number_of_cars = response.json()['Count']
         print('код:', response.status_code)
-        print('текст', response.text)
+        print('текст', response.text[:20])
         return number_of_cars
     
 
@@ -262,7 +264,7 @@ class TruckParser():
         response = self.session.get(''.join(self.current_api_url_list))
         number_of_cars = response.json()['Count']
         print('код:', response.status_code)
-        print('текст', response.text)
+        print('текст', response.text[:20])
         return number_of_cars
 
 
