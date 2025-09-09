@@ -3,7 +3,7 @@ FROM python:3.12-slim
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# системные зависимости для Chromium + Xvfb
+# системные зависимости для Chromium + Xvfb (для Playwright)
 RUN apt-get update && apt-get install -y \
     wget \
     curl \
@@ -32,7 +32,6 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /code/encar_parse
 
 COPY requirements.txt .
-
 RUN pip install --no-cache-dir -r requirements.txt
 
 # создаем пользователя и рабочие папки
@@ -42,10 +41,9 @@ RUN adduser --disabled-password --gecos '' celeryuser && \
 
 USER celeryuser
 
-# браузеры Playwright под пользовательский $HOME
+
 RUN playwright install chromium
 
 COPY . .
 
-# обертка для запуска с виртуальным дисплеем
-ENTRYPOINT ["xvfb-run", "--server-args=-screen 0 1920x1080x24", "python"]
+ENTRYPOINT ["python"]
