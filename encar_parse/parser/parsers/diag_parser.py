@@ -20,7 +20,7 @@ class AsyncCarDiagParser():
         self.session = requests.Session()
         self.encar_api_url = 'https://api.encar.com/v1/readside/diagnosis/vehicle/'
         self.car_count = Car.objects.all().count()
-        self.dummy_ids = list(map(lambda x: x['encar_id'], Car.objects.all().values('dummy_id')))
+        self.dummy_ids = list(map(lambda x: x['dummy_id'], Car.objects.all().values('dummy_id')))
         self.headers = {
                     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
                     "Referer": "https://www.encar.com/",
@@ -108,7 +108,7 @@ class AsyncTruckDiagParser():
         self.session = requests.Session()
         self.encar_api_url = 'https://api.encar.com/v1/readside/diagnosis/vehicle/'
         self.car_count = Truck.objects.all().count()
-        self.dummy_ids = Truck.objects.all().values('dummy_id')
+        self.dummy_ids = list(map(lambda x: x['dummy_id'], Truck.objects.all().values('dummy_id')))
         self.headers = {
                     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
                     "Referer": "https://www.encar.com/",
