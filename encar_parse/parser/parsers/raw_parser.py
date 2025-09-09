@@ -63,7 +63,7 @@ class CarParser():
         number_of_results = self.get_number_of_results()
         for page in range(math.ceil(number_of_results/1000)):
             self.current_api_url_list[-2] = str(page*1000)
-            response = self.session.get(''.join(self.current_api_url_list), headers=self.headers)    
+            response = self.session.get(''.join(self.current_api_url_list))    
             data = response.json()['SearchResults']
             print(f'Всего - {response.json()['Count']} Страница {page}. Количество элементов - {len(data)}')
             self.dump_data(data)
@@ -105,10 +105,27 @@ class CarParser():
 
 
     def get_cookies(self):
-        self.session.get("https://www.encar.com", headers=self.headers) 
+        self.session.get("https://www.encar.com", headers=self.headers)
 
     def get_number_of_results(self): #он может найти больше 23 тысяч результатов, но в query никогда их не выдаст, потолок - 10000
-        return self.session.get(''.join(self.current_api_url_list), headers=self.headers).json()['Count']
+        try:
+            print(''.join(self.current_api_url_list))
+            number_of_cars = self.session.get(''.join(self.current_api_url_list)).json()['Count']
+        except:
+            cookies = cookie_grabber.get_new_encar_cookies()
+            for c in cookies:
+                self.session.cookies.set(c['name'], c['value'])
+            self.session.headers.update({"User-Agent": (
+                                            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                                            "AppleWebKit/537.36 (KHTML, like Gecko) "
+                                            "Chrome/126.0.6478.127 Safari/537.36"
+                                        )
+                                    })
+        response = self.session.get(''.join(self.current_api_url_list))
+        number_of_cars = response.json()['Count']
+        print('код:', response.status_code)
+        print('текст', response.text)
+        return number_of_cars
     
 
 
@@ -173,7 +190,7 @@ class TruckParser():
         number_of_results = self.get_number_of_results()
         for page in range(math.ceil(number_of_results/1000)):
             self.current_api_url_list[-2] = str(page*1000)
-            response = self.session.get(''.join(self.current_api_url_list), headers=self.headers)    
+            response = self.session.get(''.join(self.current_api_url_list))    
             data = response.json()['SearchResults']
             print(f'Всего - {response.json()['Count']} Страница {page}. Количество элементов - {len(data)}')
             self.dump_data(data)
@@ -231,7 +248,7 @@ class TruckParser():
     def get_number_of_results(self): #он может найти больше 23 тысяч результатов, но в query никогда их не выдаст, потолок - 10000
         try:
             print(''.join(self.current_api_url_list))
-            number_of_cars = self.session.get(''.join(self.current_api_url_list), headers=self.headers).json()['Count']
+            number_of_cars = self.session.get(''.join(self.current_api_url_list)).json()['Count']
         except:
             cookies = cookie_grabber.get_new_encar_cookies()
             for c in cookies:
