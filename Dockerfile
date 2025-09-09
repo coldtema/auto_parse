@@ -25,6 +25,6 @@ COPY . .
 # Создаем пользователя
 RUN adduser --disabled-password --gecos '' celeryuser && \
     mkdir -p /code/staticfiles /code/media && \
-    chown -R celeryuser:celeryuser /code
+    chown -R celeryuser:celeryuser /code/encar_parse
 
 USER celeryuser
