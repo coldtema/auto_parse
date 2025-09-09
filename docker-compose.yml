@@ -14,7 +14,7 @@ services:
     expose:
       - "8000"
     networks:
-      - app_network2
+      - shared_network
     depends_on:
       - db
       - redis
@@ -26,12 +26,12 @@ services:
     env_file:
       - .env
     networks:
-      - app_network2
+      - shared_network
 
   redis:
     image: redis:7-alpine
     networks:
-      - app_network2
+      - shared_network
 
   celery:
     build: .
@@ -41,7 +41,7 @@ services:
     env_file:
       - .env
     networks:
-      - app_network2
+      - shared_network
     depends_on:
       - redis
       - db
@@ -55,7 +55,7 @@ services:
     env_file:
     - .env
     networks:
-      - app_network2
+      - shared_network
     depends_on:
       - redis
       - db
@@ -65,5 +65,6 @@ volumes:
   postgres_data:
 
 networks:
-  app_network2:
-    driver: bridge
+  shared_network:
+    name: app_network
+    external: true
