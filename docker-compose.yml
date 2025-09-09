@@ -38,7 +38,7 @@ services:
 
   celery2:
     build: .
-    command: celery -A encar_parse worker --concurrency=2 --max-tasks-per-child=5 --loglevel=info
+    command: python -m celery -A encar_parse worker --concurrency=2 --max-tasks-per-child=5 --loglevel=info
     volumes:
       - .:/code
     env_file:
@@ -51,12 +51,12 @@ services:
 
   celery-beat2:
     build: .
-    command: celery -A encar_parse beat --loglevel=info --schedule=/tmp/celerybeat-schedule
+    command: python -m celery -A encar_parse beat --loglevel=info --schedule=/tmp/celerybeat-schedule
     user: "1000:1000"
     volumes:
       - .:/code
     env_file:
-    - .env
+      - .env
     networks:
       - shared_network
     depends_on:
