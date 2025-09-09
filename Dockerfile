@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
     libpango-1.0-0 libcairo2 libasound2 libxshmfence1 libgtk-3-0 \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /code
+WORKDIR /code/encar_parse
 
 COPY requirements.txt .
 
