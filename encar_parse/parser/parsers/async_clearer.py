@@ -4,6 +4,7 @@ from ..models import Car, Truck
 import asyncio
 import aiohttp
 from django.db import transaction
+from parser import cookie_grabber
 
 diagnosis = 'https://api.encar.com/v1/readside/diagnosis/vehicle/40286929'
 
@@ -32,6 +33,7 @@ class AsyncCarClearer():
 
     def run(self):
         self.get_cookies()
+        self.get_number_of_results()
         print('Куки получены')
         self.batching_query()
         self.session.close()
@@ -67,7 +69,7 @@ class AsyncCarClearer():
 
 
     async def get_info(self, batch):
-        async with aiohttp.ClientSession(headers=self.headers, cookies=self.session.cookies) as session:
+        async with aiohttp.ClientSession(headers=self.session.headers, cookies=self.session.cookies) as session:
             tasks = [self.fetch(session, url) for url in batch]
             results = await asyncio.gather(*tasks)
             return results
@@ -75,6 +77,27 @@ class AsyncCarClearer():
 
     def get_cookies(self):
         self.session.get("https://www.encar.com", headers=self.headers) 
+
+
+    def get_number_of_results(self): #он может найти больше 23 тысяч результатов, но в query никогда их не выдаст, потолок - 10000
+        current_api_url_list = ['https://api.encar.com/search/car/list/premium?count=True&q=(And.Hidden.N._.CarType.A._.GreenType.Y._.(Or.Separation.A._.Separation.B.)_.Mileage.range(', '0', '..', '10000', ').)&sr=%7CModifiedDate%7C', '0', '%7C1000']
+        try:
+            print(''.join(current_api_url_list), 'идет по адресу для сбора куков на всякий')
+            number_of_cars = self.session.get(''.join(current_api_url_list)).json()['Count']
+        except:
+            cookies = cookie_grabber.get_new_encar_cookies()
+            for c in cookies:
+                self.session.cookies.set(c['name'], c['value'])
+            self.session.headers.update({"User-Agent": (
+                                            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                                            "AppleWebKit/537.36 (KHTML, like Gecko) "
+                                            "Chrome/126.0.6478.127 Safari/537.36"
+                                        )
+                                    })
+        response = self.session.get(''.join(current_api_url_list))
+        number_of_cars = response.json()['Count'] #чтобы усли что встало на ошибке и не пошло все подряд удалять
+        print('код:', response.status_code)
+        print('текст', response.text[:20])
 
 
     @transaction.atomic
@@ -110,6 +133,7 @@ class AsyncTruckClearer():
 
     def run(self):
         self.get_cookies()
+        self.get_number_of_results()
         print('Куки получены')
         self.batching_query()
         self.session.close()
@@ -145,7 +169,7 @@ class AsyncTruckClearer():
 
 
     async def get_info(self, batch):
-        async with aiohttp.ClientSession(headers=self.headers, cookies=self.session.cookies) as session:
+        async with aiohttp.ClientSession(headers=self.session.headers, cookies=self.session.cookies) as session:
             tasks = [self.fetch(session, url) for url in batch]
             results = await asyncio.gather(*tasks)
             return results
@@ -153,6 +177,28 @@ class AsyncTruckClearer():
 
     def get_cookies(self):
         self.session.get("https://www.encar.com", headers=self.headers) 
+
+
+
+    def get_number_of_results(self): #он может найти больше 23 тысяч результатов, но в query никогда их не выдаст, потолок - 10000
+        current_api_url_list = ['https://api.encar.com/search/car/list/premium?count=True&q=(And.Hidden.N._.CarType.A._.GreenType.Y._.(Or.Separation.A._.Separation.B.)_.Mileage.range(', '0', '..', '10000', ').)&sr=%7CModifiedDate%7C', '0', '%7C1000']
+        try:
+            print(''.join(current_api_url_list), 'идет по адресу для сбора куков на всякий')
+            number_of_cars = self.session.get(''.join(current_api_url_list)).json()['Count']
+        except:
+            cookies = cookie_grabber.get_new_encar_cookies()
+            for c in cookies:
+                self.session.cookies.set(c['name'], c['value'])
+            self.session.headers.update({"User-Agent": (
+                                            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                                            "AppleWebKit/537.36 (KHTML, like Gecko) "
+                                            "Chrome/126.0.6478.127 Safari/537.36"
+                                        )
+                                    })
+        response = self.session.get(''.join(current_api_url_list))
+        number_of_cars = response.json()['Count'] #чтобы eсли что встало на ошибке и не пошло все подряд удалять
+        print('код:', response.status_code)
+        print('текст', response.text[:20])
 
 
     @transaction.atomic
