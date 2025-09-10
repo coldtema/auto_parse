@@ -144,20 +144,11 @@ class CarDuplicateClearer():
                 self.encar_ids_to_delete.append(duplicates[1]['encar_id'])
         for i in range(math.ceil(len(self.encar_ids_to_delete) / 1000)):
             Car.objects.filter(encar_id__in=self.encar_ids_to_delete[i*1000:(i+1)*1000]).delete()
-        Car.objects.filter(manufacturer__in=['Others', 'etc']).delete() #удаление неизвестных encar'u машин (others-others-others)
+        Car.objects.filter(manufacturer__in=['Others', 'etc', '']).delete() #удаление неизвестных encar'u машин (others-others-others)
         Car.objects.filter(sell_type='Лизинг').delete()
         Car.objects.filter(sell_type='Аренда').delete()
-        Car.objects.filter(engine_capacity__lt=900, fuel_type__in=['Бензин', 'Дизель', 'Бензин + Электро', 'Дизель + Электро']).delete()
+        Car.objects.filter(engine_capacity__lt=900, fuel_type__in=['G', 'D', 'GE', 'DE']).delete()
         Car.objects.filter(engine_capacity__gt=9999).delete()
-        Car.objects.filter(fuel_type='Прочее').delete()
-        Car.objects.filter(fuel_type__in=["Газ (пропан-бутан) + Электро",
-                                          'Прочее',
-                                          'Водород',
-                                          'Бензин + Метан',
-                                          'Бензин + Газ (пропан-бутан)',
-                                          'Газ (пропан-бутан)',
-                                          'LPG',
-                                          'CNG']).delete()
 
 
 
@@ -300,11 +291,8 @@ class TruckDuplicateClearer():
         for i in range(math.ceil(len(self.encar_ids_to_delete) / 1000)):
             Truck.objects.filter(encar_id__in=self.encar_ids_to_delete[i*1000:(i+1)*1000]).delete()
         Truck.objects.filter(manufacturer__in=['Others', 'etc', 'Other', '']).delete() #удаление неизвестных encar'u машин (others-others-others)
-        Truck.objects.filter(engine_capacity__lt=900, fuel_type__in=['Бензин', 'Дизель']).delete()
+        Truck.objects.filter(engine_capacity__lt=900, fuel_type__in=['G', 'D']).delete()
         Truck.objects.filter(engine_capacity__gt=9999).delete()
-        Truck.objects.filter(fuel_type__in=["Пропан-бутан (Газ)",
-                                          'Метан (Газ)',
-                                          'Другое']).delete()
 
 
 
