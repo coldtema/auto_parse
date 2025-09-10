@@ -80,8 +80,9 @@ class CarParser():
             if 'Inspection' in list(elem['Condition']): flag_inspection=True
             if 'Record' in list(elem['Condition']): flag_record=True
             if 'Resume' in list(elem['Condition']): flag_resume=True
-            ru_transmission = car_korean_dict['TRANSMISSION'].get(elem.get('Transmission', ''), elem.get('Transmission', ''))
             ru_fuel_type = car_korean_dict['FUEL_TYPE'].get(elem.get('FuelType', ''), elem.get('FuelType', ''))
+            if ru_fuel_type in ['L', 'LE', 'LG', 'HY', '']: continue
+            ru_transmission = car_korean_dict['TRANSMISSION'].get(elem.get('Transmission', ''), elem.get('Transmission', ''))
             ru_cities = car_korean_dict['CITY'].get(elem.get('OfficeCityState', ''), elem.get('OfficeCityState', ''))
             ru_sell_type = car_korean_dict['SELL_TYPE'].get(elem.get('SellType', ''), elem.get('SellType', ''))
             self.new_elems.append(Car(encar_id=elem['Id'],
@@ -203,6 +204,8 @@ class TruckParser():
 
     def dump_data(self, data):
          for elem in data:
+            ru_fuel_type = truck_korean_dict['FUEL_TYPES'].get(elem.get('FuelType', ''), elem.get('FuelType', ''))
+            if ru_fuel_type in ['L', '']: continue
             flag_inspection = False
             flag_record = False
             flag_resume = False
@@ -210,7 +213,6 @@ class TruckParser():
             if 'Record' in list(elem['Condition']): flag_record=True
             if 'Resume' in list(elem['Condition']): flag_resume=True
             eng_manufacturer = truck_korean_dict['MANUFACTURERS'].get(elem.get('Manufacturer', ''), elem.get('Manufacturer', ''))
-            ru_fuel_type = truck_korean_dict['FUEL_TYPES'].get(elem.get('FuelType', ''), elem.get('FuelType', ''))
             ru_transmission = truck_korean_dict['TRANSMISSIONS'].get(elem.get('Transmission', ''), elem.get('Transmission', ''))
             eng_model = truck_korean_dict['MODELS'].get(elem.get('Model', ''), elem.get('Model', ''))
             eng_version = truck_korean_dict['VERSIONS'].get(elem.get('Badge', ''), elem.get('Badge', ''))
@@ -594,12 +596,12 @@ truck_korean_dict = {
         "2WD": "2WD"
     },
     'FUEL_TYPES': {
-        "전기": "Электричество",
-        "가솔린": "Бензин",
-        "LPG(일반인 구입)": "Пропан-бутан (Газ)",
-        "디젤": "Дизель",
-        "CNG": "Метан (Газ)",
-        "기타": "Другое"
+        "전기": "E",
+        "가솔린": "G",
+        "LPG(일반인 구입)": "L",
+        "디젤": "D",
+        "CNG": "L",
+        "기타": ""
     },
     'TRANSMISSIONS': {
         "수동": "Механическая",
@@ -806,17 +808,17 @@ car_korean_dict = {
         "대전": "Тэджон"
     },
     'FUEL_TYPE': {
-        "LPG+전기": "Газ (пропан-бутан) + Электро",
-        "가솔린": "Бензин",
-        "가솔린+전기": "Бензин + Электро",
-        "기타": "Прочее",
-        "수소": "Водород",
-        "가솔린+CNG": "Бензин + Метан",
-        "디젤": "Дизель",
-        "전기": "Электро",
-        "가솔린+LPG": "Бензин + Газ (пропан-бутан)",
-        "디젤+전기": "Дизель + Электро",
-        "LPG(일반인 구입)": "Газ (пропан-бутан)"
+        "LPG+전기": "LE",
+        "가솔린": "G",
+        "가솔린+전기": "GE",
+        "기타": "",
+        "수소": "HY",
+        "가솔린+CNG": "LG",
+        "디젤": "D",
+        "전기": "E",
+        "가솔린+LPG": "LG",
+        "디젤+전기": "DE",
+        "LPG(일반인 구입)": "L"
     },
     'COLOR': {
         "주황색": "Оранжевый",
