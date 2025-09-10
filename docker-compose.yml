@@ -28,6 +28,8 @@ services:
       - .env
     networks:
       - shared_network
+    ports:
+    - "5432:5432"
 
   redis2:
     image: redis:7-alpine
