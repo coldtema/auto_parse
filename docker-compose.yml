@@ -23,6 +23,7 @@ services:
     image: postgres:16
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     env_file:
       - .env
     networks:
