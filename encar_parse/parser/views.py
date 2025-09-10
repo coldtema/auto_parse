@@ -109,7 +109,7 @@ def vechile(request):
                                                                     'diagnosis': diagnosis,
                                                                     'record': record,
                                                                     'accidents': accidents,
-                                                                    'final_price': f'{car.recycling_fee + car.customs_duty + car.ru_price + 95000 + 20000 + 97000} ₽',
+                                                                    #'final_price': f'{car.recycling_fee + car.customs_duty + car.ru_price + 95000 + 20000 + 97000} ₽',
                                                                     })
             except:
                 traceback.print_exc()
