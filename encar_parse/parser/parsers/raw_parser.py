@@ -81,7 +81,7 @@ class CarParser():
             if 'Record' in list(elem['Condition']): flag_record=True
             if 'Resume' in list(elem['Condition']): flag_resume=True
             ru_fuel_type = car_korean_dict['FUEL_TYPE'].get(elem.get('FuelType', ''), elem.get('FuelType', ''))
-            if ru_fuel_type in ['L', 'LE', 'LG', 'HY', '']: continue
+            if ru_fuel_type in ['L', 'LE', 'LG', 'HY', '', 'LP', 'CN']: continue
             ru_transmission = car_korean_dict['TRANSMISSION'].get(elem.get('Transmission', ''), elem.get('Transmission', ''))
             ru_cities = car_korean_dict['CITY'].get(elem.get('OfficeCityState', ''), elem.get('OfficeCityState', ''))
             ru_sell_type = car_korean_dict['SELL_TYPE'].get(elem.get('SellType', ''), elem.get('SellType', ''))
