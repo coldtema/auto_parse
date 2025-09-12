@@ -219,6 +219,10 @@ class TruckParser():
             ru_cities = truck_korean_dict['CITIES'].get(elem.get('OfficeCityState', ''), elem.get('OfficeCityState', ''))
             ru_version_details = truck_korean_dict['VERSION_DETAILS'].get(elem.get('FormDetail', ''), elem.get('FormDetail', ''))
             ru_usage = truck_korean_dict['USAGES'].get(elem.get('Use', ''), elem.get('Use', ''))
+            if eng_manufacturer == elem.get('Manufacturer', ''): print(f'Не нашлось марки трака: {elem.get('Manufacturer', '')}')
+            if eng_model == elem.get('Model', ''): print(f'Не нашлось модели трака: {elem.get('Model', '')}')
+            if eng_version == elem.get('Badge', ''): print(f'Не нашлось версии трака: {elem.get('Badge', '')}')
+            if ru_version_details == elem.get('FormDetail', ''): print(f'Не нашлось деталей версии трака: {elem.get('FormDetail', '')}')
             if '기' in elem.get('Capacity', ''): #прочее/другое
                 ru_capacity = ''
             elif '이상' in elem.get('Capacity', ''): # более 톤
