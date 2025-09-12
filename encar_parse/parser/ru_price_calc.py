@@ -593,6 +593,7 @@ horsepower_dict = {
     "Hyundai Ioniq5 Long Range Commercial 2025": 239,
     "BMW iX xDrive40 First Edition None 2022": 250,
     "Porsche Taycan 4S Cross Turismo None 2024": 420,
+    "Porsche Taycan 4S Cross Turismo None 2025": 420,
     "ChevroletGMDaewoo Bolt EV EV LT DLX None 2018": 150,
     "Genesis GV60 Standard None 2023": 234,
     "Tesla Model Y Long Range None 2021": 340,
