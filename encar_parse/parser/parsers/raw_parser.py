@@ -419,6 +419,15 @@ truck_korean_dict = {
         "익스프레스밴": "Express Van"
     },
     'VERSIONS': {
+        '': '',
+        'GOLD': 'GOLD',
+        '10X4': '10X4',
+        '4X2': '4X2',
+        'SUP': 'SUP',
+        '6X2': '6X2',
+        '6X4': '6X4',
+        '8X4': '8X4',
+        
         '표준형 DLX 15인승': 'Standard DLX 15-seater',
         '휠체어 리프 트': 'Wheelchair Lift',
         '디젤 39인승': 'Diesel 39-seater',
