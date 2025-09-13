@@ -427,7 +427,7 @@ truck_korean_dict = {
         '6X2': '6X2',
         '6X4': '6X4',
         '8X4': '8X4',
-        
+        '090 20인승': '090 20-seater',
         '표준형 DLX 15인승': 'Standard DLX 15-seater',
         '휠체어 리프 트': 'Wheelchair Lift',
         '디젤 39인승': 'Diesel 39-seater',
