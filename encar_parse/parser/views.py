@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .forms import CarArtikulForm
-from .models import Car, Truck, CarOption, TruckOption, OptionCategory
+from .models import Car, Truck, CarOption, TruckOption, OptionCategory, CarPhoto, TruckPhoto
 import time
 import traceback
 
@@ -30,7 +30,6 @@ def index(request):
 
 @time_count
 def vechile(request):
-    photo_url_params = '?impolicy=heightRate&rh=696&cw=1160&ch=696&cg=Center&wtmk=https://ci.encar.com/wt_mark/w_mark_04.png'
     artikul = request.GET.get('artikul')
     kind = request.GET.get('kind')
     if artikul.isdigit(): 
@@ -42,11 +41,7 @@ def vechile(request):
                 truck = Truck.objects.get(dummy_id=artikul)
             all_truck_options = OptionCategory.objects.filter(vechile='TRUCK').prefetch_related('truckoption_set')
             current_truck_options = list(map(lambda x: TruckOption.objects.get(encar_id=x).id, eval(truck.options)))
-            photo_list = []
-            sorted_codes = sorted(set(map(lambda x: int(x), eval(truck.photos_codes))))
-            for i in sorted_codes:
-                if i < 10: photo_list.append(f'{truck.photo_url}00{i}.jpg{photo_url_params}')
-                else: photo_list.append(f'{truck.photo_url}0{i}.jpg{photo_url_params}') 
+            photo_list = TruckPhoto.objects.filter(truck_id=truck.pk).order_by('order_number').values('link')
             return render(request, 'parser/vechile.html', context={'all_options_list': all_truck_options,
                                                                    'current_options_list': current_truck_options,
                                                                    'full_name': f'{truck.manufacturer} {truck.model} {truck.version}',
@@ -71,11 +66,7 @@ def vechile(request):
                     car = Car.objects.get(dummy_id=artikul)
                 all_car_options = OptionCategory.objects.filter(vechile='CAR').prefetch_related('caroption_set')
                 current_car_options = list(map(lambda x: CarOption.objects.get(encar_id=x).id, eval(car.options)))
-                photo_list = []
-                sorted_codes = sorted(set(map(lambda x: int(x), eval(car.photos_codes))))
-                for i in sorted_codes:
-                    if i < 10: photo_list.append(f'{car.photo_url}00{i}.jpg{photo_url_params}')
-                    else: photo_list.append(f'{car.photo_url}0{i}.jpg{photo_url_params}') 
+                photo_list = CarPhoto.objects.filter(car_id=car.pk).order_by('order_number').values_list('link')
                 try:
                     diagnosis = car.diagnosis
                 except:
