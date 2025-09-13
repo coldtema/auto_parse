@@ -109,7 +109,7 @@ body {
     <!-- Правая колонка -->
     <div class="photos">
       {% for photo in photo_list%}
-        <img src='{{ photo }}' alt="Фото автомобиля">
+        <img src='{{ photo.link }}' alt="Фото автомобиля">
       {% endfor %}
     </div>
   </div>
