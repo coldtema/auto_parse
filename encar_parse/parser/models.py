@@ -160,10 +160,10 @@ class CarAccident(models.Model):
 class CarPhoto(models.Model):
     order_number = models.IntegerField()
     link = models.CharField(max_length=256)
-    car = models.ForeignKey(Car, on_delete=models.CASCADE)
+    car = models.ForeignKey(Car, on_delete=models.CASCADE, db_index=True)
 
 
 class TruckPhoto(models.Model):
     order_number = models.IntegerField()
     link = models.CharField(max_length=256)
-    truck = models.ForeignKey(Truck, on_delete=models.CASCADE)
+    truck = models.ForeignKey(Truck, on_delete=models.CASCADE, db_index=True)
