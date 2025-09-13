@@ -79,7 +79,6 @@ def vechile(request):
                 accidents = None
                 if record:
                     accidents = enumerate(record.caraccident_set.all(), 1)
-                print(photo_list)
                 return render(request, 'parser/vechile.html', context={'all_options_list': all_car_options,
                                                                     'current_options_list': current_car_options,
                                                                     'full_name': f'{car.manufacturer} {car.model} {car.version}',
