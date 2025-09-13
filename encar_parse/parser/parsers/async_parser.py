@@ -111,7 +111,7 @@ class AsyncCarParser():
                 car_to_update.dummy_id = result['dummy_id']
                 car_to_update.encar_diag = result['encar_diag']
                 self.updated_batch.append(car_to_update)
-                sorted_urls = sorted(result['photos_urls'], key=lambda x: int(x[-7:-4]))
+                sorted_urls = sorted(set(result['photos_urls']), key=lambda x: int(x[-7:-4]))
                 for number, url in enumerate(sorted_urls, 1):
                     photos_obj.append(CarPhoto(
                         order_number = number,
@@ -128,9 +128,9 @@ class AsyncCarParser():
                                         'color', 
                                         'options', 
                                         'korean_number', 
-                                        'photos_codes', 
                                         'dummy_id', 
                                         'encar_diag'], objs=self.updated_batch)
+        CarPhoto.objects.bulk_create(photos_obj, ignore_conflicts=True)
         self.results = []
 
 
@@ -156,6 +156,7 @@ class CarDuplicateClearer():
         Car.objects.filter(sell_type='Лизинг').delete()
         Car.objects.filter(sell_type='Аренда').delete()
         Car.objects.filter(engine_capacity__lt=900, fuel_type__in=['G', 'D', 'GE', 'DE']).delete()
+        Car.objects.filter(engine_capacity__lt=None, fuel_type__in=['G', 'D', 'GE', 'DE']).delete()
         Car.objects.filter(engine_capacity__gt=9999).delete()
         Car.objects.filter(engine_capacity=None).delete()
 
@@ -276,7 +277,7 @@ class AsyncTruckParser():
                 truck_to_update.encar_diag = result['encar_diag']
                 truck_to_update.dummy_id = result['dummy_id']
                 self.updated_batch.append(truck_to_update)
-                sorted_urls = sorted(result['photos_urls'], key=lambda x: int(x[-7:-4]))
+                sorted_urls = sorted(set(result['photos_urls']), key=lambda x: int(x[-7:-4]))
                 for number, url in enumerate(sorted_urls, 1):
                     photos_obj.append(TruckPhoto(
                         order_number = number,
@@ -285,7 +286,8 @@ class AsyncTruckParser():
                     ))
             else:
                 print('нет машины')
-        Truck.objects.bulk_update(fields=['encar_id', 'encar_diag', 'dummy_id', 'horse_power', 'engine_capacity', 'color', 'options', 'korean_number', 'photos_codes'], objs=self.updated_batch)
+        TruckPhoto.objects.bulk_create(photos_obj, ignore_conflicts=True)
+        Truck.objects.bulk_update(fields=['encar_id', 'encar_diag', 'dummy_id', 'horse_power', 'engine_capacity', 'color', 'options', 'korean_number'], objs=self.updated_batch)
         self.results = []
 
 
