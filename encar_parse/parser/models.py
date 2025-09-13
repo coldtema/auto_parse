@@ -158,3 +158,16 @@ class CarAccident(models.Model):
     labor_cost = models.IntegerField(default=0)
     painting_cost = models.IntegerField(default=0)
     car_record = models.ForeignKey(CarRecord, on_delete=models.CASCADE)
+
+
+
+class CarPhoto(models.Model):
+    order_number = models.IntegerField()
+    link = models.CharField(max_length=256)
+    car = models.ForeignKey(Car, on_delete=models.CASCADE)
+
+
+class TruckPhoto(models.Model):
+    order_number = models.IntegerField()
+    link = models.CharField(max_length=256)
+    truck = models.ForeignKey(Truck, on_delete=models.CASCADE)
