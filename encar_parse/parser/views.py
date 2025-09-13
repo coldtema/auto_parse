@@ -66,7 +66,7 @@ def vechile(request):
                     car = Car.objects.get(dummy_id=artikul)
                 all_car_options = OptionCategory.objects.filter(vechile='CAR').prefetch_related('caroption_set')
                 current_car_options = list(map(lambda x: CarOption.objects.get(encar_id=x).id, eval(car.options)))
-                photo_list = CarPhoto.objects.filter(car_id=car.pk).order_by('order_number').values_list('link')
+                photo_list = CarPhoto.objects.filter(car_id=car.pk).order_by('order_number').values('link')
                 try:
                     diagnosis = car.diagnosis
                 except:
@@ -79,6 +79,7 @@ def vechile(request):
                 accidents = None
                 if record:
                     accidents = enumerate(record.caraccident_set.all(), 1)
+                print(photo_list)
                 return render(request, 'parser/vechile.html', context={'all_options_list': all_car_options,
                                                                     'current_options_list': current_car_options,
                                                                     'full_name': f'{car.manufacturer} {car.model} {car.version}',
