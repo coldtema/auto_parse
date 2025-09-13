@@ -1,6 +1,6 @@
 import requests
 import math
-from ..models import Car, Truck
+from ..models import Car, Truck, TruckPhoto, CarPhoto
 import asyncio
 import aiohttp
 from parser.parsers.raw_parser import car_korean_dict
@@ -60,7 +60,7 @@ class AsyncCarParser():
         try:
             async with session.get(url, timeout=10) as response:
                 response = await response.json()
-                photos_codes = list(map(lambda x: x['path'][-7:-4], response['photos']))
+                photos_urls = list(map(lambda x: x['path'], response['photos']))
                 if response['manage']['dummy'] == True: dummy_id = response['vehicleId']
                 else: dummy_id = int(url.split('/')[-1])
                 detail_dict = {
@@ -72,7 +72,7 @@ class AsyncCarParser():
                     'options': response['options']['standard'],
                     'color': response['spec']['colorName'],
                     'engine_capacity': response['spec']['displacement'],
-                    'photos_codes': str(photos_codes),
+                    'photos_urls': photos_urls,
                     'korean_number': response['vehicleNo'],
                     'dummy_id': dummy_id,
                     'encar_diag': response['view']['encarDiagnosis'],
@@ -94,6 +94,7 @@ class AsyncCarParser():
 
     @transaction.atomic
     def save_to_db(self):
+        photos_obj = []
         self.updated_batch = []
         for result in self.results:
             if result:
@@ -110,6 +111,13 @@ class AsyncCarParser():
                 car_to_update.dummy_id = result['dummy_id']
                 car_to_update.encar_diag = result['encar_diag']
                 self.updated_batch.append(car_to_update)
+                sorted_urls = sorted(result['photos_urls'], key=lambda x: int(x[-7:-4]))
+                for number, url in enumerate(sorted_urls, 1):
+                    photos_obj.append(CarPhoto(
+                        order_number = number,
+                        link = f'https://ci.encar.com{url}?impolicy=heightRate&rh=696&cw=1160&ch=696&cg=Center&wtmk=https://ci.encar.com/wt_mark/w_mark_04.png',
+                        vechile = car_to_update
+                    ))
             else:
                 print('нет машины')
         Car.objects.bulk_update(fields=['manufacturer', 
@@ -222,7 +230,7 @@ class AsyncTruckParser():
         try:
             async with session.get(url, timeout=10) as response:
                 response = await response.json()
-                photos_codes = list(map(lambda x: x['path'][-7:-4], response['photos']))
+                photos_urls = list(map(lambda x: x['path'], response['photos']))
                 if response['manage']['dummy'] == True: dummy_id = response['vehicleId']
                 else: dummy_id = int(url.split('/')[-1])
                 detail_dict = {
@@ -230,7 +238,7 @@ class AsyncTruckParser():
                     'options': response['options']['standard'],
                     'color': response['spec']['colorName'],
                     'engine_capacity': response['spec']['displacement'],
-                    'photos_codes': str(photos_codes),
+                    'photos_urls': photos_urls,
                     'horse_power': response['spec']['horsePower'],
                     'korean_number': response['vehicleNo'],
                     'dummy_id': dummy_id,
@@ -255,19 +263,26 @@ class AsyncTruckParser():
 
     def save_to_db(self):
         self.updated_batch = []
+        photos_obj = []
         for result in self.results:
             if result:
                 truck_to_update = self.batch.get(encar_id=result['encar_id'])
                 truck_to_update.options = result['options']
                 truck_to_update.color = car_korean_dict['COLOR'].get(result['color'], result['color'])
                 truck_to_update.engine_capacity = result['engine_capacity']
-                truck_to_update.photos_codes = result['photos_codes']
                 truck_to_update.horse_power = result['horse_power']
                 truck_to_update.korean_number = result['korean_number']
                 truck_to_update.encar_id = result['encar_id']
                 truck_to_update.encar_diag = result['encar_diag']
                 truck_to_update.dummy_id = result['dummy_id']
                 self.updated_batch.append(truck_to_update)
+                sorted_urls = sorted(result['photos_urls'], key=lambda x: int(x[-7:-4]))
+                for number, url in enumerate(sorted_urls, 1):
+                    photos_obj.append(TruckPhoto(
+                        order_number = number,
+                        link = f'https://ci.encar.com{url}?impolicy=heightRate&rh=696&cw=1160&ch=696&cg=Center&wtmk=https://ci.encar.com/wt_mark/w_mark_04.png',
+                        truck = truck_to_update
+                    ))
             else:
                 print('нет машины')
         Truck.objects.bulk_update(fields=['encar_id', 'encar_diag', 'dummy_id', 'horse_power', 'engine_capacity', 'color', 'options', 'korean_number', 'photos_codes'], objs=self.updated_batch)
