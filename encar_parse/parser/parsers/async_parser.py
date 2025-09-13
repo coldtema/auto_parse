@@ -106,7 +106,6 @@ class AsyncCarParser():
                 car_to_update.options = result['options']
                 car_to_update.color = car_korean_dict['COLOR'].get(result['color'], result['color'])
                 car_to_update.engine_capacity = result['engine_capacity']
-                car_to_update.photos_codes = result['photos_codes']
                 car_to_update.korean_number = result['korean_number']
                 car_to_update.dummy_id = result['dummy_id']
                 car_to_update.encar_diag = result['encar_diag']
