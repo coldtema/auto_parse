@@ -115,7 +115,7 @@ class AsyncCarParser():
                     photos_obj.append(CarPhoto(
                         order_number = number,
                         link = f'https://ci.encar.com{url}?impolicy=heightRate&rh=696&cw=1160&ch=696&cg=Center&wtmk=https://ci.encar.com/wt_mark/w_mark_04.png',
-                        vechile = car_to_update
+                        car = car_to_update
                     ))
             else:
                 print('нет машины')
