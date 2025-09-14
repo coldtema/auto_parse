@@ -63,7 +63,11 @@ class CarParser():
         number_of_results = self.get_number_of_results()
         for page in range(math.ceil(number_of_results/1000)):
             self.current_api_url_list[-2] = str(page*1000)
-            response = self.session.get(''.join(self.current_api_url_list))
+            try:
+                response = self.session.get(''.join(self.current_api_url_list))
+            except:
+                self.get_number_of_results()
+                response = self.session.get(''.join(self.current_api_url_list))
             print('код:', response.status_code)
             print('текст', response.text[:20]) 
             data = response.json()['SearchResults']
@@ -188,7 +192,11 @@ class TruckParser():
         number_of_results = self.get_number_of_results()
         for page in range(math.ceil(number_of_results/1000)):
             self.current_api_url_list[-2] = str(page*1000)
-            response = self.session.get(''.join(self.current_api_url_list))
+            try:
+                response = self.session.get(''.join(self.current_api_url_list))
+            except:
+                self.get_number_of_results()
+                response = self.session.get(''.join(self.current_api_url_list))
             print('код:', response.status_code)
             print('текст', response.text[:20])
             data = response.json()['SearchResults']
