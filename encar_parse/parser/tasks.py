@@ -1,13 +1,18 @@
 from celery import shared_task, chain
 from parser.parsers import async_clearer, async_parser, diag_parser, raw_parser, record_parser
 from parser import ru_price_calc
+import traceback
 
 
 @shared_task
 def get_raw_car_info():
     '''Собираем инфу из полного каталога машин (батч по пробегам)'''
     p = raw_parser.CarParser()
-    p.run()
+    try:
+        p.run()
+    except Exception as e:
+        tb = traceback.format_exc() 
+        print(f"Ошибка: {e}\n{tb}")
     del p
     return True
 
@@ -16,7 +21,11 @@ def get_raw_car_info():
 def get_raw_truck_info():
     '''Собираем инфу из полного каталога траков (батч по пробегам)'''
     p = raw_parser.TruckParser()
-    p.run()
+    try:
+        p.run()
+    except Exception as e:
+        tb = traceback.format_exc() 
+        print(f"Ошибка: {e}\n{tb}")
     del p
     return True
 
@@ -25,7 +34,11 @@ def get_raw_truck_info():
 def get_full_car_info():
     '''Собираем полую инфу отдельно из каждого url машины'''
     p = async_parser.AsyncCarParser()
-    p.run()
+    try:
+        p.run()
+    except Exception as e:
+        tb = traceback.format_exc() 
+        print(f"Ошибка: {e}\n{tb}")
     del p
     return True
 
@@ -34,7 +47,11 @@ def get_full_car_info():
 def get_full_truck_info():
     '''Собираем полую инфу отдельно из каждого url трака'''
     p = async_parser.AsyncTruckParser()
-    p.run()
+    try:
+        p.run()
+    except Exception as e:
+        tb = traceback.format_exc() 
+        print(f"Ошибка: {e}\n{tb}")
     del p
     return True
 
@@ -43,7 +60,11 @@ def get_full_truck_info():
 def delete_fake_cars():
     '''Удаляем машины не для продажи в рф + дубли'''
     p = async_parser.CarDuplicateClearer()
-    p.go_through_unique_dummy_ids()
+    try:
+        p.go_through_unique_dummy_ids()
+    except Exception as e:
+        tb = traceback.format_exc() 
+        print(f"Ошибка: {e}\n{tb}")
     del p
     return True
 
@@ -52,7 +73,11 @@ def delete_fake_cars():
 def delete_fake_trucks():
     '''Удаляем траки не для продажи в рф + дубли'''
     p = async_parser.TruckDuplicateClearer()
-    p.go_through_unique_dummy_ids()
+    try:
+        p.go_through_unique_dummy_ids()
+    except Exception as e:
+        tb = traceback.format_exc() 
+        print(f"Ошибка: {e}\n{tb}")
     del p
     return True
 
@@ -61,7 +86,11 @@ def delete_fake_trucks():
 def get_car_diagnosis():
     '''Собираем инфу о состоянии кузова всех машин'''
     p = diag_parser.AsyncCarDiagParser()
-    p.run()
+    try:
+        p.run()
+    except Exception as e:
+        tb = traceback.format_exc() 
+        print(f"Ошибка: {e}\n{tb}")
     del p
     return True
 
@@ -70,7 +99,11 @@ def get_car_diagnosis():
 def get_truck_diagnosis():
     '''Собираем инфу о состоянии кузова всех траков'''
     p = diag_parser.AsyncTruckDiagParser()
-    p.run()
+    try:
+        p.run()
+    except Exception as e:
+        tb = traceback.format_exc() 
+        print(f"Ошибка: {e}\n{tb}")
     del p
     return True
 
@@ -79,7 +112,11 @@ def get_truck_diagnosis():
 def get_car_record():
     '''Собираем инфу о страховых случаях каждой машины'''
     p = record_parser.AsyncCarRecordParser()
-    p.run()
+    try:
+        p.run()
+    except Exception as e:
+        tb = traceback.format_exc() 
+        print(f"Ошибка: {e}\n{tb}")
     del p
     return True
 
@@ -88,7 +125,11 @@ def get_car_record():
 def count_duties_and_ru_price():
     '''Расчет таможенных сборов и ру-цены для каждой машины'''
     p = ru_price_calc.RuPriceCalc()
-    p.run()
+    try:
+        p.run()
+    except Exception as e:
+        tb = traceback.format_exc() 
+        print(f"Ошибка: {e}\n{tb}")
     del p
     return True
 
@@ -97,7 +138,11 @@ def count_duties_and_ru_price():
 def delete_not_avaliable_cars():
     '''Удаление неактуальных объявлений машин'''
     p = async_clearer.AsyncCarClearer()
-    p.run()
+    try:
+        p.run()
+    except Exception as e:
+        tb = traceback.format_exc() 
+        print(f"Ошибка: {e}\n{tb}")
     del p
     return True
 
@@ -106,7 +151,11 @@ def delete_not_avaliable_cars():
 def delete_not_avaliable_trucks():
     '''Удаление неактуальных объявлений траков'''
     p = async_clearer.AsyncTruckClearer()
-    p.run()
+    try:
+        p.run()
+    except Exception as e:
+        tb = traceback.format_exc() 
+        print(f"Ошибка: {e}\n{tb}")
     del p
     return True
 
