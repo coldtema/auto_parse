@@ -112,24 +112,32 @@ def delete_not_avaliable_trucks():
 
 
 @shared_task
-def main_task_car():
+def main_task():
     '''Полностью добавляет новые машины со всей подробной инфой в бд (раз в 3 часа)'''
     chain(
+        delete_not_avaliable_cars.si(),
+        count_duties_and_ru_price.si(),
         get_raw_car_info.si(),
         get_full_car_info.si(),
         delete_fake_cars.si(),
         get_car_diagnosis.si(),
         get_car_record.si(),
         count_duties_and_ru_price.si(),
+        delete_not_avaliable_trucks.si(),
+        get_raw_truck_info.si(),
+        get_full_truck_info.si(),
+        delete_fake_trucks.si(),
+        get_truck_diagnosis.si(),
     )()
     return True
 
 
 @shared_task
-def easy_task_car():
+def easy_task():
     '''Удаляет неактуальные объявления + пересчитывает таможенные сборы и ру цену (раз в час)у легковых машин'''
     chain(
         delete_not_avaliable_cars.si(),
+        delete_not_avaliable_trucks.si(),
         count_duties_and_ru_price.si(),
     )()
     return True
