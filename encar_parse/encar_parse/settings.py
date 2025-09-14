@@ -151,23 +151,21 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_EXTENDED = True
 CELERY_BEAT_SCHEDULE = {
-    'one_hour_easy_task_car':{
-        'task': 'parser.tasks.easy_task_car',
-        'schedule': timedelta(hours=1),
+    'one_hour_easy_task':{
+        'task': 'parser.tasks.easy_task',
+        'schedule': crontab(
+            minute=0,
+            hour='2,5,8,11,14,17,20,23'
+            ),
         },
-    'three_hours_main_task_car':{
-        'task': 'parser.tasks.main_task_car',
-        'schedule': timedelta(hours=3),
+    'three_hours_main_task':{
+        'task': 'parser.tasks.main_task',
+        'schedule': crontab(
+            minute=0,
+            hour='0,3,6,9,12,15,18,21'
+            ),
         },
-    'one_hour_easy_task_truck':{
-        'task': 'parser.tasks.easy_task_truck',
-        'schedule': timedelta(hours=1),
-        },
-    'three_hours_main_task_truck':{
-        'task': 'parser.tasks.main_task_truck',
-        'schedule': timedelta(hours=3),
-        },
-}
+    }
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_SSL_REDIRECT = True
