@@ -341,6 +341,10 @@ truck_korean_dict = {
         "르노삼성": "Renault Samsung"
     },
     'MODELS': {
+        '': '',
+        "레이": "Ray",
+        "F시리즈": "F-Series",
+        "올 뉴 카니발": "Carnival",
         "마이티 ": "Mighty",
         "유로카고": "Eurocargo",
         "엘프": "Elf",
@@ -450,6 +454,8 @@ truck_korean_dict = {
         "익스프레스밴": "Express Van"
     },
     'VERSIONS': {
+        '8X4': '8X4',
+        '4WD': '4WD',
         '': '',
         'GOLD': 'GOLD',
         '10X4': '10X4',
@@ -458,9 +464,12 @@ truck_korean_dict = {
         '6X2': '6X2',
         '6X4': '6X4',
         '8X4': '8X4',
+        "터보 슈퍼캡": "Turbo Super Cab",
         '090 20인승': '090 20-seater',
         '표준형 DLX 15인승': 'Standard DLX 15-seater',
+        "휠체어 리프트": "With wheelchair lift",
         '휠체어 리프 트': 'Wheelchair Lift',
+        "장축 DLX 15인승": "Long-Body DLX, 15-seater version",
         '디젤 39인승': 'Diesel 39-seater',
         '롱바디 GOLD 25인승 ': 'Long Body GOLD 25-seater',
         '롱바디 GOLD 21인승': 'Long Body GOLD 21-seater',
@@ -646,7 +655,8 @@ truck_korean_dict = {
         "수동": "Механическая",
         "오토": "Автоматическая",
         "세미오토": "Полуавтоматическая",
-        "기타": "Другое"
+        "기타": "Другое",
+        "오토": "Автоматическая",
     },
     'CITIES': {
         "충남": "Чхуннам (пров. Чхунчхон-Намдо)",
@@ -675,6 +685,7 @@ truck_korean_dict = {
     },
 
     'VERSION_DETAILS' : {
+        "이동방제차": "Передвижная машина для дезинфекции / санитарной обработки",
         'LPG/LNG탱크로리': 'Цистерна для LPG/LNG',
         "음식물수거": "Мусоровоз для пищевых отходов",
         "특수/케미컬(VOC,테플론)탱크로리": "Спецтехника / химический (VOC, тефлон) танкер",
