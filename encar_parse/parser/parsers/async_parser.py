@@ -110,7 +110,7 @@ class AsyncCarParser():
                 car_to_update.korean_number = result['korean_number']
                 car_to_update.dummy_id = result['dummy_id']
                 car_to_update.encar_diag = result['encar_diag']
-                car_to_update.body_name = result['body_name']
+                car_to_update.body_name = car_korean_dict['BODY_NAME'].get(result['body_name'], result['body_name'])
                 self.updated_batch.append(car_to_update)
                 sorted_urls = sorted(set(result['photos_urls']), key=lambda x: int(x[-7:-4]))
                 for number, url in enumerate(sorted_urls, 1):
