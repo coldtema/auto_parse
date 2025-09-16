@@ -207,7 +207,7 @@ class TruckParser():
 
     def dump_data(self, data):
          for elem in data:
-            ru_fuel_type = truck_korean_dict['FUEL_TYPES'].get(elem.get('FuelType', ''), elem.get('FuelType', ''))
+            ru_fuel_type = truck_korean_dict['FUEL_TYPES'].get(elem.get('FuelType', ''), None)
             if ru_fuel_type in ['L', '']: continue
             flag_inspection = False
             flag_record = False
@@ -215,17 +215,40 @@ class TruckParser():
             if 'Inspection' in list(elem['Condition']): flag_inspection=True
             if 'Record' in list(elem['Condition']): flag_record=True
             if 'Resume' in list(elem['Condition']): flag_resume=True
-            eng_manufacturer = truck_korean_dict['MANUFACTURERS'].get(elem.get('Manufacturer', ''), elem.get('Manufacturer', ''))
-            ru_transmission = truck_korean_dict['TRANSMISSIONS'].get(elem.get('Transmission', ''), elem.get('Transmission', ''))
-            eng_model = truck_korean_dict['MODELS'].get(elem.get('Model', ''), elem.get('Model', ''))
-            eng_version = truck_korean_dict['VERSIONS'].get(elem.get('Badge', ''), elem.get('Badge', ''))
-            ru_cities = truck_korean_dict['CITIES'].get(elem.get('OfficeCityState', ''), elem.get('OfficeCityState', ''))
-            ru_version_details = truck_korean_dict['VERSION_DETAILS'].get(elem.get('FormDetail', ''), elem.get('FormDetail', ''))
-            ru_usage = truck_korean_dict['USAGES'].get(elem.get('Use', ''), elem.get('Use', ''))
-            if eng_manufacturer == elem.get('Manufacturer', ''): print(f'Не нашлось марки трака: {elem.get('Manufacturer', '')}')
-            if eng_model == elem.get('Model', ''): print(f'Не нашлось модели трака: {elem.get('Model', '')}')
-            if eng_version == elem.get('Badge', ''): print(f'Не нашлось версии трака: {elem.get('Badge', '')}')
-            if ru_version_details == elem.get('FormDetail', ''): print(f'Не нашлось деталей версии трака: {elem.get('FormDetail', '')}')
+            eng_manufacturer = truck_korean_dict['MANUFACTURERS'].get(elem.get('Manufacturer', ''), None)
+            ru_transmission = truck_korean_dict['TRANSMISSIONS'].get(elem.get('Transmission', ''), None)
+            eng_model = truck_korean_dict['MODELS'].get(elem.get('Model', ''), None)
+            eng_version = truck_korean_dict['VERSIONS'].get(elem.get('Badge', ''), None)
+            ru_cities = truck_korean_dict['CITIES'].get(elem.get('OfficeCityState', ''), None)
+            ru_version_details = truck_korean_dict['VERSION_DETAILS'].get(elem.get('FormDetail', ''), None)
+            ru_usage = truck_korean_dict['USAGES'].get(elem.get('Use', ''), None)
+            if ru_usage != None:
+                ru_usage = elem.get('Use', '')
+                print(f'Не нашлось трансмиссии трака: {elem.get('Transmission', '')}')
+            if ru_fuel_type != None:
+                ru_fuel_type = elem.get('FuelType', '')
+                print(f'Не нашлось трансмиссии трака: {elem.get('Transmission', '')}')
+            if ru_transmission != None:
+                ru_transmission = elem.get('Transmission', '')
+                print(f'Не нашлось трансмиссии трака: {elem.get('Transmission', '')}')
+            if ru_transmission != None:
+                ru_transmission = elem.get('Transmission', '')
+                print(f'Не нашлось трансмиссии трака: {elem.get('Transmission', '')}')
+            if ru_cities != None:
+                eng_manufacturer = elem.get('OfficeCityState', '')
+                print(f'Не нашлось города трака: {elem.get('OfficeCityState', '')}')
+            if eng_manufacturer != None:
+                eng_manufacturer = elem.get('Manufacturer', '')
+                print(f'Не нашлось марки трака: {elem.get('Manufacturer', '')}')
+            if eng_model != None:
+                eng_model = elem.get('Model', '')
+                print(f'Не нашлось модели трака: {elem.get('Model', '')}')
+            if eng_version != None:
+                eng_version = elem.get('Badge', '')
+                print(f'Не нашлось версии трака: {elem.get('Badge', '')}')
+            if ru_version_details != None: 
+                ru_version_details = elem.get('FormDetail', '')
+                print(f'Не нашлось деталей версии трака: {elem.get('FormDetail', '')}')
             if '기' in elem.get('Capacity', ''): #прочее/другое
                 ru_capacity = ''
             elif '이상' in elem.get('Capacity', ''): # более 톤
