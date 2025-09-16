@@ -76,6 +76,7 @@ class AsyncCarParser():
                     'korean_number': response['vehicleNo'],
                     'dummy_id': dummy_id,
                     'encar_diag': response['view']['encarDiagnosis'],
+                    'body_name': response['spec']['bodyName']
                 }
                 return detail_dict
         except:
@@ -109,6 +110,7 @@ class AsyncCarParser():
                 car_to_update.korean_number = result['korean_number']
                 car_to_update.dummy_id = result['dummy_id']
                 car_to_update.encar_diag = result['encar_diag']
+                car_to_update.body_name = result['body_name']
                 self.updated_batch.append(car_to_update)
                 sorted_urls = sorted(set(result['photos_urls']), key=lambda x: int(x[-7:-4]))
                 for number, url in enumerate(sorted_urls, 1):
@@ -128,7 +130,8 @@ class AsyncCarParser():
                                         'options', 
                                         'korean_number', 
                                         'dummy_id', 
-                                        'encar_diag'], objs=self.updated_batch)
+                                        'encar_diag',
+                                        'body_name'], objs=self.updated_batch)
         CarPhoto.objects.bulk_create(photos_obj, ignore_conflicts=True)
         self.results = []
 
