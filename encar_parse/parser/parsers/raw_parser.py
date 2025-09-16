@@ -219,7 +219,7 @@ class TruckParser():
             ru_transmission = truck_korean_dict['TRANSMISSIONS'].get(elem.get('Transmission', ''), None)
             eng_model = truck_korean_dict['MODELS'].get(elem.get('Model', ''), None)
             eng_version = truck_korean_dict['VERSIONS'].get(elem.get('Badge', ''), None)
-            ru_cities = truck_korean_dict['CITIES'].get(elem.get('OfficeCityState', ''), None)
+            ru_cities = truck_korean_dict['CITIES'].get(elem.get('OfficeCityState', ''), '')
             ru_version_details = truck_korean_dict['VERSION_DETAILS'].get(elem.get('FormDetail', ''), None)
             ru_usage = truck_korean_dict['USAGES'].get(elem.get('Use', ''), None)
             if ru_usage == None:
@@ -234,7 +234,7 @@ class TruckParser():
             if ru_transmission == None:
                 ru_transmission = elem.get('Transmission', '')
                 print(f'Не нашлось трансмиссии трака: {elem.get('Transmission', '')}')
-            if ru_cities == None:
+            if ru_cities == '':
                 eng_manufacturer = elem.get('OfficeCityState', '')
                 print(f'Не нашлось города трака: {elem.get('OfficeCityState', '')}')
             if eng_manufacturer == None:
@@ -455,6 +455,7 @@ truck_korean_dict = {
     },
     'VERSIONS': {
         '8X4': '8X4',
+        '8X4': '8X4',
         '4WD': '4WD',
         '': '',
         'GOLD': 'GOLD',
@@ -641,7 +642,8 @@ truck_korean_dict = {
         "CRDI 슈퍼캡": "CRDI Super Cab",
         "단축 DLX 25인승": "Short Wheelbase DLX 25-seater",
         "킹캡 LPG": "King Cab LPG",
-        "2WD": "2WD"
+        "2WD": "2WD",
+        '4WD': '4WD',
     },
     'FUEL_TYPES': {
         "전기": "E",
