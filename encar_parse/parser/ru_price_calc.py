@@ -224,6 +224,9 @@ recycling_fee_dict = { #*20000 rub
 
 
 horsepower_dict = {
+    'Kia Niro Prestige None 2023': 150,
+    'Kia EV4 Long Range 2WD GT-LIne 2026': 150,
+
     'Hyundai Ioniq6 Standard E-Value+ 2025': 170,
     'Kia EV6 Long Range 4WD Air 2022': 239,
     'Kia EV6 Standard 4WD Air 2022': 125,
@@ -239,6 +242,10 @@ horsepower_dict = {
     "BMW iX1 xDrive 30 xLine None 2024": 230,
     "Mercedes-Benz EQE EQE500 4MATIC None 2024": 300,
     "Genesis G80 e-AWD None 2022": 272,
+    "Genesis G80 e-AWD None 2022": 272,
+    'Audi Q4 e-tron 45 Premium Sportback None 2025': 210,
+    'KG_Mobility_Ssangyong Torres Taxi None 2024': 120,
+
     "Kia EV3 Long Range 2WD GT-Line 2026": 160,
     "Kia EV3 Long Range 2WD GT-Line 2025": 160,
     "Kia EV3 Long Range 2WD GT-Line 2024": 160,
@@ -487,6 +494,7 @@ horsepower_dict = {
     "Hyundai Ioniq6 Long Range Prestige 2023": 239,
     "Tesla Model 3 Long Range None 2025": 340,
     "Tesla Model S 75D None 2019": 245,
+    "Tesla Model S 75D None 2018": 245,
     "Audi Q4 e-tron 40 Sportback None 2022": 150,
     "Kia EV6 Long Range GT Line 2023": 239,
     "Mercedes-Benz EQC EQC400 4MATIC None 2020": 300,
