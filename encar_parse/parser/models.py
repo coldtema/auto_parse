@@ -53,6 +53,7 @@ class Car(models.Model):
     korean_number = models.CharField(max_length=32, null=True, blank=True)
     dummy_id = models.IntegerField(null=True, blank=True, db_index=True)
     encar_diag = models.IntegerField(null=True, blank=True) # -1 - нет, 1 - да
+    body_name = models.CharField(max_length=64, null=True, blank=True)
 
     def __str__(self):
         return str(self.encar_id)
