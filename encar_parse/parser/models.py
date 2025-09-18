@@ -25,6 +25,17 @@ class AccidentType(models.TextChoices):
 
 
 
+
+class CarColor(models.Model):
+    value_key = models.CharField(max_length=32, unique=True)
+    value_name = models.CharField(max_length=32, unique=True)
+    
+
+class CarBody(models.Model):
+    value_key = models.CharField(max_length=32, unique=True)
+    value_name = models.CharField(max_length=32, unique=True)
+
+
 class Car(models.Model):
     encar_id = models.BigIntegerField(verbose_name='Внутреннее id encar', unique=True)
     url = models.URLField()
@@ -35,7 +46,7 @@ class Car(models.Model):
     model = models.CharField(max_length=128, null=True, blank=True)
     version = models.CharField(max_length=128, null=True, blank=True)
     version_details = models.CharField(max_length=128, null=True, blank=True)
-    color = models.CharField(max_length=128, null=True, blank=True, db_index=True)
+    color = models.ForeignKey(CarColor, on_delete=models.PROTECT, null=True, blank=True)
     engine_capacity = models.IntegerField(null=True, blank=True, db_index=True)
     transmission = models.CharField(max_length=128, db_index=True)
     fuel_type = models.CharField(max_length=2, choices=FuelType.choices, default=FuelType.GASOLINE, db_index=True)
@@ -53,7 +64,7 @@ class Car(models.Model):
     korean_number = models.CharField(max_length=32, null=True, blank=True)
     dummy_id = models.IntegerField(null=True, blank=True, db_index=True)
     encar_diag = models.IntegerField(null=True, blank=True) # -1 - нет, 1 - да
-    body_name = models.CharField(max_length=64, null=True, blank=True)
+    body_name = models.ForeignKey(CarBody, on_delete=models.PROTECT, null=True, blank=True)
 
     def __str__(self):
         return str(self.encar_id)
