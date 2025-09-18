@@ -66,6 +66,13 @@ class Car(models.Model):
     encar_diag = models.IntegerField(null=True, blank=True) # -1 - нет, 1 - да
     body_name = models.ForeignKey(CarBody, on_delete=models.PROTECT, null=True, blank=True)
 
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['body_name', 'model_year']),
+            models.Index(fields=['manufacturer', 'model']),
+        ]
+
     def __str__(self):
         return str(self.encar_id)
     
