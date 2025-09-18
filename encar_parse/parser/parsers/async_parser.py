@@ -1,6 +1,6 @@
 import requests
 import math
-from ..models import Car, Truck, TruckPhoto, CarPhoto
+from ..models import Car, Truck, TruckPhoto, CarPhoto, CarColor, CarBody
 import asyncio
 import aiohttp
 from parser.parsers.raw_parser import car_korean_dict
@@ -30,6 +30,8 @@ class AsyncCarParser():
         self.batch = []
         self.results = []
         self.counter = 1
+        self.color_list = CarColor.objects.all()
+        self.body_list = CarBody.objects.all()
 
     def run(self):
         self.get_cookies()
@@ -93,6 +95,33 @@ class AsyncCarParser():
     def get_cookies(self):
         self.session.get("https://www.encar.com", headers=self.headers) 
 
+
+    def get_color(self, dict_color, raw_color):
+        if not dict_color:
+            print(f'Не нашлось цвета {raw_color}')
+            return None
+        color_to_send = self.color_list.filter(value_key=dict_color[0]).first()
+        if not color_to_send:
+            new_color = CarColor.objects.create(value_key=dict_color[0], value_name=dict_color[1])
+            self.color_list = CarColor.objects.all()
+            return new_color
+        else:
+            return color_to_send
+        
+
+    def get_body(self, dict_body, raw_body):
+        if not dict_body:
+            print(f'Не нашлось цвета {raw_body}')
+            return None
+        body_to_send = self.body_list.filter(value_key=dict_body[0]).first()
+        if not body_to_send:
+            new_body = CarBody.objects.create(value_key=dict_body[0], value_name=dict_body[1])
+            self.body_list = CarBody.objects.all()
+            return new_body
+        else:
+            return body_to_send
+
+
     @transaction.atomic
     def save_to_db(self):
         photos_obj = []
@@ -105,12 +134,12 @@ class AsyncCarParser():
                 car_to_update.version = result['version']
                 car_to_update.version_details = result['version_details']
                 car_to_update.options = result['options']
-                car_to_update.color = car_korean_dict['COLOR'].get(result['color'], result['color'])
                 car_to_update.engine_capacity = result['engine_capacity']
                 car_to_update.korean_number = result['korean_number']
                 car_to_update.dummy_id = result['dummy_id']
                 car_to_update.encar_diag = result['encar_diag']
-                car_to_update.body_name = car_korean_dict['BODY_NAME'].get(result['body_name'], result['body_name'])
+                car_to_update.color = self.get_color(car_korean_dict['COLOR'].get(result['color'], None), result['color'])
+                car_to_update.body_name = self.get_body(car_korean_dict['BODY_NAME'].get(result['body_name'], None), result['body_name'])
                 self.updated_batch.append(car_to_update)
                 sorted_urls = sorted(set(result['photos_urls']), key=lambda x: int(x[-7:-4]))
                 for number, url in enumerate(sorted_urls, 1):
