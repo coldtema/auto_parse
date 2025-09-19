@@ -183,13 +183,22 @@ class CarDuplicateClearer():
                 self.encar_ids_to_delete.append(duplicates[1]['encar_id'])
         for i in range(math.ceil(len(self.encar_ids_to_delete) / 1000)):
             Car.objects.filter(encar_id__in=self.encar_ids_to_delete[i*1000:(i+1)*1000]).delete()
-        Car.objects.filter(manufacturer__in=['Others', 'etc', '']).delete() #удаление неизвестных encar'u машин (others-others-others)
+        Car.objects.filter(manufacturer__value_name__in=['Others', 'etc', '']).delete() #удаление неизвестных encar'u машин (others-others-others)
+        CarManufacturer.objects.filter(value_name__in=['Others', 'etc', '']).delete()
         Car.objects.filter(sell_type='Лизинг').delete()
         Car.objects.filter(sell_type='Аренда').delete()
-        Car.objects.filter(engine_capacity__lt=900, fuel_type__in=['G', 'D', 'GE', 'DE']).delete()
-        Car.objects.filter(engine_capacity__isnull=True, fuel_type__in=['G', 'D', 'GE', 'DE']).delete()
+        Car.objects.filter(engine_capacity__lt=900, fuel_type__value_key__in=['G', 'D', 'GE', 'DE']).delete()
+        Car.objects.filter(engine_capacity__isnull=True, fuel_type__value_key__in=['G', 'D', 'GE', 'DE']).delete()
         Car.objects.filter(engine_capacity__gt=9999).delete()
         Car.objects.filter(engine_capacity=None).delete()
+        list_manufacturers = CarManufacturer.objects.all()
+        for manufacturer in list_manufacturers:
+            manufacturer.car_count = Car.objects.filter(manufacturer=manufacturer).count()
+        CarManufacturer.objects.bulk_update(fields=['car_count'], objs=list_manufacturers)
+        
+
+
+    
 
 
 
