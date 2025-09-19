@@ -1,6 +1,6 @@
 import requests
 import math
-from ..models import Car, Truck, TruckPhoto, CarPhoto, CarColor, CarBody
+from ..models import Car, Truck, TruckPhoto, CarPhoto, CarColor, CarBody, CarManufacturer
 import asyncio
 import aiohttp
 from parser.parsers.raw_parser import car_korean_dict
@@ -32,6 +32,7 @@ class AsyncCarParser():
         self.counter = 1
         self.color_list = CarColor.objects.all()
         self.body_list = CarBody.objects.all()
+        self.manufacturer_list = CarManufacturer.objects.all()
 
     def run(self):
         self.get_cookies()
@@ -120,6 +121,20 @@ class AsyncCarParser():
             return new_body
         else:
             return body_to_send
+        
+
+    def get_manufacturer(self, raw_manufacturer:str):
+        if not raw_manufacturer:
+            print(f'Не нашлось производителя {raw_manufacturer}')
+            return None
+        manufacturer_to_send = self.manufacturer_list.filter(value_name=raw_manufacturer).first()
+        if not manufacturer_to_send:
+            key_manufacturer = raw_manufacturer.lower().replace(' ', '_').replace('(', '').replace(')', '').replace('/', '').replace('&', '').replace('-', '_')
+            new_manufacturer = CarManufacturer.objects.create(value_key=key_manufacturer, value_name=raw_manufacturer)
+            self.manufacturer_list = CarManufacturer.objects.all()
+            return new_manufacturer
+        else:
+            return manufacturer_to_send
 
 
     @transaction.atomic
@@ -129,7 +144,7 @@ class AsyncCarParser():
         for result in self.results:
             if result:
                 car_to_update = self.batch.get(encar_id=int(result['encar_id']))
-                car_to_update.manufacturer = result['manufacturer']
+                car_to_update.manufacturer = self.get_manufacturer(result['manufacturer'])
                 car_to_update.model = result['model']
                 car_to_update.version = result['version']
                 car_to_update.version_details = result['version_details']
