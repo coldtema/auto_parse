@@ -1,6 +1,6 @@
 import requests
 import math
-from ..models import Car, Truck
+from ..models import Car, Truck, CarFuel, CarManufacturer
 from parser import cookie_grabber
 from django.db import transaction
 
@@ -30,6 +30,8 @@ class CarParser():
         }
         self.all_ids = set()
         self.new_elems = []
+        self.list_fuel_types = CarFuel.objects.all()
+
 
     def run(self):
         self.get_cookies()
@@ -84,8 +86,8 @@ class CarParser():
             if 'Inspection' in list(elem['Condition']): flag_inspection=True
             if 'Record' in list(elem['Condition']): flag_record=True
             if 'Resume' in list(elem['Condition']): flag_resume=True
-            ru_fuel_type = car_korean_dict['FUEL_TYPE'].get(elem.get('FuelType', ''), '')
-            if ru_fuel_type in ['L', 'LE', 'LG', 'HY', '', 'LP', 'CN']: continue
+            ru_fuel_type = self.get_fuel_type(car_korean_dict['FUEL_TYPE'].get(elem.get('FuelType', ''), None), elem.get('FuelType', ''))
+            if ru_fuel_type == 'continue': continue
             ru_transmission = car_korean_dict['TRANSMISSION'].get(elem.get('Transmission', ''), elem.get('Transmission', ''))
             ru_cities = car_korean_dict['CITY'].get(elem.get('OfficeCityState', ''), elem.get('OfficeCityState', ''))
             ru_sell_type = car_korean_dict['SELL_TYPE'].get(elem.get('SellType', ''), elem.get('SellType', ''))
@@ -104,6 +106,20 @@ class CarParser():
                                         updated = elem.get('ModifiedDate', ''),
                                         city = ru_cities
                                         ))
+            
+
+    def get_fuel_type(self, dict_fuel_type, raw_fuel_type):
+        if not dict_fuel_type:
+            print(f'Не нашлось типа топлива {raw_fuel_type}')
+            return None
+        if dict_fuel_type[0] in ['L', 'LE', 'LG', 'HY', '', 'LP', 'CN']: return 'continue'
+        fuel_to_send = self.list_fuel_types.filter(value_key=dict_fuel_type[0]).first()
+        if not fuel_to_send:
+            new_fuel_type = CarFuel.objects.create(value_key=dict_fuel_type[0], value_name=dict_fuel_type[1])
+            self.list_fuel_types = CarFuel.objects.all()
+            return new_fuel_type
+        else:
+            return fuel_to_send
 
 
     def get_cookies(self):
@@ -860,17 +876,17 @@ car_korean_dict = {
         "대전": "Тэджон"
     },
     'FUEL_TYPE': {
-        "LPG+전기": "LE",
-        "가솔린": "G",
-        "가솔린+전기": "GE",
-        "기타": "",
-        "수소": "HY",
-        "가솔린+CNG": "LG",
-        "디젤": "D",
-        "전기": "E",
-        "가솔린+LPG": "LG",
-        "디젤+전기": "DE",
-        "LPG(일반인 구입)": "L"
+        "LPG+전기": ("LE", "СУГ + Электричество"),
+        "가솔린": ("G", "Бензин"),
+        "가솔린+전기": ("GE", "Бензин + Электричество"),
+        "기타": ("", "Прочее"),
+        "수소": ("HY", "Водород"),
+        "가솔린+CNG": ("LG", "Бензин + Газ"),
+        "디젤": ("D", "Дизель"),
+        "전기": ("E", "Электричество"),
+        "가솔린+LPG": ("LG", "Бензин + СУГ"),
+        "디젤+전기": ("DE", "Дизель + Электричество"),
+        "LPG(일반인 구입)": ("L", "СУГ (для частных владельцев)")
     },
     'COLOR': {
         "주황색": ("orange", "Оранжевый"),
