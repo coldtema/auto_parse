@@ -206,6 +206,7 @@ class CarDuplicateClearer():
         Car.objects.filter(engine_capacity__isnull=True, fuel_type__value_key__in=['G', 'D', 'GE', 'DE']).delete()
         Car.objects.filter(engine_capacity__gt=9999).delete()
         Car.objects.filter(engine_capacity=None).delete()
+        Car.objects.filter(fuel_type=None).delete()
         list_manufacturers = CarManufacturer.objects.all()
         for manufacturer in list_manufacturers:
             manufacturer.car_count = Car.objects.filter(manufacturer=manufacturer).count()
