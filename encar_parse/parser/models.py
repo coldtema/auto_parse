@@ -36,20 +36,30 @@ class CarBody(models.Model):
     value_name = models.CharField(max_length=32, unique=True)
 
 
+class CarFuel(models.Model):
+    value_key = models.CharField(max_length=32, unique=True)
+    value_name = models.CharField(max_length=32, unique=True)
+
+class CarManufacturer(models.Model):
+    value_key = models.CharField(max_length=32, unique=True)
+    value_name = models.CharField(max_length=32, unique=True)
+    car_count = models.IntegerField(null=True, blank=True, default=0)
+
+
 class Car(models.Model):
     encar_id = models.BigIntegerField(verbose_name='Внутреннее id encar', unique=True)
     url = models.URLField()
     inspection = models.BooleanField(default=False)
     record = models.BooleanField(default=False)
     resume = models.BooleanField(default=False)
-    manufacturer = models.CharField(max_length=128, null=True, blank=True)
+    manufacturer = models.ForeignKey(CarManufacturer, on_delete=models.PROTECT, null=True, blank=True)
     model = models.CharField(max_length=128, null=True, blank=True)
     version = models.CharField(max_length=128, null=True, blank=True)
     version_details = models.CharField(max_length=128, null=True, blank=True)
     color = models.ForeignKey(CarColor, on_delete=models.PROTECT, null=True, blank=True)
     engine_capacity = models.IntegerField(null=True, blank=True, db_index=True)
     transmission = models.CharField(max_length=128, db_index=True)
-    fuel_type = models.CharField(max_length=2, choices=FuelType.choices, default=FuelType.GASOLINE, db_index=True)
+    fuel_type = models.ForeignKey(CarFuel, on_delete=models.PROTECT, null=True, blank=True)
     release_date = models.IntegerField(db_index=True)
     model_year = models.IntegerField()
     mileage = models.IntegerField(db_index=True)
