@@ -58,7 +58,7 @@ class RuPriceCalc:
     def batching_query(self):
         '''Функция прохода через все батчи легковых машин'''
         for i in range(math.ceil(self.car_count/self.batch_size)):
-            self.batch = Car.objects.filter(encar_id__in=self.encar_ids[i*self.batch_size:(i+1)*self.batch_size]).select_related('fuel_type')
+            self.batch = Car.objects.filter(encar_id__in=self.encar_ids[i*self.batch_size:(i+1)*self.batch_size]).select_related('fuel_type', 'manufacturer')
             self.go_through_batch()
             self.save_to_db()
 
@@ -100,9 +100,9 @@ class RuPriceCalc:
 
 
     def get_excise_tax(self):
-        current_vechile_engine_capacity = horsepower_dict.get(f'{self.current_vechile.manufacturer} {self.current_vechile.model} {self.current_vechile.version} {self.current_vechile.version_details} {self.current_vechile.model_year}', 0)
+        current_vechile_engine_capacity = horsepower_dict.get(f'{self.current_vechile.manufacturer.value_name} {self.current_vechile.model} {self.current_vechile.version} {self.current_vechile.version_details} {self.current_vechile.model_year}', 0)
         if current_vechile_engine_capacity == 0:
-            print(f'{self.current_vechile.manufacturer} {self.current_vechile.model} {self.current_vechile.version} {self.current_vechile.version_details} {self.current_vechile.model_year}', 'не нашлось мощности')
+            print(f'{self.current_vechile.manufacturer.value_name} {self.current_vechile.model} {self.current_vechile.version} {self.current_vechile.version_details} {self.current_vechile.model_year}', 'не нашлось мощности')
         for key, value in excise_tax_dict.items():
             if key[0] <= current_vechile_engine_capacity <= key[1]:
                 return math.ceil(current_vechile_engine_capacity / 0.75 * value)
