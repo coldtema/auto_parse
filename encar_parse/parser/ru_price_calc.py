@@ -40,14 +40,14 @@ class RuPriceCalc:
 
 
     def fuel_type_dispatcher(self):
-        if self.current_vechile.fuel_type == 'E':
+        if self.current_vechile.fuel_type.value_key == 'E':
             price_customs_duty = self.get_customs_duty_electro()
             excise_tax = self.get_excise_tax()
             recycling_fee = self.get_recycling_fee_electro()
             customs_clearance_fee = self.get_customs_clearance_fee()
             nds_tax = self.get_nds_tax(excise_tax, price_customs_duty)
             return self.get_final_price(price_customs_duty, excise_tax, customs_clearance_fee, nds_tax), recycling_fee
-        elif self.current_vechile.fuel_type in ['D', 'G', 'DE', 'GE']:
+        elif self.current_vechile.fuel_type.value_key in ['D', 'G', 'DE', 'GE']:
             price_customs_duty = self.get_customs_duty_gasoline()
             recycling_fee = self.get_recycling_fee_gasoline()
             customs_clearance_fee = self.get_customs_clearance_fee()
@@ -58,7 +58,7 @@ class RuPriceCalc:
     def batching_query(self):
         '''Функция прохода через все батчи легковых машин'''
         for i in range(math.ceil(self.car_count/self.batch_size)):
-            self.batch = Car.objects.filter(encar_id__in=self.encar_ids[i*self.batch_size:(i+1)*self.batch_size])
+            self.batch = Car.objects.filter(encar_id__in=self.encar_ids[i*self.batch_size:(i+1)*self.batch_size]).select_related('fuel_type')
             self.go_through_batch()
             self.save_to_db()
 
