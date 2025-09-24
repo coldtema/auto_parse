@@ -5,6 +5,7 @@ import asyncio
 import aiohttp
 from parser.parsers.raw_parser import car_korean_dict
 from django.db import transaction
+from datetime import date
 
 diagnosis = 'https://api.encar.com/v1/readside/diagnosis/vehicle/40286929'
 
@@ -211,6 +212,16 @@ class CarDuplicateClearer():
         for manufacturer in list_manufacturers:
             manufacturer.car_count = Car.objects.filter(manufacturer=manufacturer).count()
         CarManufacturer.objects.bulk_update(fields=['car_count'], objs=list_manufacturers)
+        cars_valid_check = Car.objects.filter(relase_date__gt=0)
+        for car in cars_valid_check:
+            year = car.release_date // 100
+            month = car.release_date % 100
+            car_date = date(year, month, 1)
+            today = date.today()
+            diff_months = (today.year - car_date.year) * 12 + (today.month - car_date.month)
+            car.is_valid = 36 <= diff_months <= 60
+        Car.objects.bulk_update(fields=['is_valid'], objs=cars_valid_check)
+
         
 
 
