@@ -75,6 +75,7 @@ class Car(models.Model):
     dummy_id = models.IntegerField(null=True, blank=True, db_index=True)
     encar_diag = models.IntegerField(null=True, blank=True) # -1 - нет, 1 - да
     body_name = models.ForeignKey(CarBody, on_delete=models.PROTECT, null=True, blank=True)
+    is_valid = models.BooleanField(default=False)
 
 
     class Meta:
