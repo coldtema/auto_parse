@@ -146,7 +146,7 @@ class RuPriceCalc:
 
 
 
-
+#пошлина
 customs_duty_dict = {
     'LESS_3_YEARS':{
         (0, 8500): (0.54, 2.5), #(% from cost (in eur), but not less than eur/cm3)
@@ -174,7 +174,7 @@ customs_duty_dict = {
     }
 }
 
-
+#оформление
 customs_clearance_fee_dict = {
     (0, 200000): 775, #rub
     (200001, 450000): 1550,
@@ -190,7 +190,7 @@ customs_clearance_fee_dict = {
 }
 
 
-
+#акциза
 excise_tax_dict = {
     (0, 67.4): 0, #rub/0,75kwt
     (67.5, 112.4): 60,
@@ -201,6 +201,7 @@ excise_tax_dict = {
     (375, 100000): 1728,
 }
 
+#утиль
 recycling_fee_dict = { #*20000 rub
     'ELECTRO_LESS_3_YEARS': 0.17,
     'ELECTRO_MORE_3_YEARS': 0.26,
