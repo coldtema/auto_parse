@@ -95,8 +95,8 @@ class CarParser():
             release_date = elem.get('Year', 0)
             is_valid = False
             if release_date:
-                year = release_date // 100
-                month = release_date % 100
+                year = int(release_date // 100)
+                month = int(release_date % 100)
                 car_date = date(year, month, 1)
                 today = date.today()
                 diff_months = (today.year - car_date.year) * 12 + (today.month - car_date.month)
@@ -138,7 +138,7 @@ class CarParser():
 
     def get_number_of_results(self): #он может найти больше 23 тысяч результатов, но в query никогда их не выдаст, потолок - 10000
         try:
-            print(''.join(self.current_api_url_list))
+            # print(''.join(self.current_api_url_list))
             number_of_cars = self.session.get(''.join(self.current_api_url_list)).json()['Count']
         except:
             cookies = cookie_grabber.get_new_encar_cookies()
@@ -152,8 +152,8 @@ class CarParser():
                                     })
         response = self.session.get(''.join(self.current_api_url_list))
         number_of_cars = response.json()['Count']
-        print('код:', response.status_code)
-        print('текст', response.text[:20])
+        # print('код:', response.status_code)
+        # print('текст', response.text[:20])
         return number_of_cars
     
 
@@ -310,7 +310,7 @@ class TruckParser():
 
     def get_number_of_results(self): #он может найти больше 23 тысяч результатов, но в query никогда их не выдаст, потолок - 10000
         try:
-            print(''.join(self.current_api_url_list))
+            # print(''.join(self.current_api_url_list))
             number_of_cars = self.session.get(''.join(self.current_api_url_list)).json()['Count']
         except:
             cookies = cookie_grabber.get_new_encar_cookies()
@@ -324,8 +324,8 @@ class TruckParser():
                                     })
         response = self.session.get(''.join(self.current_api_url_list))
         number_of_cars = response.json()['Count']
-        print('код:', response.status_code)
-        print('текст', response.text[:20])
+        # print('код:', response.status_code)
+        # print('текст', response.text[:20])
         return number_of_cars
 
 
