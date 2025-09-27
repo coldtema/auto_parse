@@ -92,15 +92,6 @@ class CarParser():
             ru_transmission = car_korean_dict['TRANSMISSION'].get(elem.get('Transmission', ''), elem.get('Transmission', ''))
             ru_cities = car_korean_dict['CITY'].get(elem.get('OfficeCityState', ''), elem.get('OfficeCityState', ''))
             ru_sell_type = car_korean_dict['SELL_TYPE'].get(elem.get('SellType', ''), elem.get('SellType', ''))
-            release_date = elem.get('Year', 0)
-            is_valid = False
-            if release_date:
-                year = int(release_date // 100)
-                month = int(release_date % 100)
-                car_date = date(year, month, 1)
-                today = date.today()
-                diff_months = (today.year - car_date.year) * 12 + (today.month - car_date.month)
-                is_valid = 36 <= diff_months <= 60
             self.new_elems.append(Car(encar_id=elem['Id'],
                                         url=f'https://fem.encar.com/cars/detail/{elem['Id']}',
                                         inspection=flag_inspection,
@@ -108,14 +99,12 @@ class CarParser():
                                         resume=flag_resume,
                                         transmission=ru_transmission,
                                         fuel_type = ru_fuel_type,
-                                        release_date = release_date,
                                         model_year = elem.get('FormYear', 0),
                                         mileage = elem.get('Mileage', 0),
                                         price = elem.get('Price', 0),
                                         sell_type = ru_sell_type,
                                         updated = elem.get('ModifiedDate', ''),
                                         city = ru_cities,
-                                        is_valid = is_valid
                                         ))
             
 
