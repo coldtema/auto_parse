@@ -212,15 +212,18 @@ class CarDuplicateClearer():
         for manufacturer in list_manufacturers:
             manufacturer.car_count = Car.objects.filter(manufacturer=manufacturer).count()
         CarManufacturer.objects.bulk_update(fields=['car_count'], objs=list_manufacturers)
-        cars_valid_check = Car.objects.filter(release_date__gt=0)
-        for car in cars_valid_check:
-            year = car.release_date // 100
-            month = car.release_date % 100
-            car_date = date(year, month, 1)
-            today = date.today()
-            diff_months = (today.year - car_date.year) * 12 + (today.month - car_date.month)
-            car.is_valid = 36 <= diff_months <= 60
-        Car.objects.bulk_update(fields=['is_valid'], objs=cars_valid_check)
+        cars_valid_check_list = list(Car.objects.filter(release_date__gt=0).values('encar_id'))
+        for i in range(math.ceil(len(cars_valid_check_list) / 1000)):
+            car_batch = cars_valid_check_list[i*1000:(i+1)*1000]
+            cars_to_update = Car.objects.filter(encar_id__in=list(map(lambda x: x['encar_id'], car_batch)))
+            for car in cars_to_update:
+                year = int(car.release_date // 100)
+                month = int(car.release_date % 100)
+                car_date = date(year, month, 1)
+                today = date.today()
+                diff_months = (today.year - car_date.year) * 12 + (today.month - car_date.month)
+                car.is_valid = 36 <= diff_months <= 60
+                Car.objects.bulk_update(fields=['is_valid'], objs=cars_to_update)
 
         
 
