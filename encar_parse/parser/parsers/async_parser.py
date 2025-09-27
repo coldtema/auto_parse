@@ -223,7 +223,7 @@ class CarDuplicateClearer():
                 today = date.today()
                 diff_months = (today.year - car_date.year) * 12 + (today.month - car_date.month)
                 car.is_valid = 36 <= diff_months <= 60
-                Car.objects.bulk_update(fields=['is_valid'], objs=cars_to_update)
+            Car.objects.bulk_update(fields=['is_valid'], objs=cars_to_update)
 
         
 
