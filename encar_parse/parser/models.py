@@ -41,9 +41,11 @@ class CarFuel(models.Model):
     value_name = models.CharField(max_length=32, unique=True)
 
 class CarManufacturer(models.Model):
-    value_key = models.CharField(max_length=32, unique=True)
-    value_name = models.CharField(max_length=32, unique=True)
-    car_count = models.IntegerField(null=True, blank=True, default=0)
+    value_key = models.CharField(max_length=32, unique=True, verbose_name='Имя для запроса')
+    value_name = models.CharField(max_length=32, unique=True, verbose_name='Имя с encar')
+    car_count = models.IntegerField(null=True, blank=True, default=0, verbose_name='Кол-во машин')
+    name = models.CharField(max_length=32, verbose_name='Правильное имя машины')
+    is_foreign = models.BooleanField(default=True)
 
 
 class Car(models.Model):
@@ -60,7 +62,7 @@ class Car(models.Model):
     engine_capacity = models.IntegerField(null=True, blank=True, db_index=True)
     transmission = models.CharField(max_length=128, db_index=True)
     fuel_type = models.ForeignKey(CarFuel, on_delete=models.PROTECT, null=True, blank=True)
-    release_date = models.IntegerField(db_index=True)
+    release_date = models.IntegerField(default=0, db_index=True)
     model_year = models.IntegerField()
     mileage = models.IntegerField(db_index=True)
     options = models.CharField(max_length=1024, null=True, blank=True)
