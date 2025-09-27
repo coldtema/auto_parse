@@ -71,10 +71,10 @@ class CarParser():
             except:
                 self.get_number_of_results()
                 response = self.session.get(''.join(self.current_api_url_list))
-            print('код:', response.status_code)
-            print('текст', response.text[:20]) 
+            # print('код:', response.status_code)
+            # print('текст', response.text[:20]) 
             data = response.json()['SearchResults']
-            print(f'Всего - {response.json()['Count']} Страница {page}. Количество элементов - {len(data)}')
+            # print(f'Всего - {response.json()['Count']} Страница {page}. Количество элементов - {len(data)}')
             self.dump_data(data)
         self.current_api_url_list[-2] = '0'
 
@@ -224,10 +224,10 @@ class TruckParser():
             except:
                 self.get_number_of_results()
                 response = self.session.get(''.join(self.current_api_url_list))
-            print('код:', response.status_code)
-            print('текст', response.text[:20])
+            # print('код:', response.status_code)
+            # print('текст', response.text[:20])
             data = response.json()['SearchResults']
-            print(f'Всего - {response.json()['Count']} Страница {page}. Количество элементов - {len(data)}')
+            # print(f'Всего - {response.json()['Count']} Страница {page}. Количество элементов - {len(data)}')
             self.dump_data(data)
         self.current_api_url_list[-2] = '0'
 
