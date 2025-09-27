@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import TruckOption, OptionCategory, CarOption
+from .models import TruckOption, OptionCategory, CarOption, CarManufacturer
 
 
 @admin.register(TruckOption)
@@ -15,3 +15,8 @@ class CarOptionAdmin(admin.ModelAdmin):
 @admin.register(OptionCategory)
 class OptionCategoryAdmin(admin.ModelAdmin):
     list_display = ['name']
+
+
+@admin.register(CarManufacturer)
+class CarManufacturerAdmin(admin.ModelAdmin):
+    list_display = ['name', 'value_key', 'value_name', 'car_count', 'is_foreign']
