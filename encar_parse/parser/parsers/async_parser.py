@@ -5,7 +5,7 @@ import asyncio
 import aiohttp
 from parser.parsers.raw_parser import car_korean_dict
 from django.db import transaction
-from datetime import date
+from datetime import date, timedelta
 
 diagnosis = 'https://api.encar.com/v1/readside/diagnosis/vehicle/40286929'
 
@@ -80,7 +80,8 @@ class AsyncCarParser():
                     'korean_number': response['vehicleNo'],
                     'dummy_id': dummy_id,
                     'encar_diag': response['view']['encarDiagnosis'],
-                    'body_name': response['spec']['bodyName']
+                    'body_name': response['spec']['bodyName'],
+                    'release_date': response['category']['yearMonth'],
                 }
                 return detail_dict
         except:
@@ -136,6 +137,23 @@ class AsyncCarParser():
             return new_manufacturer
         else:
             return manufacturer_to_send
+        
+
+    def check_is_valid(self, release_date, manufacturer_is_foreign):
+        is_valid = False
+        if release_date:
+            year = int(release_date // 100)
+            month = int(release_date % 100)
+            car_date = date(year, month, 1)
+            if manufacturer_is_foreign:
+                car_date = car_date + timedelta(month=4)
+            else:
+                car_date = car_date + timedelta(month=1)
+            today = date.today()
+            diff_months = (today.year - car_date.year) * 12 + (today.month - car_date.month)
+            is_valid = 36 <= diff_months <= 60
+            release_date = int(f'{car_date.year}{car_date.month}')
+        return release_date, is_valid
 
 
     @transaction.atomic
@@ -146,6 +164,7 @@ class AsyncCarParser():
             if result:
                 car_to_update = self.batch.get(encar_id=int(result['encar_id']))
                 car_to_update.manufacturer = self.get_manufacturer(result['manufacturer'])
+                car_to_update.release_date, car_to_update.is_valid = self.check_is_valid(result['release_date'], car_to_update.manufacturer.is_foreign)
                 car_to_update.model = result['model']
                 car_to_update.version = result['version']
                 car_to_update.version_details = result['version_details']
@@ -176,7 +195,9 @@ class AsyncCarParser():
                                         'korean_number', 
                                         'dummy_id', 
                                         'encar_diag',
-                                        'body_name'], objs=self.updated_batch)
+                                        'body_name',
+                                        'release_date',
+                                        'is_valid'], objs=self.updated_batch)
         CarPhoto.objects.bulk_create(photos_obj, ignore_conflicts=True)
         self.results = []
 
