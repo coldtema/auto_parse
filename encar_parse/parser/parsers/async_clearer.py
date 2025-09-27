@@ -62,7 +62,7 @@ class AsyncCarClearer():
             async with session.get(url, timeout=10) as response:
                 response = await response.json()
                 if response['advertisement']['status'] == 'ADVERTISE':
-                        return int(url.split('/')[-1]), True
+                        return int(url.split('/')[-1]), True, response['advertisement']['price']
                 return int(url.split('/')[-1]), False
         except:
             return int(url.split('/')[-1]), False 
@@ -103,9 +103,18 @@ class AsyncCarClearer():
     @transaction.atomic
     def save_to_db(self):
         self.cars_ids_to_delete = []
+        car_ids_to_update_price = []
         for result in self.results:
             if result[1] == False:
                 self.cars_ids_to_delete.append(result[0])
+            else:
+                car_ids_to_update_price.append((result[0], result[2]))
+        car_ids_to_update_price = sorted(car_ids_to_update_price, key=lambda x: x[0])
+        cars_to_update = list(Car.objects.filter(encar_id__in=list(map(lambda x: x[0], car_ids_to_update_price))).order_by('encar_id'))
+        for i in range(len(cars_to_update)):
+            if cars_to_update[i].price != car_ids_to_update_price[i][1]:
+                cars_to_update[i].price = car_ids_to_update_price[i][1]
+        Car.objects.bulk_update(fields=['price'], objs=cars_to_update)
         if self.cars_ids_to_delete:
             print(self.cars_ids_to_delete)
             Car.objects.filter(encar_id__in=self.cars_ids_to_delete).delete()
