@@ -205,14 +205,14 @@ class CarDuplicateClearer():
         Car.objects.filter(sell_type='Аренда').delete()
         Car.objects.filter(engine_capacity__lt=900, fuel_type__value_key__in=['G', 'D', 'GE', 'DE']).delete()
         Car.objects.filter(engine_capacity__isnull=True, fuel_type__value_key__in=['G', 'D', 'GE', 'DE']).delete()
+        Car.objects.filter(fuel_type__value_key=None).delete()
         Car.objects.filter(engine_capacity__gt=9999).delete()
         Car.objects.filter(engine_capacity=None).delete()
-        Car.objects.filter(fuel_type=None).delete()
         list_manufacturers = CarManufacturer.objects.all()
         for manufacturer in list_manufacturers:
             manufacturer.car_count = Car.objects.filter(manufacturer=manufacturer).count()
         CarManufacturer.objects.bulk_update(fields=['car_count'], objs=list_manufacturers)
-        cars_valid_check = Car.objects.filter(relase_date__gt=0)
+        cars_valid_check = Car.objects.filter(release_date__gt=0)
         for car in cars_valid_check:
             year = car.release_date // 100
             month = car.release_date % 100
