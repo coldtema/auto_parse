@@ -146,9 +146,9 @@ class AsyncCarParser():
             month = int(int(release_date) % 100)
             car_date = date(year, month, 1)
             if manufacturer_is_foreign:
-                car_date = car_date + timedelta(month=4)
+                car_date = car_date + timedelta(days=120)
             else:
-                car_date = car_date + timedelta(month=1)
+                car_date = car_date + timedelta(days=30)
             today = date.today()
             diff_months = (today.year - car_date.year) * 12 + (today.month - car_date.month)
             is_valid = 36 <= diff_months <= 60
