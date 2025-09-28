@@ -142,8 +142,8 @@ class AsyncCarParser():
     def check_is_valid(self, release_date, manufacturer_is_foreign):
         is_valid = False
         if release_date:
-            year = int(release_date // 100)
-            month = int(release_date % 100)
+            year = int(int(release_date) // 100)
+            month = int(int(release_date) % 100)
             car_date = date(year, month, 1)
             if manufacturer_is_foreign:
                 car_date = car_date + timedelta(month=4)
