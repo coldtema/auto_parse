@@ -152,7 +152,10 @@ class AsyncCarParser():
             today = date.today()
             diff_months = (today.year - car_date.year) * 12 + (today.month - car_date.month)
             is_valid = 36 <= diff_months <= 60
-            release_date = int(f'{car_date.year}{car_date.month}')
+            if int(car_date.month) < 10:
+                release_date = int(f'{car_date.year}0{car_date.month}')
+            else:
+                release_date = int(f'{car_date.year}{car_date.month}')
         return release_date, is_valid
 
 
