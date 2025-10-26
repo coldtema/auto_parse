@@ -25,9 +25,22 @@ class CarParser():
         self.current_api_url_list = []
         self.session = requests.Session()
         self.headers = {
-                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
-                    "Referer": "https://www.encar.com/",
-                    "Accept": "application/json, text/plain, */*",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+            "Accept": "application/json, text/javascript, */*; q=0.01",
+            "Accept-Language": "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7",
+            "Accept-Encoding": "gzip, deflate, br, zstd",
+            "Cache-Control": "no-cache",
+            "Origin": "https://www.encar.com",
+            "Pragma": 'no-cache',
+            "Priority": "u=1, i",
+            "Referer": "https://www.encar.com/",
+            "Sec-Ch-Ua": "\"Google Chrome\";v=\"141\", \"Not?A_Brand\";v=\"8\", \"Chromium\";v=\"141\"",
+            "Sec-Ch-Ua-Mobile": "?0",
+            "Sec-Ch-Ua-Platform": "\"Windows\"",
+            "Sec-Fetch-Dest": "empty",
+            "Sec-Fetch-Mode": "cors",
+            "Sec-Fetch-Site": "same-site",
+            # "X-Requested-With": "XMLHttpRequest",
         }
         self.all_ids = set()
         self.new_elems = []
@@ -305,12 +318,12 @@ class TruckParser():
             cookies = cookie_grabber.get_new_encar_cookies()
             for c in cookies:
                 self.session.cookies.set(c['name'], c['value'])
-            self.session.headers.update({"User-Agent": (
-                                            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                                            "AppleWebKit/537.36 (KHTML, like Gecko) "
-                                            "Chrome/126.0.6478.127 Safari/537.36"
-                                        )
-                                    })
+            # # self.session.headers.update({"User-Agent": (
+            #                                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            #                                 "AppleWebKit/537.36 (KHTML, like Gecko) "
+            #                                 "Chrome/126.0.6478.127 Safari/537.36"
+            #                             )
+            #                         })
         response = self.session.get(''.join(self.current_api_url_list))
         number_of_cars = response.json()['Count']
         # print('код:', response.status_code)
