@@ -76,7 +76,7 @@ from playwright.sync_api import sync_playwright
 # --------------------------
 API_URL = "https://api.encar.com/search/car/list/premium?count=true&q=(And.Hidden.N._.CarType.A._.GreenType.Y.)&sr=%7CModifiedDate%7C0%7C20"
 OUT_DIR = Path("regen_result")
-OUT_DIR.mkdir(exist_ok=True)
+# OUT_DIR.mkdir(exist_ok=True)
 HEADLESS = False  # поставь True, если хочешь headless (но лучше тестировать headful)
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
 
@@ -186,12 +186,12 @@ def human_like(page):
 
 def get_new_encar_cookies():
     regenerated = build_regenerated_cookies(OLD_COOKIES)
-    out_old = OUT_DIR / "old_cookies.json"
-    out_new = OUT_DIR / "regenerated_cookies.json"
-    out_api = OUT_DIR / "api_result.json"
-    out_state = OUT_DIR / "encar_state_after.json"
-    out_old.write_text(json.dumps(OLD_COOKIES, ensure_ascii=False, indent=2))
-    out_new.write_text(json.dumps(regenerated, ensure_ascii=False, indent=2))
+    # out_old = OUT_DIR / "old_cookies.json"
+    # out_new = OUT_DIR / "regenerated_cookies.json"
+    # out_api = OUT_DIR / "api_result.json"
+    # out_state = OUT_DIR / "encar_state_after.json"
+    # out_old.write_text(json.dumps(OLD_COOKIES, ensure_ascii=False, indent=2))
+    # out_new.write_text(json.dumps(regenerated, ensure_ascii=False, indent=2))
 
     print("Regenerated cookies preview:")
     for c in regenerated:
