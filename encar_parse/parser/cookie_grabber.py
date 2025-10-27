@@ -284,72 +284,66 @@ from playwright.sync_api import sync_playwright
 #     print("Done. Check folder:", OUT_DIR.resolve())
 
 
-from playwright.async_api import async_playwright
-import asyncio
+from playwright.sync_api import sync_playwright
 import random
 import time
 
-async def create_stealth_browser():
-    with Display(visible=0, size=(1920, 1080)):
-        playwright = await async_playwright().start()
-        
-        browser = await playwright.chromium.launch(
-            headless=False,  # На время отладки False
-            args=[
-                '--no-sandbox',
-                '--disable-blink-features=AutomationControlled',
-                '--disable-dev-shm-usage',
-                '--disable-web-security',
-                '--disable-features=site-per-process',
-                '--no-first-run',
-                '--disable-default-apps',
-                '--disable-popup-blocking',
-                '--disable-translate',
-                '--disable-background-timer-throttling',
-                '--disable-renderer-backgrounding',
-                '--disable-backgrounding-occluded-windows',
-                '--disable-component-extensions-with-background-pages',
-            ]
-        )
-        
-        # Создаем контекст с реальными данными пользователя
-        context = await browser.new_context(
-            viewport={"width": 1920, "height": 1080},
-            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-            locale="ru-RU",
-            timezone_id="Europe/Moscow",
-            permissions=["geolocation"],
-            geolocation={"latitude": 55.7558, "longitude": 37.6173},  # Координаты Москвы
-            color_scheme="light",
-            reduced_motion="no-preference"
-        )
-        
-        # Удаляем все следы автоматизации
-        await context.add_init_script("""
-            Object.defineProperty(navigator, 'webdriver', {
-                get: () => undefined,
-            });
-            
-            Object.defineProperty(navigator, 'plugins', {
-                get: () => [1, 2, 3, 4, 5],
-            });
-            
-            Object.defineProperty(navigator, 'languages', {
-                get: () => ['ru-RU', 'ru', 'en-US', 'en'],
-            });
-            
-            window.chrome = {
-                app: {},
-                runtime: {},
-                loadTimes: function() {},
-                csi: function() {},
-            };
-        """)
-        
-        page = await context.new_page()
+def create_stealth_browser():
+    playwright = sync_playwright().start()
     
-        # Добавляем случайные заголовки
-        await page.set_extra_http_headers({
+    browser = playwright.chromium.launch(
+        headless=False,  # На время отладки False
+        args=[
+            '--no-sandbox',
+            '--disable-blink-features=AutomationControlled',
+            '--disable-dev-shm-usage',
+            '--disable-web-security',
+            '--disable-features=site-per-process',
+            '--no-first-run',
+            '--disable-default-apps',
+            '--disable-popup-blocking',
+            '--disable-translate',
+            '--disable-background-timer-throttling',
+            '--disable-renderer-backgrounding',
+            '--disable-backgrounding-occluded-windows',
+        ]
+    )
+    
+    # Создаем контекст с реальными данными пользователя
+    context = browser.new_context(
+        viewport={"width": 1920, "height": 1080},
+        user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        locale="ru-RU",
+        timezone_id="Europe/Moscow",
+        permissions=["geolocation"],
+        geolocation={"latitude": 55.7558, "longitude": 37.6173},
+        color_scheme="light"
+    )
+    
+    # Удаляем все следы автоматизации
+    context.add_init_script("""
+        Object.defineProperty(navigator, 'webdriver', {
+            get: () => undefined,
+        });
+        
+        Object.defineProperty(navigator, 'plugins', {
+            get: () => [1, 2, 3, 4, 5],
+        });
+        
+        Object.defineProperty(navigator, 'languages', {
+            get: () => ['ru-RU', 'ru', 'en-US', 'en'],
+        });
+        
+        window.chrome = {
+            app: {},
+            runtime: {},
+        };
+    """)
+    
+    page = context.new_page()
+    
+    # Добавляем случайные заголовки
+    page.set_extra_http_headers({
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
                 "Accept": "application/json, text/javascript, */*; q=0.01",
                 "Accept-Language": "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7",
@@ -367,46 +361,45 @@ async def create_stealth_browser():
                 "Sec-Fetch-Site": "same-site",
                 # "X-Requested-With": "XMLHttpRequest",
             })
-        
+    
     return playwright, browser, context, page
 
-
-async def human_delay(min_ms=1000, max_ms=5000):
+def human_delay(min_ms=1000, max_ms=5000):
     """Случайная задержка как у человека"""
     delay = random.randint(min_ms, max_ms) / 1000.0
-    await asyncio.sleep(delay)
+    time.sleep(delay)
 
-async def human_type(page, selector, text):
+def human_type(page, selector, text):
     """Человеческий ввод текста"""
-    element = await page.query_selector(selector)
-    await element.click()
+    element = page.query_selector(selector)
+    element.click()
     
     # Случайная пауза перед началом ввода
-    await human_delay(200, 800)
+    human_delay(200, 800)
     
     for char in text:
-        await element.type(char, delay=random.randint(50, 150))
+        element.type(char, delay=random.randint(50, 150))
         # Случайные паузы между словами
         if char == ' ':
-            await human_delay(100, 300)
+            human_delay(100, 300)
 
-async def human_scroll(page):
+def human_scroll(page):
     """Человеческая прокрутка страницы"""
     scroll_amount = random.randint(300, 800)
     scroll_steps = random.randint(3, 8)
     
     for _ in range(scroll_steps):
         scroll_step = scroll_amount // scroll_steps
-        await page.evaluate(f"window.scrollBy(0, {scroll_step})")
-        await human_delay(100, 400)
+        page.evaluate(f"window.scrollBy(0, {scroll_step})")
+        human_delay(100, 400)
 
-async def human_mouse_move(page, selector):
+def human_mouse_move(page, selector):
     """Плавное движение мыши к элементу"""
-    element = await page.query_selector(selector)
+    element = page.query_selector(selector)
     if not element:
         return
         
-    box = await element.bounding_box()
+    box = element.bounding_box()
     if not box:
         return
     
@@ -415,101 +408,87 @@ async def human_mouse_move(page, selector):
     target_y = box['y'] + box['height'] / 2
     
     steps = random.randint(8, 15)
-
-    current_x, current_y = 0, 0
-    
-    # Получаем текущую позицию курсора
-    try:
-        current_pos = await page.evaluate("({x: window.pageXOffset, y: window.pageYOffset})")
-        current_x = current_pos['x'] + 100  # Примерная начальная позиция
-        current_y = current_pos['y'] + 100
-    except:
-        current_x, current_y = 100, 100
+    current_x, current_y = 100, 100  # Начальная позиция
     
     for i in range(steps):
         progress = (i + 1) / steps
         new_x = current_x + (target_x - current_x) * progress
         new_y = current_y + (target_y - current_y) * progress
         
-        await page.mouse.move(new_x, new_y)
-        await asyncio.sleep(random.uniform(0.02, 0.05))
+        page.mouse.move(new_x, new_y)
+        time.sleep(random.uniform(0.02, 0.05))
     
-    await human_delay(200, 600)
-    await element.click()
+    human_delay(200, 600)
+    element.click()
 
 
-
-
-async def stealth_encar_parser():
-    playwright, browser, context, page = await create_stealth_browser()
-    
-    try:
-        filtered = []
-        print("🕵️ Запускаем stealth браузер...")
-        
-        # Сначала идем на нейтральный сайт
-        print("📝 Имитируем обычный серфинг...")
-        await page.goto("https://google.com")
-        await human_delay(2000, 5000)
-        
-        # Случайные действия на странице
-        await human_scroll(page)
-        await human_delay(1000, 3000)
-        
-        # Теперь переходим на encar
-        print("🚀 Переходим на encar.ru...")
-        await page.goto("https://www.encar.com", wait_until="networkidle", timeout=60000)
-        await human_delay(3000, 7000)
-        
-        # Имитируем изучение страницы
-        await human_scroll(page)
-        await human_delay(2000, 4000)
-        
-        # Случайные движения мыши
-        await page.mouse.move(300, 400)
-        await human_delay(500, 1500)
-        await page.mouse.move(700, 200)
-        await human_delay(500, 1500)
-        
-        print("✅ Страница загружена, можно работать...")
-        
-        # Здесь ваша логика парсинга
-        # Например, поиск элементов:
-        # elements = await page.query_selector_all(".car-item")
-        # for element in elements:
-        #     # обработка данных...
-        #     pass
-        
-        # Сохраняем куки для будущего использования
-        cookies = await context.cookies()
-        print(f"🍪 Получено {len(cookies)} кук")
-        
-        # Сохраняем куки в файл
-        import json
-        # with open("encar_cookies.json", "w") as f:
-        #     json.dump(cookies, f)
-
-        # filtered = [c for c in cookies if "encar.com" in c["domain"]]
-        
-        # print("💾 Куки сохранены в encar_cookies.json")
-        
-        # # Демонстрация работы - ждем 30 секунд
-        # print("⏳ Демонстрация работы...")
-        await human_delay(10000, 20000)
-        
-    except Exception as e:
-        print(f"❌ Ошибка: {e}")
-        
-    finally:
-        # Делаем скриншот для отладки
-        # await page.screenshot(path="encar_result.png")
-        # print("📸 Скриншот сохранен как encar_result.png")
-        
-        await browser.close()
-        await playwright.stop()
-        print(cookies)
-        return cookies
-# Запуск
 def get_new_encar_cookies():
-    return asyncio.run(stealth_encar_parser())
-
+    with Display(visible=0, size=(1920, 1080)):
+        playwright, browser, context, page = create_stealth_browser()
+        
+        try:
+            print("🕵️ Запускаем stealth браузер...")
+            
+            # Сначала идем на нейтральный сайт
+            print("📝 Имитируем обычный серфинг...")
+            page.goto("https://google.com", wait_until="networkidle")
+            human_delay(2000, 5000)
+            
+            # Случайные действия на странице
+            human_scroll(page)
+            human_delay(1000, 3000)
+            
+            # Теперь переходим на encar
+            print("🚀 Переходим на encar.ru...")
+            page.goto("https://www.encar.com", wait_until="networkidle", timeout=60000)
+            human_delay(3000, 7000)
+            
+            # Имитируем изучение страницы
+            human_scroll(page)
+            human_delay(2000, 4000)
+            
+            # Случайные движения мыши
+            page.mouse.move(300, 400)
+            human_delay(500, 1500)
+            page.mouse.move(700, 200)
+            human_delay(500, 1500)
+            
+            print("✅ Страница загружена, можно работать...")
+            
+            # Здесь ваша логика парсинга
+            # Например:
+            # elements = page.query_selector_all(".car-item")
+            # for element in elements:
+            #     title = element.query_selector(".title")
+            #     if title:
+            #         print(title.text_content())
+            
+            # Сохраняем куки для будущего использования
+            cookies = context.cookies()
+            print(f"🍪 Получено {len(cookies)} кук")
+            
+            # Сохраняем куки в файл
+            # import json
+            # with open("encar_cookies.json", "w") as f:
+            #     json.dump(cookies, f)
+            
+            print("💾 Куки сохранены в encar_cookies.json")
+            
+            # Демонстрация работы - ждем
+            print("⏳ Демонстрация работы...")
+            human_delay(10000, 20000)
+            
+            return cookies
+            
+        except Exception as e:
+            print(f"❌ Ошибка: {e}")
+            return None
+            
+        finally:
+            # Делаем скриншот для отладки
+            # page.screenshot(path="encar_result.png")
+            # print("📸 Скриншот сохранен как encar_result.png")
+            
+            browser.close()
+            playwright.stop()
+            return cookies
