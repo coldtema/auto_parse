@@ -288,6 +288,24 @@ from playwright.sync_api import sync_playwright
 import random
 import time
 
+cookie_string = "OAX=sGr5G2i9bqQACwLB; PCID=17572450956999853444598; _fwb=77F9PqnVOm4b0B1ZOWkr70.1757245130323; _fbp=fb.1.1757435425388.635278253321423332; _gcl_au=1.1.183355727.1757443117; afUserId=9d2cac16-864d-4a98-b917-82248bf93ce9-p; RecentViewTruck=40341321%2C40517735; _ga_GRHD5Z14DC=GS2.2.s1758037408$o1$g0$t1758037418$j50$l0$h0; _ga_BQ7RK9J6BZ=GS2.1.s1758037408$o1$g1$t1758037429$j39$l0$h287401605; cto_bundle=WD5YnV8yN0dEb3BSWnlmNHhFczBnN0pXZmNGdjlOJTJCZjMydkluTiUyQm1rN09pa1FmNnRFaWhmVEtGSkNkR0lLOGVaNE50akxnQkQzMjVyMUk1dDYwaXhOV081SFFYZ25UdDl1R0JDZWtoOVZ4QWp5R0U5MGxWJTJCSVY0dXFkeXN4NmJOMUZvaCUyRm83RGloZW5RckRQc3NYcjdaRmJ4QSUzRCUzRA; _ga_SX6YBF7MKB=GS2.1.s1758037408$o1$g1$t1758037430$j38$l0$h0; AF_SYNC=1761005549155; WMONID=VvQ26h4wLkB; _encar_hostname=https://www.encar.com; _ga=GA1.2.697281578.1757245096; _gid=GA1.2.1056656369.1761483327; RecentViewAllCar=40295866%2C40513970%2C40510520%2C39311796%2C39628414%2C40156109%2C40430916%2C40294388%2C40434638%2C39852733%2C40448202%2C40176722%2C40372580%2C40341321%2C40517735%2C40425905%2C40478397%2C40480049%2C40489567%2C39422651%2C40343782; RecentViewCar=40295866%2C40513970%2C40510520%2C39311796%2C39628414%2C40156109%2C40430916%2C40294388%2C40434638%2C39852733%2C40448202%2C40176722%2C40372580%2C40425905%2C40478397%2C40480049%2C40489567%2C39422651%2C40343782; JSESSIONID=B10CE7CFE38FC573848FFC645E48C36D.mono-web-prod_201.65; _enlog_lpi=3270.aHR0cHM6Ly93d3cuZW5jYXIuY29tL2luZGV4LmRv.6a2; _enlog_datatalk_hit=; wcs_bt=4b4e532670e38c:1761544745; _ga_WY0RWR65ED=GS2.2.s1761544706$o13$g1$t1761544747$j19$l0$h0"
+
+def parse_cookie_string(cookie_string):
+    """Преобразует строку кук в формат для Playwright"""
+    cookies = []
+    for cookie in cookie_string.split('; '):
+        if '=' in cookie:
+            name, value = cookie.split('=', 1)
+            cookies.append({
+                'name': name.strip(),
+                'value': value.strip(),
+                'domain': '.encar.com',
+                'path': '/'
+            })
+    return cookies
+
+
+
 def create_stealth_browser():
     playwright = sync_playwright().start()
     
@@ -431,7 +449,7 @@ def get_new_encar_cookies():
             
             # Сначала идем на нейтральный сайт
             print("📝 Имитируем обычный серфинг...")
-            page.goto("https://google.com", wait_until="networkidle")
+            page.goto("https://google.com")
             human_delay(2000, 5000)
             
             # Случайные действия на странице
@@ -440,6 +458,8 @@ def get_new_encar_cookies():
             
             # Теперь переходим на encar
             print("🚀 Переходим на encar.ru...")
+            cookies = parse_cookie_string(cookie_string)
+            context.add_cookies(cookies)
             page.goto("https://www.encar.com", wait_until="networkidle", timeout=60000)
             human_delay(3000, 7000)
             
