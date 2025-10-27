@@ -460,7 +460,7 @@ def get_new_encar_cookies():
             print("🚀 Переходим на encar.ru...")
             cookies = parse_cookie_string(cookie_string)
             context.add_cookies(cookies)
-            page.goto("https://www.encar.com", wait_until="networkidle", timeout=60000)
+            page.goto("https://api.encar.com/search/car/list/premium?count=true&q=(And.Hidden.N._.CarType.A._.GreenType.Y.)&sr=%7CModifiedDate%7C0%7C20", wait_until="networkidle", timeout=60000)
             human_delay(3000, 7000)
             
             # Имитируем изучение страницы
