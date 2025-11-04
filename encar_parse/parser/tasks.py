@@ -172,11 +172,11 @@ def main_task():
         get_car_diagnosis.si(),
         get_car_record.si(),
         count_duties_and_ru_price.si(),
-        delete_not_avaliable_trucks.si(),
-        get_raw_truck_info.si(),
-        get_full_truck_info.si(),
-        delete_fake_trucks.si(),
-        get_truck_diagnosis.si(),
+        # delete_not_avaliable_trucks.si(),
+        # get_raw_truck_info.si(),
+        # get_full_truck_info.si(),
+        # delete_fake_trucks.si(),
+        # get_truck_diagnosis.si(),
     )()
     return True
 
@@ -186,7 +186,7 @@ def easy_task():
     '''Удаляет неактуальные объявления + пересчитывает таможенные сборы и ру цену (раз в час)у легковых машин'''
     chain(
         delete_not_avaliable_cars.si(),
-        delete_not_avaliable_trucks.si(),
+        # delete_not_avaliable_trucks.si(),
         count_duties_and_ru_price.si(),
     )()
     return True
