@@ -78,6 +78,8 @@ class Car(models.Model):
     encar_diag = models.IntegerField(null=True, blank=True) # -1 - нет, 1 - да
     body_name = models.ForeignKey(CarBody, on_delete=models.PROTECT, null=True, blank=True)
     is_valid = models.BooleanField(default=False)
+    hp = models.IntegerField(default=0)
+    final_price = models.IntegerField(null=True, blank=True)
 
 
     class Meta:
@@ -199,3 +201,22 @@ class TruckPhoto(models.Model):
     order_number = models.IntegerField()
     link = models.CharField(max_length=256)
     truck = models.ForeignKey(Truck, on_delete=models.CASCADE, db_index=True)
+
+
+class Config(models.Model):
+    delivery_cost = models.IntegerField(verbose_name='Стоимость доставки (В $)', default=1200)
+    extra_expenses = models.IntegerField(verbose_name='Доп. расходы (необязательно)', default=0)
+    rate = models.IntegerField(verbose_name='Курс', default=80)
+    asia_services = models.IntegerField(verbose_name='Услуги Asia Alliance (В %)', default=4)
+    dealer_services = models.IntegerField(verbose_name='Услуги дилера', default=0)
+    korea_invoice = models.IntegerField(verbose_name='Стоимость по инвойсу в Корее', default=0)
+    broker_cost = models.IntegerField(verbose_name='Услуги брокера / СВХ / Лаборатория (В руб.)', default=115000)
+
+
+class HorsePower(models.Model):
+    value_name = models.CharField(max_length=32, db_index=True, null=True, blank=True)
+    model = models.CharField(max_length=32, db_index=True, null=True, blank=True)
+    model_year = models.CharField(max_length=32, db_index=True, null=True, blank=True)
+    version = models.CharField(max_length=32, db_index=True, null=True, blank=True)
+    engine_capacity = models.CharField(max_length=32, db_index=True, null=True, blank=True)
+    hp = models.IntegerField(default=0)

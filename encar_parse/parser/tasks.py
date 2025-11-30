@@ -1,6 +1,6 @@
 from celery import shared_task, chain
 from parser.parsers import async_clearer, async_parser, diag_parser, raw_parser, record_parser
-from parser import ru_price_calc
+from parser import ru_price_calc, hp_grabber
 import traceback
 
 
@@ -133,6 +133,18 @@ def count_duties_and_ru_price():
     del p
     return True
 
+@shared_task
+def count_hp():
+    '''Взятие лс для каждой машины'''
+    p = hp_grabber.HorsePowerParser()
+    try:
+        p.run()
+    except Exception as e:
+        tb = traceback.format_exc() 
+        print(f"Ошибка: {e}\n{tb}")
+    del p
+    return True
+
 
 @shared_task
 def delete_not_avaliable_cars():
@@ -171,6 +183,7 @@ def main_task():
         delete_fake_cars.si(),
         get_car_diagnosis.si(),
         get_car_record.si(),
+        count_hp.si(),
         count_duties_and_ru_price.si(),
         # delete_not_avaliable_trucks.si(),
         # get_raw_truck_info.si(),

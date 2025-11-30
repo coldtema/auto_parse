@@ -117,14 +117,58 @@ class RuPriceCalc:
 
 
     def get_recycling_fee_gasoline(self):
-        if 0 <= self.current_vechile_age < 3:
-             for key, value in recycling_fee_dict['GASOLINE_LESS_3_YEARS'].items():
-                if key[0] <= self.current_vechile.engine_capacity <= key[1]:
-                    return 20000 * value
+        if self.current_vechile.hp <= 160:
+            if 0 <= self.current_vechile_age < 3:
+                for key, value in recycling_fee_dict['GASOLINE_LESS_3_YEARS'].items():
+                    if key[0] <= self.current_vechile.engine_capacity <= key[1]:
+                        return 20000 * value
+            else:
+                for key, value in recycling_fee_dict['GASOLINE_MORE_3_YEARS'].items():
+                    if key[0] <= self.current_vechile.engine_capacity <= key[1]:
+                        return 20000 * value
         else:
-            for key, value in recycling_fee_dict['GASOLINE_MORE_3_YEARS'].items():
-                if key[0] <= self.current_vechile.engine_capacity <= key[1]:
-                    return 20000 * value
+            if 0 <= self.current_vechile_age < 3:
+                if self.current_vechile.engine_capacity <= 2000:
+                    for key, value in commercial_recycling_fee_dict['GASOLINE_LESS_3_YEARS']['1-2_litre'].items():
+                            if key[0] <= self.current_vechile.hp <= key[1]:
+                                return value
+                            
+                if 2001 <= self.current_vechile.engine_capacity <= 3000:
+                    for key, value in commercial_recycling_fee_dict['GASOLINE_LESS_3_YEARS']['2-3_litre'].items():
+                            if key[0] <= self.current_vechile.hp <= key[1]:
+                                return value
+                            
+                if 3001 <= self.current_vechile.engine_capacity <= 3500:
+                    for key, value in commercial_recycling_fee_dict['GASOLINE_LESS_3_YEARS']['3-3.5_litre'].items():
+                            if key[0] <= self.current_vechile.hp <= key[1]:
+                                return value
+                        
+                if 3501 <= self.current_vechile.engine_capacity:
+                    for key, value in commercial_recycling_fee_dict['GASOLINE_LESS_3_YEARS']['3.5_and_more_litre'].items():
+                            if key[0] <= self.current_vechile.hp <= key[1]:
+                                return value
+                            
+            else:
+                if self.current_vechile.engine_capacity <= 2000:
+                    for key, value in commercial_recycling_fee_dict['GASOLINE_MORE_3_YEARS']['1-2_litre'].items():
+                            if key[0] <= self.current_vechile.hp <= key[1]:
+                                return value
+                            
+                if 2001 <= self.current_vechile.engine_capacity <= 3000:
+                    for key, value in commercial_recycling_fee_dict['GASOLINE_MORE_3_YEARS']['2-3_litre'].items():
+                            if key[0] <= self.current_vechile.hp <= key[1]:
+                                return value
+                            
+                if 3001 <= self.current_vechile.engine_capacity <= 3500:
+                    for key, value in commercial_recycling_fee_dict['GASOLINE_MORE_3_YEARS']['3-3.5_litre'].items():
+                            if key[0] <= self.current_vechile.hp <= key[1]:
+                                return value
+                        
+                if 3501 <= self.current_vechile.engine_capacity:
+                    for key, value in commercial_recycling_fee_dict['GASOLINE_MORE_3_YEARS']['3.5_and_more_litre'].items():
+                            if key[0] <= self.current_vechile.hp <= key[1]:
+                                return value
+
 
 
     def get_customs_clearance_fee(self):
@@ -203,6 +247,127 @@ excise_tax_dict = {
 }
 
 #утиль
+commercial_recycling_fee_dict = { #*20000 rub
+    'ELECTRO_LESS_3_YEARS': 0.17,
+    'ELECTRO_MORE_3_YEARS': 0.26,
+    'GASOLINE_LESS_3_YEARS':{
+        '1-2_litre':{
+            (160, 190): 750_000, 
+            (191, 220): 794_000,
+            (221, 250): 842_000,
+            (251, 280): 952_000,
+            (281, 310): 1_076_000,
+            (311, 340): 1_216_000,
+            (341, 370): 1_386_000,
+            (371, 400): 1_580_000,
+            (401, 430): 1_800_000,
+            (431, 460): 2_054_000,
+            (461, 500): 2_340_000,
+            (501, 999999): 2_668_000,
+        },
+        '2-3_litre':{
+            (160, 190): 1_922_000, 
+            (191, 220): 1_970_000,
+            (221, 250): 2_002_000,
+            (251, 280): 2_100_000,
+            (281, 310): 2_184_000,
+            (311, 340): 2_272_000,
+            (341, 370): 2_362_000,
+            (371, 400): 2_458_000,
+            (401, 430): 2_556_000,
+            (431, 460): 2_658_000,
+            (461, 500): 2_764_000,
+            (501, 999999): 2_874_000,
+        },
+        '3-3.5_litre':{
+            (160, 190): 2_196_000, 
+            (191, 220): 2_240_000,
+            (221, 250): 2_286_000,
+            (251, 280): 2_342_000,
+            (281, 310): 2_400_000,
+            (311, 340): 2_532_000,
+            (341, 370): 2_672_000,
+            (371, 400): 2_820_000,
+            (401, 430): 2_974_000,
+            (431, 460): 3_138_000,
+            (461, 500): 3_310_000,
+            (501, 999999): 3_492_000,
+        },
+        '3.5_and_more_litre':{
+            (160, 190): 2_788_000, 
+            (191, 220): 2_836_000,
+            (221, 250): 2_884_000,
+            (251, 280): 2_942_000,
+            (281, 310): 3_000_000,
+            (311, 340): 3_106_000,
+            (341, 370): 3_214_000,
+            (371, 400): 3_328_000,
+            (401, 430): 3_444_000,
+            (431, 460): 3_564_000,
+            (461, 500): 3_688_000,
+            (501, 999999): 3_818_000,
+        },
+    },
+    'GASOLINE_MORE_3_YEARS':{
+        '1-2_litre':{
+            (160, 190): 1_244_000, 
+            (191, 220): 1_320_000,
+            (221, 250): 1_398_000,
+            (251, 280): 1_532_000,
+            (281, 310): 1_676_000,
+            (311, 340): 1_836_000,
+            (341, 370): 2_010_000,
+            (371, 400): 2_200_000,
+            (401, 430): 2_410_000,
+            (431, 460): 2_640_000,
+            (461, 500): 2_890_000,
+            (501, 999999): 3_164_000,
+        },
+        '2-3_litre':{
+            (160, 190): 2_880_000, 
+            (191, 220): 2_918_000,
+            (221, 250): 2_960_000,
+            (251, 280): 3_050_000,
+            (281, 310): 3_142_000,
+            (311, 340): 3_228_000,
+            (341, 370): 3_318_000,
+            (371, 400): 3_412_000,
+            (401, 430): 3_508_000,
+            (431, 460): 3_606_000,
+            (461, 500): 3_706_000,
+            (501, 999999): 3_810_000,
+        },
+        '3-3.5_litre':{
+            (160, 190): 3_334_000, 
+            (191, 220): 3_370_000,
+            (221, 250): 3_406_000,
+            (251, 280): 3_454_000,
+            (281, 310): 3_540_000,
+            (311, 340): 3_630_000,
+            (341, 370): 3_738_000,
+            (371, 400): 3_850_000,
+            (401, 430): 3_966_000,
+            (431, 460): 4_084_000,
+            (461, 500): 4_208_000,
+            (501, 999999): 4_334_000,
+        },
+        '3.5_and_more_litre':{
+            (160, 190): 3_658_000, 
+            (191, 220): 3_714_000,
+            (221, 250): 3_770_000,
+            (251, 280): 3_856_000,
+            (281, 310): 3_944_000,
+            (311, 340): 4_160_000,
+            (341, 370): 4_390_000,
+            (371, 400): 4_632_000,
+            (401, 430): 4_886_000,
+            (431, 460): 5_156_000,
+            (461, 500): 5_440_000,
+            (501, 999999): 5_738_000,
+        },
+    }
+}
+
 recycling_fee_dict = { #*20000 rub
     'ELECTRO_LESS_3_YEARS': 0.17,
     'ELECTRO_MORE_3_YEARS': 0.26,

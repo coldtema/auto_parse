@@ -26,13 +26,20 @@ class AsyncCarRecordParser():
         self.batch = []
         self.results = []
         self.counter = 1
+        self.krw_rate = 0
 
     def run(self):
         self.get_cookies()
         print('Куки получены')
+        self.get_currency_rate()
         self.batching_query()
         self.session.close()
 
+
+    def get_currency_rate(self):
+        currency_checker_url = 'https://www.cbr-xml-daily.ru/daily_json.js'
+        response = requests.get(currency_checker_url).json()
+        self.krw_rate = float(response['Valute']['KRW']['Value']/response['Valute']['KRW']['Nominal'])
 
     def batching_query(self):
         '''Функция прохода через все батчи легковых машин'''
@@ -87,19 +94,19 @@ class AsyncCarRecordParser():
                 car_to_update = self.batch.get(dummy_id=result['dummy_id'])
                 car_record = CarRecord.objects.create(
                                 owner_count = result['owner_count'],
-                                other_accident_cost = result['other_accident_cost'],
+                                other_accident_cost = round(result['other_accident_cost'] * self.krw_rate),
                                 other_accident_count = result['other_accident_count'],
-                                driver_accident_cost = result['driver_accident_cost'],
+                                driver_accident_cost = round(result['driver_accident_cost'] * self.krw_rate),
                                 driver_accident_count = result['driver_accident_count'],
                                 car=car_to_update)
                 for accident in result['accidents']:
                     accidents.append(CarAccident(
                         type_of_accident = accident['type'],
                         date = accident['date'],
-                        insurance_benefit = accident['insuranceBenefit'],
-                        part_cost = accident['partCost'],
-                        labor_cost = accident['laborCost'],
-                        painting_cost = accident['paintingCost'],
+                        insurance_benefit = round(accident['insuranceBenefit'] * self.krw_rate),
+                        part_cost = round(accident['partCost'] * self.krw_rate),
+                        labor_cost = round(accident['laborCost'] * self.krw_rate),
+                        painting_cost = round(accident['paintingCost'] * self.krw_rate),
                         car_record = car_record,
                     ))
             else:
