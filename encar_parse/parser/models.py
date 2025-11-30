@@ -79,7 +79,7 @@ class Car(models.Model):
     body_name = models.ForeignKey(CarBody, on_delete=models.PROTECT, null=True, blank=True)
     is_valid = models.BooleanField(default=False)
     hp = models.IntegerField(default=0)
-    final_price = models.IntegerField(null=True, blank=True)
+    final_price_rub = models.IntegerField(null=True, blank=True)
 
 
     class Meta:

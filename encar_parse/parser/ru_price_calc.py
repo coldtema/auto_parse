@@ -68,6 +68,7 @@ class RuPriceCalc:
             self.current_vechile = car
             car.customs_duty, car.recycling_fee = self.fuel_type_dispatcher()
             car.ru_price = self.current_vechile_ru_price
+            car.final_price_rub = car.ru_price + car.customs_duty + car.recycling_fee + 212000
 
 
     def get_customs_duty_electro(self):
@@ -185,7 +186,7 @@ class RuPriceCalc:
 
 
     def save_to_db(self):
-        Car.objects.bulk_update(fields=['ru_price', 'recycling_fee', 'customs_duty'], objs=self.batch)
+        Car.objects.bulk_update(fields=['ru_price', 'recycling_fee', 'customs_duty', 'final_price_rub'], objs=self.batch)
         self.batch = []
 
 
