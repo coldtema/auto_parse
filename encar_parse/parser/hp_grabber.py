@@ -57,20 +57,18 @@ class HorsePowerParser():
 
 
     def check_db_hp(self, batch: list[Car]):
-        with open('no_hp_cars.txt', 'a', encoding='utf-8') as file:
-            for car in batch:
-                value_name = self.norm(car.manufacturer.value_name)
-                model = self.norm(car.model)
-                model_year = self.norm(car.model_year)
-                version = self.norm(car.version)
-                engine_capacity = self.norm(car.engine_capacity)
-                # string = self.normalize_key(value_name, model, model_year, version, engine_capacity)
+        for car in batch:
+            value_name = self.norm(car.manufacturer.value_name)
+            model = self.norm(car.model)
+            model_year = self.norm(car.model_year)
+            version = self.norm(car.version)
+            engine_capacity = self.norm(car.engine_capacity)
+            # string = self.normalize_key(value_name, model, model_year, version, engine_capacity)
 
-                hp = HorsePower.objects.filter(value_name=value_name, model=model, model_year=model_year, version=version, engine_capacity=engine_capacity).first()
-                file.write(f'{value_name} {model} {model_year} {version} {engine_capacity}\n')
+            hp = HorsePower.objects.filter(value_name=value_name, model=model, model_year=model_year, version=version, engine_capacity=engine_capacity).first()
 
-                if hp:
-                    car.hp = hp.hp
+            if hp:
+                car.hp = hp.hp
         return batch
 
      
