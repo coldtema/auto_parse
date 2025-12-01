@@ -214,9 +214,9 @@ class Config(models.Model):
 
 
 class HorsePower(models.Model):
-    value_name = models.CharField(max_length=32, db_index=True, null=True, blank=True)
-    model = models.CharField(max_length=32, db_index=True, null=True, blank=True)
-    model_year = models.CharField(max_length=32, db_index=True, null=True, blank=True)
-    version = models.CharField(max_length=32, db_index=True, null=True, blank=True)
-    engine_capacity = models.CharField(max_length=32, db_index=True, null=True, blank=True)
+    value_name = models.CharField(max_length=128, db_index=True, null=True, blank=True)
+    model = models.CharField(max_length=128, db_index=True, null=True, blank=True)
+    model_year = models.CharField(max_length=128, db_index=True, null=True, blank=True)
+    version = models.CharField(max_length=128, db_index=True, null=True, blank=True)
+    engine_capacity = models.CharField(max_length=128, db_index=True, null=True, blank=True)
     hp = models.IntegerField(default=0)
