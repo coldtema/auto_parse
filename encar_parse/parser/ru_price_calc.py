@@ -66,6 +66,12 @@ class RuPriceCalc:
     def go_through_batch(self):
         for car in self.batch:
             self.current_vechile = car
+            if self.current_vechile.hp == 0:
+                 car.customs_duty = 0
+                 car.recycling_fee = 0
+                 car.ru_price = 0
+                 car.final_price_rub = 0
+                 continue
             car.customs_duty, car.recycling_fee = self.fuel_type_dispatcher()
             car.ru_price = self.current_vechile_ru_price
             car.final_price_rub = car.ru_price + car.customs_duty + car.recycling_fee + 212000
