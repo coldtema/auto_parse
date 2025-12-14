@@ -38,9 +38,9 @@ class HorsePowerParser():
         self.batch_size = 10
         t = timezone.now()
         if int(t.day) % 2 == 0:
-            car_query = Car.objects.filter(Q(hp=0, fuel_type__value_key__in=['GE', 'G', 'D', 'DE']) | Q(kw=0, hp_in_kw=0, fuel_type__value_key__in=['GE', 'DE'])).order_by('updated')
-        else:
             car_query = Car.objects.filter(Q(hp=0, fuel_type__value_key__in=['GE', 'G', 'D', 'DE']) | Q(kw=0, hp_in_kw=0, fuel_type__value_key__in=['GE', 'DE'])).order_by('-updated')
+        else:
+            car_query = Car.objects.filter(Q(hp=0, fuel_type__value_key__in=['GE', 'G', 'D', 'DE']) | Q(kw=0, hp_in_kw=0, fuel_type__value_key__in=['GE', 'DE'])).order_by('updated')
 
         car_dict = dict()
         for car in car_query:
