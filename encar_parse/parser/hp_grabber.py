@@ -36,12 +36,8 @@ class HorsePowerParser():
         self.car_count = Car.objects.filter(Q(hp=0, fuel_type__value_key__in=['GE', 'G', 'D', 'DE']) | Q(kw=0, hp_in_kw=0, fuel_type__value_key__in=['GE', 'DE'])).count()
         print(self.car_count)
         self.batch_size = 10
-        t = timezone.now()
-        if int(t.day) % 2 == 0:
-            car_query = Car.objects.filter(Q(hp=0, fuel_type__value_key__in=['GE', 'G', 'D', 'DE']) | Q(kw=0, hp_in_kw=0, fuel_type__value_key__in=['GE', 'DE'])).order_by('-updated')
-        else:
-            car_query = Car.objects.filter(Q(hp=0, fuel_type__value_key__in=['GE', 'G', 'D', 'DE']) | Q(kw=0, hp_in_kw=0, fuel_type__value_key__in=['GE', 'DE'])).order_by('updated')
-
+        car_query = Car.objects.filter(Q(hp=0, fuel_type__value_key__in=['GE', 'G', 'D', 'DE']))
+        
         car_dict = dict()
         for car in car_query:
             value_name = self.norm(car.manufacturer.value_name)
@@ -52,6 +48,9 @@ class HorsePowerParser():
             car_dict.setdefault(f'{value_name}{model}{model_year}{version}{engine_capacity}', car.encar_id)
 
         self.encar_ids = list(car_dict.values())
+        car_query = Car.objects.filter(Q(kw=0, hp_in_kw=0, fuel_type__value_key__in=['GE', 'DE']))
+        for car in car_query:
+            self.encar_ids.append(car.encar_id)
         self.car_count = len(self.encar_ids)
         print(self.car_count)
         
