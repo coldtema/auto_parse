@@ -47,9 +47,14 @@ class RuPriceCalc:
             customs_clearance_fee = self.get_customs_clearance_fee()
             nds_tax = self.get_nds_tax(excise_tax, price_customs_duty)
             return self.get_final_price(price_customs_duty, excise_tax, customs_clearance_fee, nds_tax), recycling_fee
-        elif self.current_vechile.fuel_type.value_key in ['D', 'G', 'DE', 'GE']:
+        elif self.current_vechile.fuel_type.value_key in ['D', 'G']:
             price_customs_duty = self.get_customs_duty_gasoline()
             recycling_fee = self.get_recycling_fee_gasoline()
+            customs_clearance_fee = self.get_customs_clearance_fee()
+            return self.get_final_price(price_customs_duty, customs_clearance_fee), recycling_fee
+        elif self.current_vechile.fuel_type.value_key in ['DE', 'GE']:
+            price_customs_duty = self.get_customs_duty_gasoline()
+            recycling_fee = self.get_recycling_fee_hybrid()
             customs_clearance_fee = self.get_customs_clearance_fee()
             return self.get_final_price(price_customs_duty, customs_clearance_fee), recycling_fee
         return None
@@ -121,6 +126,18 @@ class RuPriceCalc:
             return recycling_fee_dict['ELECTRO_LESS_3_YEARS'] * 20000
         else:
             return recycling_fee_dict['ELECTRO_MORE_3_YEARS'] * 20000
+        
+        
+    def get_recycling_fee_hybrid(self):
+            if 0 <= self.current_vechile_age < 3:
+                for key, value in commercial_recycling_fee_dict['HYBRID_LESS_3_YEARS'].items():
+                    if key[0] <= self.current_vechile.hp_in_kw + self.current_vechile.kw <= key[1]:
+                        return value
+            else:
+                for key, value in commercial_recycling_fee_dict['HYBRID_MORE_3_YEARS'].items():
+                    if key[0] <= self.current_vechile.hp_in_kw + self.current_vechile.kw <= key[1]:
+                        return value
+    
 
 
     def get_recycling_fee_gasoline(self):
@@ -372,6 +389,28 @@ commercial_recycling_fee_dict = { #*20000 rub
             (461, 500): 5_440_000,
             (501, 999999): 5_738_000,
         },
+    },
+    'HYBRID_LESS_3_YEARS':{
+        (0, 58.84): 667_400, 
+        (58.85, 73.55): 826_000,
+        (73.56, 95.61): 1_098_000,
+        (95.62, 117.68): 1_300_000,
+        (117.69, 139.75): 1_540_000,
+        (139.76, 161.81): 1_828_000,
+        (161.82, 183.88): 2_166_000,
+        (183.89, 205.94): 2_566_000,
+        (205.95, 9999999): 3_040_000,
+    },
+    'HYBRID_MORE_3_YEARS':{
+        (0, 58.84): 1_174_000, 
+        (58.85, 73.55): 1_368_000,
+        (73.56, 95.61): 1_594_000,
+        (95.62, 117.68): 1_856_000,
+        (117.69, 139.75): 2_162_000,
+        (139.76, 161.81): 2_520_000,
+        (161.82, 183.88): 2_936_000,
+        (183.89, 205.94): 3_420_000,
+        (205.95, 9999999): 3_984_000,
     }
 }
 

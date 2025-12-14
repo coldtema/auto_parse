@@ -80,6 +80,8 @@ class Car(models.Model):
     is_valid = models.BooleanField(default=False)
     hp = models.IntegerField(default=0)
     final_price_rub = models.IntegerField(null=True, blank=True)
+    hp_in_kw = models.FloatField(default=0)
+    kw = models.FloatField(default=0)
 
 
     class Meta:
@@ -220,3 +222,5 @@ class HorsePower(models.Model):
     version = models.CharField(max_length=128, db_index=True, null=True, blank=True)
     engine_capacity = models.CharField(max_length=128, db_index=True, null=True, blank=True)
     hp = models.IntegerField(default=0)
+    hp_in_kw = models.FloatField(default=0, null=True)
+    kw = models.FloatField(default=0)
