@@ -140,7 +140,12 @@ def calc_view(request):
             generate_pdf(data, pdf_buffer)
             pdf_buffer.seek(0)
 
-            return FileResponse(pdf_buffer, as_attachment=True, filename="AsiaAlliance_Report.pdf")
+            return FileResponse(
+                pdf_buffer,
+                as_attachment=True,
+                filename="AsiaAlliance_Report.pdf",
+                content_type='application/pdf'
+            )
 
     else:
         form = CarCalcForm()
