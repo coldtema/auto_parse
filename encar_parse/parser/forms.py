@@ -1,4 +1,6 @@
 from django import forms
+from .models import Config
+import requests
 
 class CarArtikulForm(forms.Form):
     artikul = forms.CharField(
@@ -15,3 +17,39 @@ class CarArtikulForm(forms.Form):
         label='Тип ТС',
         choices=KIND_CHOICES,
         widget=forms.RadioSelect)
+    
+
+class CarCalcForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        cfg = Config.objects.first()
+        if cfg:
+            self.fields["delivery_cost"].initial = cfg.delivery_cost
+            self.fields["extra_expenses"].initial = cfg.extra_expenses
+            self.fields["asia_services"].initial = cfg.asia_services
+            self.fields["dealer_services"].initial = cfg.dealer_services
+            self.fields["korea_invoice"].initial = cfg.korea_invoice
+            self.fields["broker_cost"].initial = cfg.broker_cost
+
+        self.fields["rate"].initial = self.get_rate()
+            
+
+    encar_url = forms.CharField(label="Ссылка на Encar")
+
+    korean_price = forms.CharField(label="Стоимость автомобиля на сегодняшний день (в $)", required=False)
+
+    delivery_cost = forms.CharField(label="Стоимость доставки (в $)", required=False)
+    extra_expenses = forms.CharField(label="Доп. расходы (в руб.)", required=False)
+    rate = forms.CharField(label="Курс $", required=False)
+
+    asia_services = forms.CharField(label="Услуги Asia Alliance (в %)", required=False)
+    dealer_services = forms.CharField(label="Услуги дилера (в $)", required=False)
+    korea_invoice = forms.CharField(label="Оплата по инвойсу в Корею (в $)", required=False)
+
+    broker_cost = forms.CharField(label="Брокер / СВХ / Лаборатория (в руб.)", required=False)
+
+
+    def get_rate(self):
+        response = requests.get('https://www.cbr-xml-daily.ru/daily_json.js').json()
+        return response['Valute']['USD']['Value']/response['Valute']['USD']['Nominal']

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор Asia Alliance</title>
+
+    <style>
+        body {
+            background: #111;
+            color: #fff;
+            font-family: "Montserrat", Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 650px;
+            margin: 0 auto;
+            padding: 25px 15px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #d4af37;
+            font-weight: 600;
+        }
+
+        /* ===== PRESETS ===== */
+
+        .presets {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .preset-btn {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 12px;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+
+        .preset-btn:hover {
+            border-color: #d4af37;
+        }
+
+        .preset-btn.active {
+            background: #d4af37;
+            color: #111;
+            font-weight: 600;
+            border-color: #d4af37;
+        }
+
+        /* ===== FORM ===== */
+
+        form {
+            background: #1a1a1a;
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            box-shadow: 0 0 20px rgba(0,0,0,0.4);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background: #111;
+            color: #fff;
+            font-size: 15px;
+            margin-bottom: 18px;
+            transition: border-color .2s;
+            outline: none;
+        }
+
+        input:focus, select:focus {
+            border-color: #d4af37;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            background: #d4af37;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            color: #111;
+            transition: 0.25s;
+        }
+
+        button[type="submit"]:hover {
+            background: #f4d676;
+        }
+
+        *, *:before, *:after {
+            box-sizing: border-box;
+        }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 22px; }
+            .presets { grid-template-columns: 1fr; }
+            label { font-size: 13px; }
+            input, select, button { font-size: 14px; }
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <h1>Калькулятор стоимости</h1>
+
+    <!-- ===== PRESET BUTTONS ===== -->
+    <div class="presets">
+        <button type="button" class="preset-btn active" data-preset="korea_rf">
+            Корея → РФ
+        </button>
+        <button type="button" class="preset-btn" data-preset="korea_rf_legal">
+            Корея → РФ (юр. лицо)
+        </button>
+        <button type="button" class="preset-btn" data-preset="korea_minsk_rf">
+            Корея → Минск → РФ
+        </button>
+        <button type="button" class="preset-btn" data-preset="korea_bishkek_rf">
+            Корея → Бишкек → РФ
+        </button>
+    </div>
+
+    <div id="car-info" style="
+    display:none;
+    margin-top: 15px;
+    padding: 14px;
+    background:#111;
+    border:1px solid #333;
+    border-radius:10px;
+    font-size:15px;
+    color:#d4af37;
+    text-align:center;
+">
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <input type="hidden" name="preset" id="preset" value="korea_rf">
+
+        {% for field in form %}
+            <div class="form-field" data-field="{{ field.name }}">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                    <div style="color:#ff6a6a; font-size:13px; margin-top:-12px; margin-bottom:10px;">
+                        {{ field.errors|striptags }}
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <button type="submit">Посчитать</button>
+    </form>
+</div>
+
+<script>
+    // === конфигурация пресетов ===
+    const PRESETS = {
+        korea_rf: [
+            'type',
+            'encar_url',
+            'korean_price',
+            'delivery_cost',
+            'rate',
+            'asia_services',
+            'dealer_services',
+            'korea_invoice',
+            'broker_cost',
+        ],
+
+        korea_rf_legal: [
+            'type',
+            'encar_url',
+            'delivery_cost',
+            'rate',
+            'broker_cost',
+            'korea_invoice'
+        ],
+
+        korea_minsk_rf: [
+            'type',
+            'encar_url',
+            'delivery_cost',
+            'extra_expenses',
+            'rate'
+        ],
+
+        korea_bishkek_rf: [
+            'type',
+            'encar_url',
+            'delivery_cost',
+            'extra_expenses',
+            'broker_cost'
+        ]
+    };
+
+    const presetButtons = document.querySelectorAll('.preset-btn');
+    const presetInput = document.getElementById('preset');
+    const allFields = document.querySelectorAll('.form-field');
+
+    function applyPreset(presetName) {
+        const visibleFields = PRESETS[presetName];
+
+        allFields.forEach(field => {
+            const fieldName = field.dataset.field;
+
+            if (visibleFields.includes(fieldName)) {
+                field.style.display = 'block';
+            } else {
+                field.style.display = 'none';
+            }
+        });
+
+        presetInput.value = presetName;
+    }
+
+    presetButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            presetButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            applyPreset(btn.dataset.preset);
+        });
+    });
+
+    // применяем дефолтный пресет при загрузке страницы
+    applyPreset('korea_rf');
+</script>
+
+
+
+
+
+<script>
+const encarInput = document.querySelector('[name="encar_url"]');
+const usdRateInput = document.querySelector('[name="rate"]');
+const carInfo = document.getElementById('car-info');
+const koreanPriceInput = document.querySelector('[name="korean_price"]');
+const extraInput = document.querySelector('[name="extra_expenses"]');
+
+let fetchTimer = null;
+
+// общая функция для запроса данных и обновления формы
+function updateCarData() {
+    const url = encarInput.value.trim();
+    const rate = usdRateInput.value.trim();
+
+    if (!url) {
+        carInfo.style.display = 'none';
+        return;
+    }
+
+    fetch(`/api/encar-data/?url=${encodeURIComponent(url)}&usd_rate=${encodeURIComponent(rate)}`)
+        .then(res => res.json())
+        .then(data => {
+            console.log('Ответ сервера:', data);
+
+            if (!data.found) {
+                carInfo.style.display = 'none';
+                return;
+            }
+
+            // показываем название авто
+            carInfo.innerHTML = `<strong>${data.car_name}</strong>`;
+            carInfo.style.display = 'block';
+
+            // автозаполнение полей
+            if (koreanPriceInput && data.korean_price !== undefined) {
+                koreanPriceInput.value = data.korean_price;
+            }
+
+            if (extraInput && data.ru_price !== undefined) {
+                extraInput.value = data.ru_price;
+            }
+        })
+        .catch(console.error);
+}
+
+// debounce, чтобы не слать запрос на каждый символ
+function scheduleUpdate() {
+    clearTimeout(fetchTimer);
+    fetchTimer = setTimeout(updateCarData, 500); // 0.5 сек после последнего ввода
+}
+
+// слушаем изменения обоих полей
+encarInput.addEventListener('input', scheduleUpdate);
+usdRateInput.addEventListener('input', scheduleUpdate);
+</script>
+
+
+
+
+
+</body>
+</html>

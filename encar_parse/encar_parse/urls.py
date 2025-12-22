@@ -16,10 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from parser.views import index, vechile
+from parser.views import index, vechile, calc_view, api_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', index, name='index'),
-    path('vechile/', vechile, name='vechile')
+    path('vechile/', vechile, name='vechile'),
+    path('calculator/', calc_view, name='calculator'),
+    path('api/encar-data/', api_view, name='api')
 ]
