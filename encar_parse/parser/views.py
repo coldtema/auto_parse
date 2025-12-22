@@ -116,12 +116,13 @@ def vechile(request):
 
 
 def calc_view(request):
-    try:
-        if request.method == "POST":
+    if request.method == "POST":
+        try:
             form = CarCalcForm(request.POST)
             if form.is_valid():
                 data = form.cleaned_data
                 data['encar_url'] = data['encar_url'].split('?')[0]
+                print(data['encar_url'])
                 car = Car.objects.filter(url=data['encar_url']).last()
                 if car:
                     data['ru_price'] = str(round(float(data["rate"]) * float(data["korean_price"])))
@@ -139,10 +140,10 @@ def calc_view(request):
                 pdf_buffer = io.BytesIO()
                 generate_pdf(data, pdf_buffer)
                 pdf_buffer.seek(0)
+        except Exception as e:
+            print(traceback.format_exc())
 
-                return FileResponse(pdf_buffer, as_attachment=True, filename="AsiaAlliance_Report.pdf")
-    except Exception as e:
-        print(traceback.format_exc())
+            return FileResponse(pdf_buffer, as_attachment=True, filename="AsiaAlliance_Report.pdf")
 
     else:
         form = CarCalcForm()
