@@ -4,7 +4,7 @@ from .models import Car, Truck, CarOption, TruckOption, OptionCategory, CarPhoto
 import time
 import traceback
 from .forms import CarCalcForm
-# from .pdf_generator import generate_pdf
+from .pdf_generator import generate_pdf
 import io
 from django.http import FileResponse, JsonResponse
 import requests
