@@ -117,31 +117,28 @@ def vechile(request):
 
 def calc_view(request):
     if request.method == "POST":
-        try:
-            form = CarCalcForm(request.POST)
-            if form.is_valid():
-                data = form.cleaned_data
-                data['encar_url'] = data['encar_url'].split('?')[0]
-                print(data['encar_url'])
-                car = Car.objects.filter(url=data['encar_url']).last()
-                if car:
-                    data['ru_price'] = str(round(float(data["rate"]) * float(data["korean_price"])))
-                    data['customs_duty'] = car.customs_duty
-                    data['recycling_fee'] = car.recycling_fee
-                    data['full_name'] = f'{car.manufacturer.value_name} {car.model}'
-                    data["dealer_services"] = str(round(float(data["rate"]) * float(data["dealer_services"])))
-                    data["korea_invoice"] = str(round(float(data["rate"]) * float(data["korea_invoice"])))
-                    
-                    photos = car.carphoto_set.all()[:2]  # берём максимум 2 фото
+        form = CarCalcForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            data['encar_url'] = data['encar_url'].split('?')[0]
+            print(data['encar_url'])
+            car = Car.objects.filter(url=data['encar_url']).last()
+            if car:
+                data['ru_price'] = str(round(float(data["rate"]) * float(data["korean_price"])))
+                data['customs_duty'] = car.customs_duty
+                data['recycling_fee'] = car.recycling_fee
+                data['full_name'] = f'{car.manufacturer.value_name} {car.model}'
+                data["dealer_services"] = str(round(float(data["rate"]) * float(data["dealer_services"])))
+                data["korea_invoice"] = str(round(float(data["rate"]) * float(data["korea_invoice"])))
+                
+                photos = car.carphoto_set.all()[:2]  # берём максимум 2 фото
 
-                    data['photo'] = photos[0].link
-                    data['photo2'] = photos[1].link
-                    
-                pdf_buffer = io.BytesIO()
-                generate_pdf(data, pdf_buffer)
-                pdf_buffer.seek(0)
-        except Exception as e:
-            print(traceback.format_exc())
+                data['photo'] = photos[0].link
+                data['photo2'] = photos[1].link
+                
+            pdf_buffer = io.BytesIO()
+            generate_pdf(data, pdf_buffer)
+            pdf_buffer.seek(0)
 
             return FileResponse(pdf_buffer, as_attachment=True, filename="AsiaAlliance_Report.pdf")
 
