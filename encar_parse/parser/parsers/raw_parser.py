@@ -4,6 +4,7 @@ from ..models import Car, Truck, CarFuel, CarManufacturer
 from parser import cookie_grabber
 from django.db import transaction
 from datetime import date
+import time
 
 diagnosis = 'https://api.encar.com/v1/readside/diagnosis/vehicle/40286929'
 
@@ -18,9 +19,9 @@ class CarParser():
         self.current_page = 0
         self.url_dict = {
             #'new_electro_url': ['https://api.encar.com/search/car/list/premium?count=true&q=(And.(And.Mileage.range(', '0', '..', '10000', ')._.Hidden.N._.CarType.A._.GreenType.Y._.(Or.Separation.A._.Separation.B.)))&sr=%7CModifiedDate%7C', '0', '%7C1000'],
-            'electro_url': ['https://api.encar.com/search/car/list/premium?count=True&q=(And.Hidden.N._.CarType.A._.GreenType.Y._.(Or.Separation.A._.Separation.B.)_.Mileage.range(', '0', '..', '10000', ').)&sr=%7CModifiedDate%7C', '0', '%7C1000'],
-            'import_url': ['https://api.encar.com/search/car/list/premium?count=True&q=(And.Hidden.N._.CarType.N._.(Or.Separation.A._.Separation.F._.Separation.B.)_.SellType.%EC%9D%BC%EB%B0%98._.Mileage.range(', '0', '..', '10000', ').)&sr=%7CModifiedDate%7C', '0', '%7C1000'],
-            'native_url': ['https://api.encar.com/search/car/list/premium?count=True&q=(And.Hidden.N._.CarType.Y._.(Or.Separation.A._.Separation.B.)_.SellType.%EC%9D%BC%EB%B0%98._.Mileage.range(', '0', '..', '10000', ').)&sr=%7CModifiedDate%7C', '0', '%7C1000']
+            'electro_url': ['https://api.encar.com/search/car/list/premium?count=True&q=(And.Hidden.N._.CarType.A._.GreenType.Y._.Mileage.range(', '0', '..', '5000', ').)&sr=%7CModifiedDate%7C', '0', '%7C1000'],
+            'import_url': ['https://api.encar.com/search/car/list/premium?count=true&q=(And.Hidden.N._.CarType.N._.Mileage.range(', '0', '..', '5000', ').)&sr=%7CModifiedDate%7C', '0', '%7C1000'],
+            'native_url': ['https://api.encar.com/search/car/list/premium?count=True&q=(And.Hidden.N._.CarType.Y._.Mileage.range(', '0', '..', '5000', ').)&sr=%7CModifiedDate%7C', '0', '%7C1000']
         }
         self.current_api_url_list = []
         self.session = requests.Session()
@@ -67,11 +68,11 @@ class CarParser():
         '''Функция прохода через все пробеги легковых машин'''
         for mileage in range(0, 1000000, 10000):
             self.current_api_url_list[1] = str(mileage)
-            self.current_api_url_list[3] = str(mileage + 10000)
+            self.current_api_url_list[3] = str(mileage + 5000)
             print(f'Пробег: от {self.current_api_url_list[1]} до {self.current_api_url_list[3]}')
             self.go_through_all_pages_of_mileage()
         self.current_api_url_list[1] = '0'
-        self.current_api_url_list[3] = '10000'
+        self.current_api_url_list[3] = '5000'
 
 
     def go_through_all_pages_of_mileage(self):
@@ -105,6 +106,7 @@ class CarParser():
             ru_transmission = car_korean_dict['TRANSMISSION'].get(elem.get('Transmission', ''), elem.get('Transmission', ''))
             ru_cities = car_korean_dict['CITY'].get(elem.get('OfficeCityState', ''), elem.get('OfficeCityState', ''))
             ru_sell_type = car_korean_dict['SELL_TYPE'].get(elem.get('SellType', ''), elem.get('SellType', ''))
+            if ru_sell_type != 'Обычная покупка': continue
             self.new_elems.append(Car(encar_id=elem['Id'],
                                         url=f'https://fem.encar.com/cars/detail/{elem['Id']}',
                                         inspection=flag_inspection,
