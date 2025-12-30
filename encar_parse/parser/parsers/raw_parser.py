@@ -106,7 +106,7 @@ class CarParser():
             ru_transmission = car_korean_dict['TRANSMISSION'].get(elem.get('Transmission', ''), elem.get('Transmission', ''))
             ru_cities = car_korean_dict['CITY'].get(elem.get('OfficeCityState', ''), elem.get('OfficeCityState', ''))
             ru_sell_type = car_korean_dict['SELL_TYPE'].get(elem.get('SellType', ''), elem.get('SellType', ''))
-            if ru_sell_type != 'Аренда': continue
+            if ru_sell_type == 'Аренда': continue
             self.new_elems.append(Car(encar_id=elem['Id'],
                                         url=f'https://fem.encar.com/cars/detail/{elem['Id']}',
                                         inspection=flag_inspection,
