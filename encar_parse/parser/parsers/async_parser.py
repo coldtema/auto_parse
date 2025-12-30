@@ -225,7 +225,7 @@ class CarDuplicateClearer():
             Car.objects.filter(encar_id__in=self.encar_ids_to_delete[i*1000:(i+1)*1000]).delete()
         Car.objects.filter(manufacturer__value_name__in=['Others', 'etc', '']).delete() #удаление неизвестных encar'u машин (others-others-others)
         CarManufacturer.objects.filter(value_name__in=['Others', 'etc', '']).delete()
-        Car.objects.exclude(sell_type='Обычная покупка').delete()
+        Car.objects.exclude(sell_type__in=['Обычная покупка', 'Лизинг']).delete()
         Car.objects.filter(engine_capacity__lt=900, fuel_type__value_key__in=['G', 'D', 'GE', 'DE']).delete()
         Car.objects.filter(engine_capacity__isnull=True, fuel_type__value_key__in=['G', 'D', 'GE', 'DE']).delete()
         Car.objects.filter(fuel_type__value_key=None).delete()
