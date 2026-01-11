@@ -262,6 +262,9 @@ const usdRateInput = document.querySelector('[name="rate"]');
 const carInfo = document.getElementById('car-info');
 const koreanPriceInput = document.querySelector('[name="korean_price"]');
 const extraInput = document.querySelector('[name="extra_expenses"]');
+const recyclingFee = document.querySelector('[name="recycling_fee"]');
+const customsFee = document.querySelector('[name="customs_fee"]');
+const horsePower = document.querySelector('[name="horse_power"]');
 
 let fetchTimer = null;
 
@@ -297,6 +300,18 @@ function updateCarData() {
             if (extraInput && data.ru_price !== undefined) {
                 extraInput.value = data.ru_price;
             }
+
+            if (recyclingFee && data.recycling_fee !== undefined) {
+                recyclingFee.value = data.recycling_fee;
+            }
+
+            if (customsFee && data.customs_fee !== undefined) {
+                customsFee.value = data.customs_fee;
+            }
+
+            if (horsePower && data.horse_power !== undefined) {
+                horsePower.value = data.horse_power;
+            }
         })
         .catch(console.error);
 }
@@ -311,6 +326,32 @@ function scheduleUpdate() {
 encarInput.addEventListener('input', scheduleUpdate);
 usdRateInput.addEventListener('input', scheduleUpdate);
 </script>
+
+<script>
+const extraFieldsForEncar = [
+    'customs_fee',
+    'recycling_fee',
+    'horse_power'
+];
+
+function toggleEncarExtraFields() {
+    const hasUrl = encarInput.value.trim().length > 0;
+
+    extraFieldsForEncar.forEach(name => {
+        const field = document.querySelector(`.form-field[data-field="${name}"]`);
+        if (!field) return;
+
+        field.style.display = hasUrl ? 'block' : 'none';
+    });
+}
+
+// при вводе ссылки
+encarInput.addEventListener('input', toggleEncarExtraFields);
+
+// при загрузке страницы (если ссылка уже есть)
+toggleEncarExtraFields();
+</script>
+
 
 
 

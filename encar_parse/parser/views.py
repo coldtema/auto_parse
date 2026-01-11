@@ -130,11 +130,14 @@ def calc_view(request):
                 data['full_name'] = f'{car.manufacturer.value_name} {car.model}'
                 data["dealer_services"] = str(round(float(data["rate"]) * float(data["dealer_services"])))
                 data["korea_invoice"] = str(round(float(data["rate"]) * float(data["korea_invoice"])))
+                data["options"] = eval(car.options)
                 
-                photos = car.carphoto_set.all()[:2]  # берём максимум 2 фото
+                photos = car.carphoto_set.all()[:4]  # берём максимум 2 фото
 
                 data['photo'] = photos[0].link
                 data['photo2'] = photos[1].link
+                data['photo3'] = photos[2].link
+                data['photo4'] = photos[3].link
                 
             pdf_buffer = io.BytesIO()
             generate_pdf(data, pdf_buffer)
@@ -156,11 +159,14 @@ def calc_view(request):
 def api_view(request):
     if request.method == 'GET':
         url = request.GET.get("url")
-        url = url.split('?')[0]
+        url = url.split('?')[0].split('/')[-1]
         print(url)
         name = []
 
-        car = Car.objects.filter(url=url).last()
+        car = Car.objects.filter(encar_id=int(url)).last()
+
+        if not car:
+            car = Car.objects.filter(dummy_id=int(url)).last()
 
         if car.manufacturer.value_name:
             name.append(car.manufacturer.value_name)
@@ -194,5 +200,8 @@ def api_view(request):
         "found": True,
         "korean_price": round(car.price * 10000 * currency_dict['krw/usd']),
         "ru_price": car.ru_price,
+        "horse_power": car.hp,
+        "customs_fee": car.customs_duty,
+        "recycling_fee": car.recycling_fee,
         "car_name": name
     })

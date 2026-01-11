@@ -48,6 +48,10 @@ class CarCalcForm(forms.Form):
     korea_invoice = forms.CharField(label="Оплата по инвойсу в Корею (в $)", required=False)
 
     broker_cost = forms.CharField(label="Брокер / СВХ / Лаборатория (в руб.)", required=False)
+    
+    horse_power = forms.CharField(label="Лошадиные силы", required=False)
+    customs_fee = forms.CharField(label="Таможенные платежи", required=False)
+    recycling_fee = forms.CharField(label="Утилизационный сбор", required=False)
 
 
     def get_rate(self):

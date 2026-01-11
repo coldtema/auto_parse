@@ -8,12 +8,16 @@ import requests
 from io import BytesIO
 
 
-BACKGROUND_IMAGE = "parser/static/images/step1.png"  # твоя картинка
+BACKGROUND_IMAGE = "parser/static/images/step1.png"
+BACKGROUND_IMAGE2 = "parser/static/images/step2.png"
+BACKGROUND_IMAGE3 = "parser/static/images/step3.png"
 
 def generate_pdf(data, buffer):
     print(data)
     c = canvas.Canvas(buffer, pagesize=A4)
     pdfmetrics.registerFont(TTFont("TTNormsPro-Bold", "parser/static/fonts/TTNormsPro-Bold.ttf"))
+    pdfmetrics.registerFont(TTFont("DAMN", "parser/static/fonts/DAMN.ttf"))
+    pdfmetrics.registerFont(TTFont("NotoEmoji", "parser/static/fonts/NotoEmoji.ttf"))
 
     # # === СТРАНИЦА 1: АНКЕТА ===
     # c.setFillColor(Color(0, 0, 0, 1))
@@ -72,23 +76,23 @@ def generate_pdf(data, buffer):
         ("Общая стоимость: ", f'{comma_price(final_price)} руб.'),
     ]
 
-    c.drawString(350, 673, f"{price_items[0][1]}")
+    c.drawString(350, 653, f"{price_items[0][1]}")
 
-    c.drawString(340, 620, f"{price_items[1][1]}")
+    c.drawString(340, 600, f"{price_items[1][1]}")
 
-    c.drawString(241, 563, f"{price_items[2][1]}")
+    c.drawString(241, 543, f"{price_items[2][1]}")
 
-    c.drawString(185, 507, f"{price_items[3][1]}")
+    c.drawString(185, 487, f"{price_items[3][1]}")
 
-    c.drawString(235, 447, f"{price_items[4][1]}")
+    c.drawString(235, 427, f"{price_items[4][1]}")
 
-    c.drawString(135, 393, f"{price_items[5][1]}")
+    c.drawString(135, 303, f"{price_items[5][1]}")
 
-    c.drawString(270, 334, f"{price_items[6][1]}")
+    c.drawString(270, 244, f"{price_items[6][1]}")
 
-    c.drawString(300, 276, f"{price_items[7][1]}")
+    c.drawString(300, 186, f"{price_items[7][1]}")
 
-    c.drawString(220, 217, f"{price_items[8][1]}")
+    c.drawString(220, 127, f"{price_items[8][1]}")
 
     photo_url = data["photo"]
 
@@ -98,8 +102,8 @@ def generate_pdf(data, buffer):
     # координаты и размер фото (можно подстроить)
     x = 0
     y = 0
-    img_width = 300
-    img_height = 200
+    img_width = 150
+    img_height = 100
 
     img_reader = ImageReader(img_data)
 
@@ -112,17 +116,85 @@ def generate_pdf(data, buffer):
     img_data = BytesIO(response.content)
 
     # координаты и размер фото (можно подстроить)
+    x = 150
+    y = 0
+    img_width = 150
+    img_height = 100
+
+    img_reader = ImageReader(img_data)
+
+    c.drawImage(img_reader, x, y, width=img_width, height=img_height, preserveAspectRatio=True, mask='auto')
+
+
+    photo_url = data["photo3"]
+
+    response = requests.get(photo_url)
+    img_data = BytesIO(response.content)
+
+    # координаты и размер фото (можно подстроить)
     x = 300
     y = 0
-    img_width = 300
-    img_height = 200
+    img_width = 150
+    img_height = 100
+
+    img_reader = ImageReader(img_data)
+
+    c.drawImage(img_reader, x, y, width=img_width, height=img_height, preserveAspectRatio=True, mask='auto')
+
+
+    photo_url = data["photo4"]
+
+    response = requests.get(photo_url)
+    img_data = BytesIO(response.content)
+
+    # координаты и размер фото (можно подстроить)
+    x = 450
+    y = 0
+    img_width = 150
+    img_height = 100
 
     img_reader = ImageReader(img_data)
 
     c.drawImage(img_reader, x, y, width=img_width, height=img_height, preserveAspectRatio=True, mask='auto')
     
 
+
+    # === СТРАНИЦА 2: КОПЛЕКТАЦИЯ ===
     c.showPage()
+    width, height = A4
+    c.drawImage(BACKGROUND_IMAGE2, 0, 0, width=width, height=height)
+
+    # draw_grid(c)
+
+    c.setFillColorRGB(1, 1, 1)
+    c.setFont("NotoEmoji", 11)
+
+
+    #COMPLECTATION_DICT_PAGE1.keys()
+    for option in data['options']:
+        if option in COMPLECTATION_DICT_PAGE1.keys():
+            coords = COMPLECTATION_DICT_PAGE1[option]
+            c.drawString(coords[0], coords[1], "✔")
+    
+
+
+    # === СТРАНИЦА 3: КОПЛЕКТАЦИЯ ===
+    c.showPage()
+    width, height = A4
+    c.drawImage(BACKGROUND_IMAGE3, 0, 0, width=width, height=height)
+
+    # draw_grid(c)
+
+    c.setFillColorRGB(1, 1, 1)
+    c.setFont("NotoEmoji", 11)
+
+
+    #COMPLECTATION_DICT_PAGE2.keys()
+    for option in data['options']:
+        if option in COMPLECTATION_DICT_PAGE2.keys():
+            coords = COMPLECTATION_DICT_PAGE2[option]
+            c.drawString(coords[0], coords[1], "✔")
+    
     c.save()
 
 
@@ -195,3 +267,75 @@ def make_gradient_text(text, font_path, font_size):
 
     img.putalpha(mask)
     return img
+
+
+
+COMPLECTATION_DICT_PAGE1 = {
+    "006": (16, 683),
+    "008": (16, 653),
+    "017": (16, 621),
+    "029": (16, 591),
+    "031": (16, 561),
+    "062": (16, 530),
+    "075": (16, 499),
+    "082": (16, 468),
+    "084": (16, 432),
+    "007": (327, 683),
+    "010": (327, 650),
+    "024": (327, 613),
+    "030": (327, 562),
+    "074": (328, 525),
+    "059": (328, 495),
+    "080": (328, 463),
+    "083": (328, 427),
+    "001": (16.5, 314),
+    "019": (16.5, 274),
+    "026": (16.5, 227),
+    "032": (16.5, 190),
+    "055": (16.5, 151),
+    "058": (16.5, 112),
+    "086": (16.5, 78),
+    "088": (16.5, 30),
+    "002": (327, 314),
+    "020": (327, 265),
+    "027": (327, 222.5),
+    "033": (327, 184.5),
+    "056": (328, 139),
+    "085": (328, 93),
+    "087": (328, 61),
+    "083": (328, 26),
+}
+
+
+COMPLECTATION_DICT_PAGE2 = {
+    "003": (16, 690),
+    "005": (16, 660),
+    "023": (16, 628),
+    "057": (16, 598),
+    "071": (16, 568),
+    "096": (16, 537.5),
+    "092": (16, 502),
+    "094": (16, 457),
+    "068": (16, 413),
+    "004": (327, 691),
+    "015": (327, 657),
+    "054": (327, 620),
+    "079": (327, 583.5),
+    "072": (328, 546.5),
+    "081": (328, 516.5),
+    "095": (328, 484.5),
+    "093": (328, 448.5),
+    "097": (328, 408.5),
+    "014": (16.5, 314),
+    "022": (16.5, 274),
+    "021": (16.5, 227),
+    "051": (16.5, 190),
+    "063": (16.5, 151),
+    "090": (16.5, 112),
+    "035": (327, 314),
+    "034": (327, 265),
+    "078": (327, 228.5),
+    "077": (327, 193.5),
+    "089": (328, 149),
+    "091": (328, 111),
+}
