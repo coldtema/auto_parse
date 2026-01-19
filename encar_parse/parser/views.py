@@ -121,8 +121,12 @@ def calc_view(request):
         if form.is_valid():
             data = form.cleaned_data
             data['encar_url'] = data['encar_url'].split('?')[0]
-            print(data['encar_url'])
-            car = Car.objects.filter(url=data['encar_url']).last()
+            artikul = data['encar_url'].split('?')[0].split('/')[-1]
+            
+            car = Car.objects.filter(encar_id=int(artikul)).last()
+            if not car:
+                car = Car.objects.filter(dummy_id=int(artikul)).last()
+
             if car:
                 data['ru_price'] = str(round(float(data["rate"]) * float(data["korean_price"])))
                 data['customs_duty'] = car.customs_duty
