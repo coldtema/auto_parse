@@ -55,5 +55,9 @@ class CarCalcForm(forms.Form):
 
 
     def get_rate(self):
-        response = requests.get('https://www.cbr-xml-daily.ru/daily_json.js').json()
-        return response['Valute']['USD']['Value']/response['Valute']['USD']['Nominal']
+        try:
+            response = requests.get('https://moscaex.online/api2/usdt_rate').json()
+            return response['buy']
+        except:
+            response = requests.get('https://www.cbr-xml-daily.ru/daily_json.js').json()
+            return response['Valute']['USD']['Value']/response['Valute']['USD']['Nominal']

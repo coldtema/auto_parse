@@ -6,7 +6,7 @@ import traceback
 from .forms import CarCalcForm
 from .pdf_generator import generate_pdf
 import io
-from django.http import FileResponse, JsonResponse
+from django.http import FileResponse, HttpResponse, JsonResponse
 import requests
 
 def time_count(func):
@@ -131,28 +131,51 @@ def calc_view(request):
                 data['ru_price'] = str(round(float(data["rate"]) * float(data["korean_price"])))
                 data['customs_duty'] = car.customs_duty
                 data['recycling_fee'] = car.recycling_fee
-                data['full_name'] = f'{car.manufacturer.value_name} {car.model}'
-                data["dealer_services"] = str(round(float(data["rate"]) * float(data["dealer_services"])))
-                data["korea_invoice"] = str(round(float(data["rate"]) * float(data["korea_invoice"])))
+                data['full_name'] = f'{car.manufacturer.value_name} {car.model} ({car.release_date//100})'
+                data['mileage'] = f'Пробег: {car.mileage} км'
+                # data["dealer_services"] = str(round(float(data["rate"]) * float(data["dealer_services"])))
+                # data["korea_invoice"] = str(round(float(data["rate"]) * float(data["korea_invoice"])))
                 data["options"] = eval(car.options)
                 
-                photos = car.carphoto_set.all()[:4]  # берём максимум 2 фото
+                photos = car.carphoto_set.all()[:4]  # берём максимум 4 фото
 
-                data['photo'] = photos[0].link
+                data['photo1'] = photos[0].link
                 data['photo2'] = photos[1].link
                 data['photo3'] = photos[2].link
                 data['photo4'] = photos[3].link
-                
-            pdf_buffer = io.BytesIO()
-            generate_pdf(data, pdf_buffer)
-            pdf_buffer.seek(0)
 
-            return FileResponse(
+            # print(data)
+                
+            data['rates'] = {"USD_RUB": float(data["rate"])}
+
+            data['upfront_rows'] = [
+                    {"label": "Авто в Корее", "rub": int(float(data['korean_price']) * float(data['rate'])), "usd": int(data['korean_price'])},
+                    {"label": "Услуги Asia Alliance", "rub": 30000, "usd": usd_nominalo(30000, 'rub', data['rate'])},
+                    {"label": "Услуги Дилера", "rub": int(float(data['dealer_services']) * float(data['rate'])), "usd": float(data['dealer_services'])},
+                    {"label": "Оплата по Инвойсу", "rub": int(float(data['korea_invoice']) * float(data['rate'])), "usd": float(data['korea_invoice'])},
+                ]
+            
+            data['delivery_options'] = [
+                    {"label": "Владивосток", "rub": int(float(data['delivery_cost']) * float(data['rate'])), "usd": int(data['delivery_cost']), "selected": True},
+                    # {"label": "Москва", "rub": int(float(data['delivery_cost']) * float(data['rate'])), "usd": int(data['delivery_cost']), "selected": False},
+                ]
+            
+            data['customs_rows'] = [
+                    {"label": "Таможня", "rub": int(float(data['customs_fee'])), "usd": usd_nominalo(int(data['customs_fee']), 'rub', data['rate'])},
+                    {"label": "Утилизационный сбор", "rub": int(float(data['recycling_fee'])), "usd": usd_nominalo(int(data['recycling_fee']), 'rub', data['rate'])},
+                    {"label": "Брокер / СВХ / Лаб.", "rub": int(float(data['broker_cost'])), "usd": usd_nominalo(int(data['broker_cost']), 'rub', data['rate'])},
+                ]
+            
+            data['total'] = [{"label": "ИТОГО", "rub": final_price(data)['rub'], "usd": final_price(data)['usd']}]
+            
+            pdf_buffer = generate_pdf(data)
+
+            response = HttpResponse(
                 pdf_buffer,
-                as_attachment=True,
-                filename="AsiaAlliance_Report.pdf",
-                content_type='application/pdf'
+                content_type="application/pdf"
             )
+            response["Content-Disposition"] = 'attachment; filename="AsiaAlliance_Report.pdf"'
+            return response
 
     else:
         form = CarCalcForm()
@@ -209,3 +232,43 @@ def api_view(request):
         "recycling_fee": car.recycling_fee,
         "car_name": name
     })
+
+
+
+def usd_nominalo(amount, currency, rate):
+    currency_dict = dict()
+    amount = float(amount)
+    response = requests.get('https://www.cbr-xml-daily.ru/daily_json.js').json()
+    currency_dict['krw/rub'] = response['Valute']['KRW']['Value']/response['Valute']['KRW']['Nominal']
+    currency_dict['usd/rub'] = float(rate)
+    currency_dict['krw/usd'] = currency_dict['krw/rub'] / currency_dict['usd/rub']
+
+    match currency:
+        case 'krw':
+            return int(round(amount * float(currency_dict['krw/usd'])))
+        
+        case 'rub':
+            return int(round(amount / float(currency_dict['usd/rub'])))
+        
+    return amount
+
+
+def final_price(data):
+    rub_counter = 0
+    usd_counter = 0
+    fields_to_count = [
+        "Авто в Корее",
+        "Услуги Asia Alliance",
+        "Услуги Дилера",
+        "Владивосток",
+        "Москва",
+        "Таможня",
+        "Утилизационный сбор",
+        "Брокер / СВХ / Лаб.",
+    ]
+    data = data['customs_rows'] + data['upfront_rows'] + data['delivery_options']
+    for row in data:
+        if row['label'] in fields_to_count:
+            rub_counter+=int(row['rub'])
+            usd_counter+=int(row['usd'])
+    return {'rub': rub_counter, 'usd': usd_counter}
