@@ -272,6 +272,7 @@ let fetchTimer = null;
 function updateCarData() {
     const url = encarInput.value.trim();
     const rate = usdRateInput.value.trim();
+    const hp = horsePower.value.trim();
 
     if (!url) {
         carInfo.style.display = 'none';
@@ -316,15 +317,57 @@ function updateCarData() {
         .catch(console.error);
 }
 
+function sendHorsePowerUpdate() {
+    const url = encarInput.value.trim();
+    const hp = parseFloat(horsePower.value) || 0;
+
+    if (!url) {
+        carInfo.style.display = 'none';
+        return;
+    }
+
+    fetch('/api/encar-data/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({
+            url: url,
+            horse_power: hp
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log('Ответ сервера:', data);
+
+        // автозаполнение полей
+        if (recyclingFee && data.recycling_fee !== undefined) {
+            recyclingFee.value = data.recycling_fee;
+        }
+
+        if (customsFee && data.customs_fee !== undefined) {
+            customsFee.value = data.customs_fee;
+        }
+    })
+    .catch(console.error);
+}
+
 // debounce, чтобы не слать запрос на каждый символ
 function scheduleUpdate() {
     clearTimeout(fetchTimer);
     fetchTimer = setTimeout(updateCarData, 500); // 0.5 сек после последнего ввода
 }
 
+function scheduleUpdateHP() {
+    clearTimeout(fetchTimer);
+    fetchTimer = setTimeout(sendHorsePowerUpdate, 500); // 0.5 сек после последнего ввода
+}
+
 // слушаем изменения обоих полей
 encarInput.addEventListener('input', scheduleUpdate);
 usdRateInput.addEventListener('input', scheduleUpdate);
+horsePower.addEventListener('input', scheduleUpdateHP);
 </script>
 
 <script>
@@ -347,6 +390,8 @@ function toggleEncarExtraFields() {
 
 // при вводе ссылки
 encarInput.addEventListener('input', toggleEncarExtraFields);
+
+horsePower.addEventListener('input', toggleEncarExtraFields);
 
 // при загрузке страницы (если ссылка уже есть)
 toggleEncarExtraFields();

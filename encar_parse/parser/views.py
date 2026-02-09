@@ -1,3 +1,4 @@
+import json
 from django.shortcuts import render
 from .forms import CarArtikulForm
 from .models import Car, Truck, CarOption, TruckOption, OptionCategory, CarPhoto, TruckPhoto, Config
@@ -8,6 +9,7 @@ from .pdf_generator import generate_pdf
 import io
 from django.http import FileResponse, HttpResponse, JsonResponse
 import requests
+from .ru_price_calc import RuPriceCalc
 
 def time_count(func):
     def wrapper(*args, **kwargs):
@@ -232,6 +234,34 @@ def api_view(request):
         "recycling_fee": car.recycling_fee,
         "car_name": name
     })
+
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        print(data)
+
+        url = data.get('url')
+        horse_power = data.get('horse_power')
+
+        url = url.split('?')[0].split('/')[-1]
+
+        car = Car.objects.filter(encar_id=int(url)).last()
+
+        if not car:
+            car = Car.objects.filter(dummy_id=int(url)).last()
+
+        car.hp = horse_power
+        car.save()
+
+        RuPriceCalc(encar_id=car.encar_id).run()
+
+        car.refresh_from_db()
+
+        return JsonResponse({
+            "received": True,
+            "url": url,
+            "recycling_fee": car.recycling_fee,
+            "customs_fee": car.customs_duty,
+        })
 
 
 

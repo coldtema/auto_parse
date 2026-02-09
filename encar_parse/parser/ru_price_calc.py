@@ -8,12 +8,17 @@ one_eur = 1614.69 #(kor w)
 
 
 class RuPriceCalc:
-    def __init__(self):
+    def __init__(self, encar_id=None):
+        if encar_id == None:
+             self.car_count = Car.objects.all().count()
+             self.encar_ids = list(map(lambda x: x['encar_id'], Car.objects.all().values('encar_id')))
+        else:
+             self.car_count = 1
+             self.encar_ids = [encar_id]
+
         self.currency_checker_url = 'https://www.cbr-xml-daily.ru/daily_json.js'
         self.currency_dict = dict()
         self.batch_size = 1000
-        self.car_count = Car.objects.all().count()
-        self.encar_ids = list(map(lambda x: x['encar_id'], Car.objects.all().values('encar_id')))
         self.headers = {
                     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
                     "Referer": "https://www.encar.com/",
