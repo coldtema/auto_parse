@@ -1,15 +1,18 @@
 import json
+import re
 from django.shortcuts import render
 from .forms import CarArtikulForm
-from .models import Car, Truck, CarOption, TruckOption, OptionCategory, CarPhoto, TruckPhoto, Config
+from .models import Car, Truck, CarOption, TruckOption, OptionCategory, CarPhoto, TruckPhoto, Config, HorsePower
 import time
 import traceback
-from .forms import CarCalcForm
+from .forms import CarCalcForm, CarCalcForm2
 from .pdf_generator import generate_pdf
+from .pdf_generator2 import generate_pdf2
 import io
 from django.http import FileResponse, HttpResponse, JsonResponse
 import requests
 from .ru_price_calc import RuPriceCalc
+from unicodedata import normalize
 
 def time_count(func):
     def wrapper(*args, **kwargs):
@@ -122,6 +125,7 @@ def calc_view(request):
         form = CarCalcForm(request.POST)
         if form.is_valid():
             data = form.cleaned_data
+            print(data)
             data['encar_url'] = data['encar_url'].split('?')[0]
             artikul = data['encar_url'].split('?')[0].split('/')[-1]
             
@@ -183,6 +187,79 @@ def calc_view(request):
         form = CarCalcForm()
 
     return render(request, "parser/calculator.html", {"form": form})
+
+
+def calc_view2(request):
+    if request.method == "POST":
+        form = CarCalcForm2(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            print(data)
+            data['encar_url'] = data['encar_url'].split('?')[0]
+            artikul = data['encar_url'].split('?')[0].split('/')[-1]
+            
+            car = Car.objects.filter(encar_id=int(artikul)).last()
+            if not car:
+                car = Car.objects.filter(dummy_id=int(artikul)).last()
+
+            if car:
+                data['ru_price'] = str(round(float(data["rate"]) * float(data["korean_price"])))
+                data['customs_duty'] = car.customs_duty
+                data['recycling_fee'] = car.recycling_fee
+                data['full_name'] = f'{car.manufacturer.value_name} {car.model} ({car.release_date//100})'
+                data['mileage'] = f'Пробег: {car.mileage} км'
+                # data["dealer_services"] = str(round(float(data["rate"]) * float(data["dealer_services"])))
+                # data["korea_invoice"] = str(round(float(data["rate"]) * float(data["korea_invoice"])))
+                data["options"] = eval(car.options)
+                
+                photos = car.carphoto_set.all()[:4]  # берём максимум 4 фото
+
+                data['photo1'] = photos[0].link
+                data['photo2'] = photos[1].link
+                data['photo3'] = photos[2].link
+                data['photo4'] = photos[3].link
+
+            # print(data)
+                
+            data['rates'] = {"USD_RUB": float(data["rate"])}
+
+            data['upfront_rows'] = [
+                    {"label": "Авто в Корее", "rub": int(float(data['korean_price']) * float(data['rate'])), "usd": int(data['korean_price'])},
+                    {"label": "Доставка в Бишкек", "rub": int(float(data['delivery_cost_korea_bishkek']) * float(data['rate'])), "usd": int(data['delivery_cost_korea_bishkek']), "selected": True},
+                    {"label": "Услуги Asia Alliance", "rub": 30000, "usd": usd_nominalo(30000, 'rub', data['rate'])},
+                    {"label": "Услуги Дилера", "rub": int(float(data['dealer_services']) * float(data['rate'])), "usd": float(data['dealer_services'])},
+                    {"label": "Инвойс в Корею", "rub": int(float(data['korea_invoice']) * float(data['rate'])), "usd": float(data['korea_invoice'])},
+                ]
+            
+            data['middle_rows'] = [
+                    {"label": "Таможня (Бишкек)", "rub": int(float(data['customs_fee_bishkek']) * float(data['rate'])), "usd": int(data['customs_fee_bishkek'])},
+                    {"label": "Брокер (Бишкек)", "rub": int(float(data['broker_cost_bishkek']) * float(data['rate'])), "usd": int(data['broker_cost_bishkek'])},
+                ]
+            data['delivery_options'] = [
+                    {"label": "Доставка в Москву", "rub": int(float(data['delivery_cost_bishkek_moscow']) * float(data['rate'])), "usd": int(data['delivery_cost_bishkek_moscow']), "selected": True},
+                    {"label": "Инвойс в Бишкек", "rub": int(float(data['korea_invoice']) * float(data['rate'])), "usd": float(data['korea_invoice'])},
+                ]
+            
+            data['customs_rows'] = [
+                    {"label": "Утилизационный сбор", "rub": int(float(data['recycling_fee'])), "usd": usd_nominalo(int(data['recycling_fee']), 'rub', data['rate'])},
+                    {"label": "Лаборатория (Москва)", "rub": int(float(data['lab_moscow'])), "usd": usd_nominalo(int(data['lab_moscow']), 'rub', data['rate'])},
+                ]
+            
+            data['total'] = [{"label": "ИТОГО", "rub": final_price2(data)['rub'], "usd": final_price2(data)['usd']}]
+            
+            pdf_buffer = generate_pdf2(data)
+
+            response = HttpResponse(
+                pdf_buffer,
+                content_type="application/pdf"
+            )
+            response["Content-Disposition"] = 'attachment; filename="AsiaAlliance_Report.pdf"'
+            return response
+
+    else:
+        form = CarCalcForm2()
+
+    return render(request, "parser/calculator2.html", {"form": form})
 
 
 def api_view(request):
@@ -256,6 +333,16 @@ def api_view(request):
 
         car.refresh_from_db()
 
+        value_name = norm(car.manufacturer.value_name)
+        model = norm(car.model)
+        model_year = norm(car.model_year)
+        version = norm(car.version)
+        engine_capacity = norm(car.engine_capacity)
+
+        if not HorsePower.objects.filter(value_name=value_name, model=model, model_year=model_year, version=version, engine_capacity=engine_capacity).exists():
+            HorsePower.objects.create(value_name=value_name, model=model, model_year=model_year, version=version, engine_capacity=engine_capacity, hp=horse_power)
+
+
         return JsonResponse({
             "received": True,
             "url": url,
@@ -263,7 +350,13 @@ def api_view(request):
             "customs_fee": car.customs_duty,
         })
 
-
+def norm(s: str | int | None):
+    if s is None:
+        return None
+    s = str(s).strip().lower()
+    s = normalize('NFKD', s)
+    s = re.sub(r'\s+', ' ', s)
+    return s
 
 def usd_nominalo(amount, currency, rate):
     currency_dict = dict()
@@ -297,6 +390,29 @@ def final_price(data):
         "Брокер / СВХ / Лаб.",
     ]
     data = data['customs_rows'] + data['upfront_rows'] + data['delivery_options']
+    for row in data:
+        if row['label'] in fields_to_count:
+            rub_counter+=int(row['rub'])
+            usd_counter+=int(row['usd'])
+    return {'rub': rub_counter, 'usd': usd_counter}
+
+
+
+def final_price2(data):
+    rub_counter = 0
+    usd_counter = 0
+    fields_to_count = [
+        "Авто в Корее",
+        "Доставка в Бишкек",
+        "Услуги Asia Alliance",
+        "Услуги Дилера",
+        "Таможня (Бишкек)",
+        "Брокер (Бишкек)",
+        "Доставка в Москву",
+        "Утилизационный сбор",
+        "Лаборатория (Москва)",
+    ]
+    data = data['customs_rows'] + data['middle_rows'] + data['delivery_options'] + data['upfront_rows'] 
     for row in data:
         if row['label'] in fields_to_count:
             rub_counter+=int(row['rub'])

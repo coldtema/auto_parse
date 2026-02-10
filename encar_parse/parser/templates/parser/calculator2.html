@@ -130,12 +130,12 @@
     <!-- ===== PRESET BUTTONS ===== -->
     <div class="presets">
         <a href="{% url 'calculator' %}"
-        class="preset-btn active">
+        class="preset-btn">
             Корея → РФ
         </a>
 
         <a href="{% url 'calculator2' %}"
-        class="preset-btn">
+        class="preset-btn active">
             Корея → Бишкек → РФ
         </a>
     </div>
@@ -178,41 +178,21 @@
 <script>
     // === конфигурация пресетов ===
     const PRESETS = {
-        korea_rf: [
-            'type',
-            'encar_url',
-            'korean_price',
-            'delivery_cost',
-            'rate',
-            'asia_services',
-            'dealer_services',
-            'korea_invoice',
-            'broker_cost',
-        ],
-
-        korea_rf_legal: [
-            'type',
-            'encar_url',
-            'delivery_cost',
-            'rate',
-            'broker_cost',
-            'korea_invoice'
-        ],
-
-        korea_minsk_rf: [
-            'type',
-            'encar_url',
-            'delivery_cost',
-            'extra_expenses',
-            'rate'
-        ],
-
         korea_bishkek_rf: [
-            'type',
-            'encar_url',
-            'delivery_cost',
-            'extra_expenses',
-            'broker_cost'
+            'encar_url'
+            'korean_price'
+            'delivery_cost_korea_bishkek'
+            'asia_services'
+            'dealer_services'
+            'korea_invoice'
+            'customs_fee_bishkek'
+            'broker_cost_bishkek'
+            'delivery_cost_bishkek_moscow'
+            'bishkek_invoice'
+            'lab_moscow'
+            'recycling_fee'
+            'rate'
+            'horse_power'
         ]
     };
 

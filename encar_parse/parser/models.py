@@ -213,6 +213,10 @@ class Config(models.Model):
     dealer_services = models.IntegerField(verbose_name='Услуги дилера', default=0)
     korea_invoice = models.IntegerField(verbose_name='Стоимость по инвойсу в Корее', default=0)
     broker_cost = models.IntegerField(verbose_name='Услуги брокера / СВХ / Лаборатория (В руб.)', default=115000)
+    delivery_cost_korea_bishkek = models.IntegerField(verbose_name='Стоимость доставки из Кореи в Бишкек (В $)', default=4000)
+    broker_cost_bishkek = models.IntegerField(verbose_name='Услуги брокера в Бишкеке (В $)', default=1000)
+    delivery_cost_bishkek_moscow = models.IntegerField(verbose_name='Стоимость доставки из Бишкека в Москву (В $)', default=1500)
+    lab_moscow = models.IntegerField(verbose_name='Лаборатория в Москве (В руб.)', default=50000)
 
 
 class HorsePower(models.Model):
