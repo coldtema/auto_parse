@@ -7,6 +7,8 @@ from django.db import transaction
 import os
 from dotenv import load_dotenv
 from aiohttp_socks import ProxyConnector
+import time
+import random
 
 load_dotenv()
 
@@ -60,6 +62,8 @@ class AsyncCarRecordParser():
             list_api_urls.append(f'{self.encar_api_url[0]}{car.dummy_id}{self.encar_api_url[2]}{car.korean_number}')
         print(f'Запуск {self.counter}')
         self.counter += 1
+        if self.counter % 10 == 0:
+            time.sleep(random.randint(1, 10))
         self.results = asyncio.run(self.get_info(list_api_urls))
         
     

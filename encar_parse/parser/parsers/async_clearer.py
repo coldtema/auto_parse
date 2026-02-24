@@ -8,6 +8,8 @@ from parser import cookie_grabber
 import os
 from dotenv import load_dotenv
 from aiohttp_socks import ProxyConnector
+import time
+import random
 
 load_dotenv()
 
@@ -58,6 +60,8 @@ class AsyncCarClearer():
             list_api_urls.append(f'{self.encar_api_url}{car.encar_id}')
         print(f'Запуск {self.counter}')
         self.counter += 1
+        if self.counter % 10 == 0:
+            time.sleep(random.randint(1, 10))
         self.results = asyncio.run(self.get_info(list_api_urls))
         
     

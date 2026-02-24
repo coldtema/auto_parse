@@ -10,6 +10,8 @@ from dotenv import load_dotenv
 from aiohttp_socks import ProxyConnector
 
 load_dotenv()
+import time
+import random
 
 diagnosis1 = 'https://api.encar.com/v1/readside/diagnosis/vehicle/40286929'
 
@@ -57,6 +59,8 @@ class AsyncCarDiagParser():
             list_api_urls.append(f'{self.encar_api_url}{car.dummy_id}')
         print(f'Запуск {self.counter}')
         self.counter += 1
+        if self.counter % 10 == 0:
+            time.sleep(random.randint(1, 10))
         self.results = asyncio.run(self.get_info(list_api_urls))
         
     
