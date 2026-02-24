@@ -20,7 +20,7 @@ photos = 'https://ci.encar.com/carpicture/carpicture03/pic4003/40034021_001.jpg?
 
 class AsyncCarParser():
     def __init__(self):
-        self.batch_size = 1000
+        self.batch_size = 100
         self.session = requests.Session()
         self.encar_api_url = 'https://api.encar.com/v1/readside/vehicle/'
         self.car_count = Car.objects.all().count()
@@ -65,7 +65,10 @@ class AsyncCarParser():
     async def fetch(self, session, url):
         try:
             async with session.get(url, timeout=10) as response:
-                response = await response.json()
+                print(response.status)
+                print(response.headers)
+                text = await response.text()
+                print(text)
                 photos_urls = list(map(lambda x: x['path'], response['photos']))
                 if response['manage']['dummy'] == True: dummy_id = response['vehicleId']
                 else: dummy_id = int(url.split('/')[-1])
