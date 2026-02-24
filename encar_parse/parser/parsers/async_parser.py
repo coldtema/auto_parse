@@ -26,6 +26,7 @@ photos = 'https://ci.encar.com/carpicture/carpicture03/pic4003/40034021_001.jpg?
 class AsyncCarParser():
     def __init__(self):
         self.batch_size = 100
+        self.session = requests.Session()
         self.encar_api_url = 'https://api.encar.com/v1/readside/vehicle/'
         self.car_count = Car.objects.all().count()
         self.encar_ids = list(map(lambda x: x['encar_id'], Car.objects.all().values('encar_id')))
