@@ -6,6 +6,8 @@ import aiohttp
 from parser.parsers.raw_parser import car_korean_dict
 from django.db import transaction
 from datetime import date, timedelta
+import traceback
+import time
 
 diagnosis = 'https://api.encar.com/v1/readside/diagnosis/vehicle/40286929'
 
@@ -85,6 +87,8 @@ class AsyncCarParser():
                 }
                 return detail_dict
         except:
+            print(traceback.format_exc())
+            time.sleep(20)
             return None
 
 
