@@ -4,6 +4,11 @@ from ..models import Car, CarRecord, CarAccident
 import asyncio
 import aiohttp
 from django.db import transaction
+import os
+from dotenv import load_dotenv
+from aiohttp_socks import ProxyConnector
+
+load_dotenv()
 
 
 record1 = 'https://api.encar.com/v1/readside/record/vehicle/40387760/open?vehicleNo='
@@ -13,7 +18,7 @@ sold = 'https://fem.encar.com/cars/detail/39568684'
 
 class AsyncCarRecordParser():
     def __init__(self):
-        self.batch_size = 1000
+        self.batch_size = 100
         self.session = requests.Session()
         self.encar_api_url = ['https://api.encar.com/v1/readside/record/vehicle/', '', '/open?vehicleNo=', '']
         self.car_count = Car.objects.all().count()
@@ -77,7 +82,8 @@ class AsyncCarRecordParser():
 
 
     async def get_info(self, batch):
-        async with aiohttp.ClientSession(headers=self.headers, cookies=self.session.cookies) as session:
+        proxy_connector = ProxyConnector.from_url(os.getenv('PROXY_URL'))
+        async with aiohttp.ClientSession(headers=self.headers, cookies=self.session.cookies, connector=proxy_connector) as session:
             tasks = [self.fetch(session, url) for url in batch]
             results = await asyncio.gather(*tasks)
             return results

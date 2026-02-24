@@ -5,6 +5,12 @@ import asyncio
 import aiohttp
 from django.db import transaction
 
+import os
+from dotenv import load_dotenv
+from aiohttp_socks import ProxyConnector
+
+load_dotenv()
+
 diagnosis1 = 'https://api.encar.com/v1/readside/diagnosis/vehicle/40286929'
 
 car_info = 'https://api.encar.com/v1/readside/vehicle/38877922'
@@ -16,7 +22,7 @@ photos = 'https://ci.encar.com/carpicture/carpicture03/pic4003/40034021_001.jpg?
 
 class AsyncCarDiagParser():
     def __init__(self):
-        self.batch_size = 1000
+        self.batch_size = 100
         self.session = requests.Session()
         self.encar_api_url = 'https://api.encar.com/v1/readside/diagnosis/vehicle/'
         self.car_count = Car.objects.all().count()
@@ -70,7 +76,8 @@ class AsyncCarDiagParser():
 
 
     async def get_info(self, batch):
-        async with aiohttp.ClientSession(headers=self.headers, cookies=self.session.cookies) as session:
+        proxy_connector = ProxyConnector.from_url(os.getenv('PROXY_URL'))
+        async with aiohttp.ClientSession(headers=self.headers, cookies=self.session.cookies, connector=proxy_connector) as session:
             tasks = [self.fetch(session, url) for url in batch]
             results = await asyncio.gather(*tasks)
             return results
