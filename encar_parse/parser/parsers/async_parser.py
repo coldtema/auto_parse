@@ -177,7 +177,7 @@ class AsyncCarParser():
     def save_to_db(self):
         photos_obj = []
         self.updated_batch = []
-        if not any(x[1] for x in self.results):
+        if not any(x for x in self.results):
             print('вообще не обновляет машины')
             return
         for result in self.results:
