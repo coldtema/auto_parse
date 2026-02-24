@@ -26,7 +26,6 @@ photos = 'https://ci.encar.com/carpicture/carpicture03/pic4003/40034021_001.jpg?
 class AsyncCarParser():
     def __init__(self):
         self.batch_size = 100
-        self.proxy_connector = ProxyConnector.from_url(os.getenv('PROXY_URL'))
         self.encar_api_url = 'https://api.encar.com/v1/readside/vehicle/'
         self.car_count = Car.objects.all().count()
         self.encar_ids = list(map(lambda x: x['encar_id'], Car.objects.all().values('encar_id')))
@@ -103,7 +102,8 @@ class AsyncCarParser():
 
 
     async def get_info(self, batch):
-        async with aiohttp.ClientSession(headers=self.headers, cookies=self.session.cookies, connector=self.proxy_connector) as session:
+        proxy_connector = ProxyConnector.from_url(os.getenv('PROXY_URL'))
+        async with aiohttp.ClientSession(headers=self.headers, cookies=self.session.cookies, connector=proxy_connector) as session:
             tasks = [self.fetch(session, url) for url in batch]
             results = await asyncio.gather(*tasks)
             return results
