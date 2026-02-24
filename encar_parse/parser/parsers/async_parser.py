@@ -8,6 +8,10 @@ from django.db import transaction
 from datetime import date, timedelta
 import traceback
 import time
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 diagnosis = 'https://api.encar.com/v1/readside/diagnosis/vehicle/40286929'
 
@@ -26,16 +30,19 @@ class AsyncCarParser():
         self.car_count = Car.objects.all().count()
         self.encar_ids = list(map(lambda x: x['encar_id'], Car.objects.all().values('encar_id')))
         self.headers = {
-                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
-                    "Referer": "https://www.encar.com/",
-                    "Accept": "application/json, text/plain, */*",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+            "Accept": "application/json, text/plain, */*",
+            "Referer": "https://www.encar.com/",
+            "Origin": "https://www.encar.com"
         }
+
         self.batch = []
         self.results = []
         self.counter = 1
         self.color_list = CarColor.objects.all()
         self.body_list = CarBody.objects.all()
         self.manufacturer_list = CarManufacturer.objects.all()
+        self.proxy = os.getenv('PROXY_URL')
 
     def run(self):
         self.get_cookies()
@@ -64,7 +71,7 @@ class AsyncCarParser():
 
     async def fetch(self, session, url):
         try:
-            async with session.get(url, timeout=10) as response:
+            async with session.get(url, headers=self.headers, proxy=self.proxy, timeout=10) as response:
                 print(response.status)
                 print(response.headers)
                 text = await response.text()
