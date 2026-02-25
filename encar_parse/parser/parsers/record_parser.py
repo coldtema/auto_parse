@@ -20,7 +20,7 @@ sold = 'https://fem.encar.com/cars/detail/39568684'
 
 class AsyncCarRecordParser():
     def __init__(self):
-        self.batch_size = 100
+        self.batch_size = 1000
         self.session = requests.Session()
         self.encar_api_url = ['https://api.encar.com/v1/readside/record/vehicle/', '', '/open?vehicleNo=', '']
         self.car_count = Car.objects.all().count()
