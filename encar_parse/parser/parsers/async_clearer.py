@@ -24,7 +24,7 @@ photos = 'https://ci.encar.com/carpicture/carpicture03/pic4003/40034021_001.jpg?
 
 class AsyncCarClearer():
     def __init__(self):
-        self.batch_size = 100
+        self.batch_size = 10
         self.session = requests.Session()
         self.encar_api_url = 'https://api.encar.com/v1/readside/vehicle/'
         self.car_count = Car.objects.all().count()
