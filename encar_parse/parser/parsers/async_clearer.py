@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 from aiohttp_socks import ProxyConnector
 import time
 import random
+import traceback
 
 load_dotenv()
 
@@ -84,17 +85,8 @@ class AsyncCarClearer():
                 if attempt < 2:
                     await asyncio.sleep(random.uniform(1.0, 2.5))
                     continue
+                print(traceback.format_exc())
                 return ad_id, False
-
-    async def fetch(self, session, url):
-        try:
-            async with session.get(url, timeout=20) as response:
-                response = await response.json()
-                if response['advertisement']['status'] == 'ADVERTISE':
-                        return int(url.split('/')[-1]), True, response['advertisement']['price']
-                return int(url.split('/')[-1]), False
-        except:
-            return int(url.split('/')[-1]), False 
 
 
     async def get_info(self, batch):
