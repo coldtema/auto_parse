@@ -80,14 +80,11 @@ class AsyncCarClearer():
 
                     return ad_id, False
 
-            except (aiohttp.ClientError, asyncio.TimeoutError):
-                if attempt == 0:
+            except:
+                if attempt < 2:
                     await asyncio.sleep(random.uniform(1.0, 2.5))
                     continue
                 return ad_id, False
-
-            except Exception:
-                return ad_id, False 
 
     async def fetch(self, session, url):
         try:
