@@ -70,7 +70,7 @@ class AsyncCarRecordParser():
 
     async def fetch(self, session, url):
         try:
-            async with session.get(url, timeout=10) as response:
+            async with session.get(url, timeout=20) as response:
                 response = await response.json()
                 record_dict = dict()
                 record_dict['owner_count'] = response['ownerChangeCnt'] + 1

@@ -67,7 +67,7 @@ class AsyncCarDiagParser():
 
     async def fetch(self, session, url):
         try:
-            async with session.get(url, timeout=10) as response:
+            async with session.get(url, timeout=20) as response:
                 response = await response.json()
                 items = response['items']
                 diag_dict = dict()

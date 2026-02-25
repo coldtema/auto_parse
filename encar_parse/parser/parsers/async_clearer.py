@@ -68,7 +68,7 @@ class AsyncCarClearer():
 
     async def fetch(self, session, url):
         try:
-            async with session.get(url, timeout=10) as response:
+            async with session.get(url, timeout=20) as response:
                 response = await response.json()
                 if response['advertisement']['status'] == 'ADVERTISE':
                         return int(url.split('/')[-1]), True, response['advertisement']['price']

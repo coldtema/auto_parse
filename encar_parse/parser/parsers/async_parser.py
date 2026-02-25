@@ -75,7 +75,7 @@ class AsyncCarParser():
 
     async def fetch(self, session, url):
         try:
-            async with session.get(url, timeout=10) as response:
+            async with session.get(url, timeout=20) as response:
                 response = await response.json()
                 photos_urls = list(map(lambda x: x['path'], response['photos']))
                 if response['manage']['dummy'] == True: dummy_id = response['vehicleId']
