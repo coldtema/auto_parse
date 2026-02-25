@@ -24,7 +24,7 @@ photos = 'https://ci.encar.com/carpicture/carpicture03/pic4003/40034021_001.jpg?
 
 class AsyncCarDiagParser():
     def __init__(self):
-        self.batch_size = 10
+        self.batch_size = 1000
         self.session = requests.Session()
         self.encar_api_url = 'https://api.encar.com/v1/readside/diagnosis/vehicle/'
         self.car_count = Car.objects.all().count()
