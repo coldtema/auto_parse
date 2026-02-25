@@ -69,7 +69,7 @@ class AsyncCarRecordParser():
     
 
     async def fetch(self, session, url):
-        for attempt in range(2):
+        for attempt in range(3):
             try:
                 await asyncio.sleep(random.uniform(0.2, 0.6))
                 async with session.get(url, timeout=20) as response:
