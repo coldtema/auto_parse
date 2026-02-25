@@ -66,17 +66,26 @@ class AsyncCarDiagParser():
     
 
     async def fetch(self, session, url):
-        try:
-            async with session.get(url, timeout=20) as response:
-                response = await response.json()
-                items = response['items']
-                diag_dict = dict()
-                for item in items:
-                    diag_dict.setdefault(item['name'], item['resultCode'])
-                diag_dict['dummy_id'] = response['vehicleId']
-                return diag_dict
-        except:
-            return None
+        for attempt in range(2):
+            try:
+                await asyncio.sleep(random.uniform(0.2, 0.6))
+                async with session.get(url, timeout=20) as response:
+                    response = await response.json()
+                    items = response['items']
+                    diag_dict = dict()
+                    for item in items:
+                        diag_dict.setdefault(item['name'], item['resultCode'])
+                    diag_dict['dummy_id'] = response['vehicleId']
+                    return diag_dict
+                
+            except(aiohttp.ClientError, asyncio.TimeoutError):
+                if attempt == 0:
+                    await asyncio.sleep(random.uniform(1.0, 2.5))
+                    continue
+                return None
+            
+            except Exception:
+                return None
 
 
     async def get_info(self, batch):

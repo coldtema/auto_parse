@@ -69,20 +69,29 @@ class AsyncCarRecordParser():
     
 
     async def fetch(self, session, url):
-        try:
-            async with session.get(url, timeout=20) as response:
-                response = await response.json()
-                record_dict = dict()
-                record_dict['owner_count'] = response['ownerChangeCnt'] + 1
-                record_dict['other_accident_cost'] = response['otherAccidentCost']
-                record_dict['other_accident_count'] = response['otherAccidentCnt']
-                record_dict['driver_accident_cost'] = response['myAccidentCost']
-                record_dict['driver_accident_count'] = response['myAccidentCnt']
-                record_dict['dummy_id'] = url.split('/')[7]
-                record_dict['accidents'] = response['accidents']
-                return record_dict
-        except:
-            return None
+        for attempt in range(2):
+            try:
+                await asyncio.sleep(random.uniform(0.2, 0.6))
+                async with session.get(url, timeout=20) as response:
+                    response = await response.json()
+                    record_dict = dict()
+                    record_dict['owner_count'] = response['ownerChangeCnt'] + 1
+                    record_dict['other_accident_cost'] = response['otherAccidentCost']
+                    record_dict['other_accident_count'] = response['otherAccidentCnt']
+                    record_dict['driver_accident_cost'] = response['myAccidentCost']
+                    record_dict['driver_accident_count'] = response['myAccidentCnt']
+                    record_dict['dummy_id'] = url.split('/')[7]
+                    record_dict['accidents'] = response['accidents']
+                    return record_dict
+                
+            except(aiohttp.ClientError, asyncio.TimeoutError):
+                if attempt == 0:
+                    await asyncio.sleep(random.uniform(1.0, 2.5))
+                    continue
+                return None
+            
+            except Exception:
+                return None
 
 
     async def get_info(self, batch):

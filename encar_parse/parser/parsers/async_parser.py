@@ -74,31 +74,40 @@ class AsyncCarParser():
     
 
     async def fetch(self, session, url):
-        try:
-            async with session.get(url, timeout=20) as response:
-                response = await response.json()
-                photos_urls = list(map(lambda x: x['path'], response['photos']))
-                if response['manage']['dummy'] == True: dummy_id = response['vehicleId']
-                else: dummy_id = int(url.split('/')[-1])
-                detail_dict = {
-                    'encar_id': int(url.split('/')[-1]), 
-                    'manufacturer': response['category']['manufacturerEnglishName'],
-                    'model': response['category']['modelGroupEnglishName'],
-                    'version': response['category']['gradeEnglishName'],
-                    'version_details': response['category']['gradeDetailEnglishName'],
-                    'options': response['options']['standard'],
-                    'color': response['spec']['colorName'],
-                    'engine_capacity': response['spec']['displacement'],
-                    'photos_urls': photos_urls,
-                    'korean_number': response['vehicleNo'],
-                    'dummy_id': dummy_id,
-                    'encar_diag': response['view']['encarDiagnosis'],
-                    'body_name': response['spec']['bodyName'],
-                    'release_date': response['category']['yearMonth'],
-                }
-                return detail_dict
-        except:
-            return None
+        for attempt in range(2):
+            try:
+                await asyncio.sleep(random.uniform(0.2, 0.6))
+                async with session.get(url, timeout=20) as response:
+                    response = await response.json()
+                    photos_urls = list(map(lambda x: x['path'], response['photos']))
+                    if response['manage']['dummy'] == True: dummy_id = response['vehicleId']
+                    else: dummy_id = int(url.split('/')[-1])
+                    detail_dict = {
+                        'encar_id': int(url.split('/')[-1]), 
+                        'manufacturer': response['category']['manufacturerEnglishName'],
+                        'model': response['category']['modelGroupEnglishName'],
+                        'version': response['category']['gradeEnglishName'],
+                        'version_details': response['category']['gradeDetailEnglishName'],
+                        'options': response['options']['standard'],
+                        'color': response['spec']['colorName'],
+                        'engine_capacity': response['spec']['displacement'],
+                        'photos_urls': photos_urls,
+                        'korean_number': response['vehicleNo'],
+                        'dummy_id': dummy_id,
+                        'encar_diag': response['view']['encarDiagnosis'],
+                        'body_name': response['spec']['bodyName'],
+                        'release_date': response['category']['yearMonth'],
+                    }
+                    return detail_dict
+                
+            except(aiohttp.ClientError, asyncio.TimeoutError):
+                if attempt == 0:
+                    await asyncio.sleep(random.uniform(1.0, 2.5))
+                    continue
+                return None
+            
+            except Exception:
+                return None
 
 
     async def get_info(self, batch):

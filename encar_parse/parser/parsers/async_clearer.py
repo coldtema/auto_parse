@@ -64,7 +64,30 @@ class AsyncCarClearer():
             time.sleep(random.randint(1, 10))
         self.results = asyncio.run(self.get_info(list_api_urls))
         
-    
+    async def fetch(self, session, url):
+        ad_id = int(url.split('/')[-1])
+
+        for attempt in range(2):
+            try:
+                await asyncio.sleep(random.uniform(0.2, 0.6))
+
+                async with session.get(url, timeout=20) as response:
+                    response.raise_for_status()
+                    data = await response.json()
+
+                    if data['advertisement']['status'] == 'ADVERTISE':
+                        return ad_id, True, data['advertisement']['price']
+
+                    return ad_id, False
+
+            except (aiohttp.ClientError, asyncio.TimeoutError):
+                if attempt == 0:
+                    await asyncio.sleep(random.uniform(1.0, 2.5))
+                    continue
+                return ad_id, False
+
+            except Exception:
+                return ad_id, False 
 
     async def fetch(self, session, url):
         try:
