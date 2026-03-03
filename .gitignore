@@ -1,4 +1,5 @@
 auto_venv
+venv
 db.sqlite3
 .env
 *.txt

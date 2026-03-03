@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from parser.views import index, vechile, calc_view, api_view, calc_view2
+from parser.views import index, vechile, calc_view, api_view, calc_view2, calc_view3
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -24,7 +24,7 @@ urlpatterns = [
     path('vechile/', vechile, name='vechile'),
     path('calculator/', calc_view, name='calculator'),
     path('calculator2/', calc_view2, name='calculator2'),
-    # path("calculator3/", views.calculator, {"preset": "korea_minsk_rf"}, name="calculator_3"),
+    path("calculator3/", calc_view3, name='calculator3'),
     # path("calculator4/", views.calculator, {"preset": "korea_bishkek_rf"}, name="calculator_4"),
     path('api/encar-data/', api_view, name='api')
 ]

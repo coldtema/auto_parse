@@ -262,6 +262,75 @@ def calc_view2(request):
     return render(request, "parser/calculator2.html", {"form": form})
 
 
+def calc_view3(request):
+    if request.method == "POST":
+        form = CarCalcForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            print(data)
+            data['encar_url'] = data['encar_url'].split('?')[0]
+            artikul = data['encar_url'].split('?')[0].split('/')[-1]
+            
+            car = Car.objects.filter(encar_id=int(artikul)).last()
+            if not car:
+                car = Car.objects.filter(dummy_id=int(artikul)).last()
+
+            if car:
+                data['ru_price'] = str(round(float(data["rate"]) * float(data["korean_price"])))
+                data['customs_duty'] = car.customs_duty
+                data['recycling_fee'] = car.recycling_fee
+                data['full_name'] = f'{car.manufacturer.value_name} {car.model} ({car.release_date//100})'
+                data['mileage'] = f'Пробег: {car.mileage} км'
+                # data["dealer_services"] = str(round(float(data["rate"]) * float(data["dealer_services"])))
+                # data["korea_invoice"] = str(round(float(data["rate"]) * float(data["korea_invoice"])))
+                data["options"] = eval(car.options)
+                
+                photos = car.carphoto_set.all()[:4]  # берём максимум 4 фото
+
+                data['photo1'] = photos[0].link
+                data['photo2'] = photos[1].link
+                data['photo3'] = photos[2].link
+                data['photo4'] = photos[3].link
+
+            # print(data)
+                
+            data['rates'] = {"USD_RUB": float(data["rate"])}
+
+            data['upfront_rows'] = [
+                    {"label": "Авто в Корее", "rub": int(float(data['korean_price']) * float(data['rate'])), "usd": int(data['korean_price'])},
+                    {"label": "Услуги Asia Alliance", "rub": 30000, "usd": usd_nominalo(30000, 'rub', data['rate'])},
+                    {"label": "Услуги Дилера", "rub": int(float(data['dealer_services']) * float(data['rate'])), "usd": float(data['dealer_services'])},
+                    {"label": "Оплата по Инвойсу", "rub": int(float(data['korea_invoice']) * float(data['rate'])), "usd": float(data['korea_invoice'])},
+                ]
+            
+            data['delivery_options'] = [
+                    {"label": "Владивосток", "rub": int(float(data['delivery_cost']) * float(data['rate'])), "usd": int(data['delivery_cost']), "selected": True},
+                    # {"label": "Москва", "rub": int(float(data['delivery_cost']) * float(data['rate'])), "usd": int(data['delivery_cost']), "selected": False},
+                ]
+            
+            data['customs_rows'] = [
+                    {"label": "Таможня", "rub": int(float(data['customs_fee'])), "usd": usd_nominalo(int(data['customs_fee']), 'rub', data['rate'])},
+                    {"label": "Утилизационный сбор", "rub": int(float(data['recycling_fee'])), "usd": usd_nominalo(int(data['recycling_fee']), 'rub', data['rate'])},
+                    {"label": "Брокер / СВХ / Лаб.", "rub": int(float(data['broker_cost'])), "usd": usd_nominalo(int(data['broker_cost']), 'rub', data['rate'])},
+                ]
+            
+            data['total'] = [{"label": "ИТОГО", "rub": final_price(data)['rub'], "usd": final_price(data)['usd']}]
+            
+            pdf_buffer = generate_pdf(data)
+
+            response = HttpResponse(
+                pdf_buffer,
+                content_type="application/pdf"
+            )
+            response["Content-Disposition"] = 'attachment; filename="AsiaAlliance_Report.pdf"'
+            return response
+
+    else:
+        form = CarCalcForm()
+
+    return render(request, "parser/calculator3.html", {"form": form})
+
+
 def api_view(request):
     if request.method == 'GET':
         url = request.GET.get("url")
