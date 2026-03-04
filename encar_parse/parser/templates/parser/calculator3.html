@@ -130,12 +130,12 @@
     <!-- ===== PRESET BUTTONS ===== -->
     <div class="presets">
         <a href="{% url 'calculator' %}"
-        class="preset-btn active">
+        class="preset-btn">
             Корея → РФ (физлицо)
         </a>
 
         <a href="{% url 'calculator3' %}"
-        class="preset-btn">
+        class="preset-btn active">
             Корея → РФ (юрлицо)
         </a>
 
@@ -184,41 +184,22 @@
     // === конфигурация пресетов ===
     const PRESETS = {
         korea_rf: [
-            'type',
             'encar_url',
-            'korean_price',
-            'delivery_cost',
             'rate',
+            'horse_power',
+            'korean_price',
+            'delivery_cost_vladi',
             'asia_services',
             'dealer_services',
+            'payment_agent_services',
             'korea_invoice',
+            'customs_fee',
+            'nds',
+            'recycling_fee',
             'broker_cost',
+            'delivery_cost_msk',
+            'car_insurance',
         ],
-
-        korea_rf_legal: [
-            'type',
-            'encar_url',
-            'delivery_cost',
-            'rate',
-            'broker_cost',
-            'korea_invoice'
-        ],
-
-        korea_minsk_rf: [
-            'type',
-            'encar_url',
-            'delivery_cost',
-            'extra_expenses',
-            'rate'
-        ],
-
-        korea_bishkek_rf: [
-            'type',
-            'encar_url',
-            'delivery_cost',
-            'extra_expenses',
-            'broker_cost'
-        ]
     };
 
     const presetButtons = document.querySelectorAll('.preset-btn');
