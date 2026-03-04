@@ -43,7 +43,7 @@ class CarCalcForm(forms.Form):
     extra_expenses = forms.CharField(label="Доп. расходы (в руб.)", required=False)
     rate = forms.CharField(label="Курс $", required=False)
 
-    asia_services = forms.CharField(label="Услуги Asia Alliance (в %)", required=False)
+    asia_services = forms.CharField(label="Услуги Asia Alliance (в руб.)", required=False)
     dealer_services = forms.CharField(label="Услуги дилера (в $)", required=False)
     korea_invoice = forms.CharField(label="Оплата по инвойсу в Корею (в $)", required=False)
 
@@ -82,7 +82,7 @@ class CarCalcForm2(forms.Form):
 
     korean_price = forms.CharField(label="Стоимость автомобиля на сегодняшний день (в $)", required=False)
     delivery_cost_korea_bishkek = forms.CharField(label="Стоимость доставки из Кореи в Бишкек (в $)", required=False)
-    asia_services = forms.CharField(label="Услуги Asia Alliance (в %)", required=False)
+    asia_services = forms.CharField(label="Услуги Asia Alliance (в руб.)", required=False)
     dealer_services = forms.CharField(label="Услуги дилера (в $)", required=False, initial=0)
     korea_invoice = forms.CharField(label="Оплата по инвойсу в Корею (в $)", required=False, initial=0)
 
@@ -114,8 +114,7 @@ class CarCalcForm3(forms.Form):
 
         cfg = Config.objects.first()
         if cfg:
-            self.fields["delivery_cost"].initial = cfg.delivery_cost
-            self.fields["extra_expenses"].initial = cfg.extra_expenses
+            self.fields["delivery_cost_vladi"].initial = cfg.delivery_cost
             self.fields["asia_services"].initial = cfg.asia_services
             self.fields["dealer_services"].initial = cfg.dealer_services
             self.fields["korea_invoice"].initial = cfg.korea_invoice
@@ -125,22 +124,23 @@ class CarCalcForm3(forms.Form):
             
 
     encar_url = forms.CharField(label="Ссылка на Encar")
+    rate = forms.CharField(label="Курс $", required=False)
+    horse_power = forms.CharField(label="Лошадиные силы", required=False)
 
     korean_price = forms.CharField(label="Стоимость автомобиля на сегодняшний день (в $)", required=False)
-
-    delivery_cost = forms.CharField(label="Стоимость доставки (в $)", required=False)
-    extra_expenses = forms.CharField(label="Доп. расходы (в руб.)", required=False)
-    rate = forms.CharField(label="Курс $", required=False)
-
-    asia_services = forms.CharField(label="Услуги Asia Alliance (в %)", required=False)
+    delivery_cost_vladi = forms.CharField(label="Стоимость доставки (до Владивостока) (в $)", required=False)
+    asia_services = forms.CharField(label="Услуги Asia Alliance (в руб.)", required=False)
     dealer_services = forms.CharField(label="Услуги дилера (в $)", required=False)
+    payment_agent_services = forms.CharField(label="Услуги платежного агента (в $)", required=False, initial=0)
     korea_invoice = forms.CharField(label="Оплата по инвойсу в Корею (в $)", required=False)
 
-    broker_cost = forms.CharField(label="Брокер / СВХ / Лаборатория (в руб.)", required=False)
-    
-    horse_power = forms.CharField(label="Лошадиные силы", required=False)
     customs_fee = forms.CharField(label="Таможенные платежи", required=False)
-    recycling_fee = forms.CharField(label="Утилизационный сбор", required=False)
+    nds = forms.CharField(label="НДС", required=False, initial=0)
+    recycling_fee = forms.CharField(label="Утилизационный сбор", required=False, initial=0)
+    broker_cost = forms.CharField(label="Брокер / СВХ / Лаборатория (в руб.)", required=False, initial=0)
+    delivery_cost_msk = forms.CharField(label="Стоимость доставки (до Москвы) (в $)", required=False, initial=0)
+    car_insurance = forms.CharField(label="Страховка автомобиля (в $)", required=False, initial=0)
+
 
 
     def get_rate(self):

@@ -5,9 +5,10 @@ from .forms import CarArtikulForm
 from .models import Car, Truck, CarOption, TruckOption, OptionCategory, CarPhoto, TruckPhoto, Config, HorsePower
 import time
 import traceback
-from .forms import CarCalcForm, CarCalcForm2
+from .forms import CarCalcForm, CarCalcForm2, CarCalcForm3
 from .pdf_generator import generate_pdf
 from .pdf_generator2 import generate_pdf2
+from .pdf_generator3 import generate_pdf3
 import io
 from django.http import FileResponse, HttpResponse, JsonResponse
 import requests
@@ -264,7 +265,7 @@ def calc_view2(request):
 
 def calc_view3(request):
     if request.method == "POST":
-        form = CarCalcForm(request.POST)
+        form = CarCalcForm3(request.POST)
         if form.is_valid():
             data = form.cleaned_data
             print(data)
@@ -300,23 +301,27 @@ def calc_view3(request):
                     {"label": "Авто в Корее", "rub": int(float(data['korean_price']) * float(data['rate'])), "usd": int(data['korean_price'])},
                     {"label": "Услуги Asia Alliance", "rub": 30000, "usd": usd_nominalo(30000, 'rub', data['rate'])},
                     {"label": "Услуги Дилера", "rub": int(float(data['dealer_services']) * float(data['rate'])), "usd": float(data['dealer_services'])},
+                    {"label": "Услуги пл. агента", "rub": int(float(data['payment_agent_services']) * float(data['rate'])), "usd": float(data['payment_agent_services'])},
                     {"label": "Оплата по Инвойсу", "rub": int(float(data['korea_invoice']) * float(data['rate'])), "usd": float(data['korea_invoice'])},
                 ]
             
             data['delivery_options'] = [
-                    {"label": "Владивосток", "rub": int(float(data['delivery_cost']) * float(data['rate'])), "usd": int(data['delivery_cost']), "selected": True},
+                    {"label": "Владивосток", "rub": int(float(data['delivery_cost_vladi']) * float(data['rate'])), "usd": int(data['delivery_cost_vladi']), "selected": True},
                     # {"label": "Москва", "rub": int(float(data['delivery_cost']) * float(data['rate'])), "usd": int(data['delivery_cost']), "selected": False},
                 ]
             
             data['customs_rows'] = [
                     {"label": "Таможня", "rub": int(float(data['customs_fee'])), "usd": usd_nominalo(int(data['customs_fee']), 'rub', data['rate'])},
+                    {"label": "НДС", "rub": int(float(data['nds'])), "usd": usd_nominalo(int(data['nds']), 'rub', data['rate'])},
                     {"label": "Утилизационный сбор", "rub": int(float(data['recycling_fee'])), "usd": usd_nominalo(int(data['recycling_fee']), 'rub', data['rate'])},
                     {"label": "Брокер / СВХ / Лаб.", "rub": int(float(data['broker_cost'])), "usd": usd_nominalo(int(data['broker_cost']), 'rub', data['rate'])},
+                    {"label": "Москва", "rub": int(float(data['delivery_cost_msk']) * float(data['rate'])), "usd": int(data['delivery_cost_msk']), "selected": True},
+                    {"label": "Страховка авто", "rub": int(float(data['car_insurance']) * float(data['rate'])), "usd": float(data['car_insurance']), "selected": True}
                 ]
             
-            data['total'] = [{"label": "ИТОГО", "rub": final_price(data)['rub'], "usd": final_price(data)['usd']}]
+            data['total'] = [{"label": "ИТОГО", "rub": final_price3(data)['rub'], "usd": final_price3(data)['usd']}]
             
-            pdf_buffer = generate_pdf(data)
+            pdf_buffer = generate_pdf3(data)
 
             response = HttpResponse(
                 pdf_buffer,
@@ -326,7 +331,7 @@ def calc_view3(request):
             return response
 
     else:
-        form = CarCalcForm()
+        form = CarCalcForm3()
 
     return render(request, "parser/calculator3.html", {"form": form})
 
@@ -482,6 +487,30 @@ def final_price2(data):
         "Лаборатория (Москва)",
     ]
     data = data['customs_rows'] + data['middle_rows'] + data['delivery_options'] + data['upfront_rows'] 
+    for row in data:
+        if row['label'] in fields_to_count:
+            rub_counter+=int(row['rub'])
+            usd_counter+=int(row['usd'])
+    return {'rub': rub_counter, 'usd': usd_counter}
+
+
+def final_price3(data):
+    rub_counter = 0
+    usd_counter = 0
+    fields_to_count = [
+        'Авто в Корее',
+        'Услуги Asia Alliance',
+        'Услуги Дилера',
+        'Услуги пл. агента',
+        'Владивосток',
+        'Таможня',
+        'НДС',
+        'Утилизационный сбор',
+        'Брокер / СВХ / Лаб.',
+        'Москва',
+        'Страховка авто'
+    ]
+    data = data['customs_rows'] + data['delivery_options'] + data['upfront_rows'] 
     for row in data:
         if row['label'] in fields_to_count:
             rub_counter+=int(row['rub'])

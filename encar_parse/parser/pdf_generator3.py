@@ -64,8 +64,8 @@ RATE_STYLE = ParagraphStyle(
     fontName="TTNormsPro-Italic",
     alignment=TA_RIGHT,
     textColor=colors.white,
-    spaceBefore=10,
-    spaceAfter=10,
+    spaceBefore=5,
+    spaceAfter=5,
 )
 
 TEXT_STYLE = ParagraphStyle(
@@ -107,7 +107,7 @@ def draw_footer_photos(canvas, doc, photo_urls):
             print(f"Ошибка при загрузке фото {url}: {e}")
 
 
-def generate_pdf(data):
+def generate_pdf3(data):
 
     car_name = data['full_name']
     rates = data['rates']
@@ -174,11 +174,11 @@ def generate_pdf(data):
     elements.append(Paragraph(car_name, SUBTITLE_STYLE))
     elements.append(Spacer(1, 8))
     elements.append(Paragraph(data['mileage'], SUBTITLE_STYLE))
-    elements.append(Spacer(1, 10))
+    # elements.append(Spacer(1, 10)) 
 
     elements.append(rate_block("КУРС", f"$ = {rates['USD_RUB']} ₽"))
 
-    elements.append(Spacer(1, 12))
+    elements.append(Spacer(1, 5))
     elements.append(price_table("ОПЛАТА СРАЗУ", upfront_rows+delivery_options))
     elements.append(Spacer(1, 30))
 
