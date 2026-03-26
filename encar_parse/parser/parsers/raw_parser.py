@@ -61,7 +61,7 @@ class CarParser():
             self.current_api_url_list = api_url_list
             self.get_number_of_results()
             self.go_through_all_mileages()
-            self.save_to_db()
+            # self.save_to_db()
 
 
     def go_through_all_mileages(self):
@@ -71,6 +71,7 @@ class CarParser():
             self.current_api_url_list[3] = str(mileage + 5000)
             print(f'Пробег: от {self.current_api_url_list[1]} до {self.current_api_url_list[3]}')
             self.go_through_all_pages_of_mileage()
+            self.save_to_db()
         self.current_api_url_list[1] = '0'
         self.current_api_url_list[3] = '5000'
 
