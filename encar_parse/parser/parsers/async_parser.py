@@ -82,10 +82,12 @@ class AsyncCarParser():
                     photos_urls = list(map(lambda x: x['path'], response['photos']))
                     if response['manage']['dummy'] == True: dummy_id = response['vehicleId']
                     else: dummy_id = int(url.split('/')[-1])
+                    model = response['category']['modelGroupEnglishName']
+                    if model == 'Canival': model = 'Carnival'
                     detail_dict = {
                         'encar_id': int(url.split('/')[-1]), 
                         'manufacturer': response['category']['manufacturerEnglishName'],
-                        'model': response['category']['modelGroupEnglishName'],
+                        'model': model,
                         'version': response['category']['gradeEnglishName'],
                         'version_details': response['category']['gradeDetailEnglishName'],
                         'options': response['options']['standard'],
