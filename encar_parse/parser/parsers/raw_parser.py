@@ -109,7 +109,7 @@ class CarParser():
             ru_sell_type = car_korean_dict['SELL_TYPE'].get(elem.get('SellType', ''), elem.get('SellType', ''))
             if ru_sell_type == 'Аренда': continue
             self.new_elems.append(Car(encar_id=elem['Id'],
-                                        url=f'https://fem.encar.com/cars/detail/{elem['Id']}',
+                                        url=f"https://fem.encar.com/cars/detail/{elem['Id']}",
                                         inspection=flag_inspection,
                                         record=flag_record,
                                         resume=flag_resume,
@@ -256,40 +256,40 @@ class TruckParser():
             ru_usage = truck_korean_dict['USAGES'].get(elem.get('Use', ''), None)
             if ru_usage == None:
                 ru_usage = elem.get('Use', '')
-                print(f'Не нашлось трансмиссии трака: {elem.get('Transmission', '')}')
+                print(f"Не нашлось трансмиссии трака: {elem.get('Transmission', '')}")
             if ru_fuel_type == None:
                 ru_fuel_type = elem.get('FuelType', '')
-                print(f'Не нашлось трансмиссии трака: {elem.get('Transmission', '')}')
+                print(f"Не нашлось трансмиссии трака: {elem.get('Transmission', '')}")
             if ru_transmission == None:
                 ru_transmission = elem.get('Transmission', '')
-                print(f'Не нашлось трансмиссии трака: {elem.get('Transmission', '')}')
+                print(f"Не нашлось трансмиссии трака: {elem.get('Transmission', '')}")
             if ru_transmission == None:
                 ru_transmission = elem.get('Transmission', '')
-                print(f'Не нашлось трансмиссии трака: {elem.get('Transmission', '')}')
+                print(f"Не нашлось трансмиссии трака: {elem.get('Transmission', '')}")
             if ru_cities == '':
                 eng_manufacturer = elem.get('OfficeCityState', '')
-                print(f'Не нашлось города трака: {elem.get('OfficeCityState', '')}')
+                print(f"Не нашлось города трака: {elem.get('OfficeCityState', '')}")
             if eng_manufacturer == None:
                 eng_manufacturer = elem.get('Manufacturer', '')
-                print(f'Не нашлось марки трака: {elem.get('Manufacturer', '')}')
+                print(f"Не нашлось марки трака: {elem.get('Manufacturer', '')}")
             if eng_model == None:
                 eng_model = elem.get('Model', '')
-                print(f'Не нашлось модели трака: {elem.get('Model', '')}')
+                print(f"Не нашлось модели трака: {elem.get('Model', '')}")
             if eng_version == None:
                 eng_version = elem.get('Badge', '')
-                print(f'Не нашлось версии трака: {elem.get('Badge', '')}')
+                print(f"Не нашлось версии трака: {elem.get('Badge', '')}")
             if ru_version_details == None: 
                 ru_version_details = elem.get('FormDetail', '')
-                print(f'Не нашлось деталей версии трака: {elem.get('FormDetail', '')}')
+                print(f"Не нашлось деталей версии трака: {elem.get('FormDetail', '')}")
             if '기' in elem.get('Capacity', ''): #прочее/другое
                 ru_capacity = ''
             elif '이상' in elem.get('Capacity', ''): # более 톤
-                ru_capacity = f'{elem.get('Capacity', '')[:-3]}+ т.'
+                ru_capacity = f"{elem.get('Capacity', '')[:-3]}+ т."
             else:
-                ru_capacity = f'{elem.get('Capacity', '')[:-1]}т.'
+                ru_capacity = f"{elem.get('Capacity', '')[:-1]}т."
             if len(ru_capacity) == 2: ru_capacity = ''
             self.new_elems.append(Truck(encar_id=elem['Id'],
-                                        url=f'https://fem.encar.com/cars/detail/{elem['Id']}',
+                                        url=f"https://fem.encar.com/cars/detail/{elem['Id']}",
                                         inspection=flag_inspection,
                                         record=flag_record,
                                         resume=flag_resume,

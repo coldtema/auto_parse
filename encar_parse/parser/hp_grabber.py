@@ -82,7 +82,7 @@ class HorsePowerParser():
 
     async def fetch(self, session, car: Car):
         try:
-            async with session.get(f'https://zefir.pan-auto.ru/api/cars/{car["encar_id"]}/', timeout=30) as response:
+            async with session.get(f'https://pan-auto.ru/api/korea/{car["encar_id"]}/', timeout=30) as response:
                 data = await response.json()
                 hp = data["hp"]
                 ckw = data.get('ckw', 0)
@@ -95,7 +95,7 @@ class HorsePowerParser():
                     raise Exception
         except:
             try:
-                async with session.get(f'https://zefir.pan-auto.ru/api/cars/{car["dummy_id"]}/', timeout=30) as response:
+                async with session.get(f'https://pan-auto.ru/api/korea/{car["dummy_id"]}/', timeout=30) as response:
                     data = await response.json()
                     hp = data["hp"]
                     ckw = data.get('ckw', 0)

@@ -298,25 +298,26 @@ def calc_view3(request):
             data['rates'] = {"USD_RUB": float(data["rate"])}
 
             data['upfront_rows'] = [
-                    {"label": "Авто в Корее", "rub": int(float(data['korean_price']) * float(data['rate'])), "usd": int(data['korean_price'])},
-                    {"label": "Услуги Asia Alliance", "rub": 30000, "usd": usd_nominalo(30000, 'rub', data['rate'])},
+                    {"label": "Стоимость авто в Корее", "rub": int(float(data['korean_price']) * float(data['rate'])), "usd": int(data['korean_price'])},
+                    {"label": "Доставка до Владивостока", "rub": int(float(data['delivery_cost_vladi']) * float(data['rate'])), "usd": int(data['delivery_cost_vladi']), "selected": True},
+                    {"label": "Услуги Asia Alliance", "rub": count_asia_fee(data, 'rub'), "usd": count_asia_fee(data, 'usd')},
                     {"label": "Услуги Дилера", "rub": int(float(data['dealer_services']) * float(data['rate'])), "usd": float(data['dealer_services'])},
-                    {"label": "Услуги пл. агента", "rub": int(float(data['payment_agent_services']) * float(data['rate'])), "usd": float(data['payment_agent_services'])},
-                    {"label": "Оплата по Инвойсу", "rub": int(float(data['korea_invoice']) * float(data['rate'])), "usd": float(data['korea_invoice'])},
+                    {"label": "Услуги пл. агента", "rub": count_agent_fee(data, 'rub'), "usd": count_agent_fee(data, 'usd')},
+                    # {"label": "Оплата по Инвойсу", "rub": int(float(data['korea_invoice']) * float(data['rate'])), "usd": float(data['korea_invoice'])},
                 ]
             
             data['delivery_options'] = [
-                    {"label": "Владивосток", "rub": int(float(data['delivery_cost_vladi']) * float(data['rate'])), "usd": int(data['delivery_cost_vladi']), "selected": True},
+                    # {"label": "Доставка до Владивостока", "rub": int(float(data['delivery_cost_vladi']) * float(data['rate'])), "usd": int(data['delivery_cost_vladi']), "selected": True},
                     # {"label": "Москва", "rub": int(float(data['delivery_cost']) * float(data['rate'])), "usd": int(data['delivery_cost']), "selected": False},
                 ]
             
             data['customs_rows'] = [
-                    {"label": "Таможня", "rub": int(float(data['customs_fee'])), "usd": usd_nominalo(int(data['customs_fee']), 'rub', data['rate'])},
-                    {"label": "НДС", "rub": int(float(data['nds'])), "usd": usd_nominalo(int(data['nds']), 'rub', data['rate'])},
+                    {"label": "Таможенные платежи", "rub": int(float(data['customs_fee'])), "usd": usd_nominalo(int(data['customs_fee']), 'rub', data['rate'])},
+                    {"label": "НДС", "rub": count_nds(data, 'rub'), "usd": count_nds(data, 'usd')},
                     {"label": "Утилизационный сбор", "rub": int(float(data['recycling_fee'])), "usd": usd_nominalo(int(data['recycling_fee']), 'rub', data['rate'])},
                     {"label": "Брокер / СВХ / Лаб.", "rub": int(float(data['broker_cost'])), "usd": usd_nominalo(int(data['broker_cost']), 'rub', data['rate'])},
-                    {"label": "Москва", "rub": int(float(data['delivery_cost_msk']) * float(data['rate'])), "usd": int(data['delivery_cost_msk']), "selected": True},
-                    {"label": "Страховка авто", "rub": int(float(data['car_insurance']) * float(data['rate'])), "usd": float(data['car_insurance']), "selected": True}
+                    {"label": "Доставка до Москвы", "rub": int(float(data['delivery_cost_msk'])), "usd": usd_nominalo(int(data['delivery_cost_msk']), 'rub', data['rate']), "selected": True},
+                    {"label": "Страховка автомобиля", "rub": count_insurance(data, 'rub'), "usd": count_insurance(data, 'usd'), "selected": True}
                 ]
             
             data['total'] = [{"label": "ИТОГО", "rub": final_price3(data)['rub'], "usd": final_price3(data)['usd']}]
@@ -498,17 +499,17 @@ def final_price3(data):
     rub_counter = 0
     usd_counter = 0
     fields_to_count = [
-        'Авто в Корее',
+        'Стоимость авто в Корее',
         'Услуги Asia Alliance',
         'Услуги Дилера',
         'Услуги пл. агента',
-        'Владивосток',
-        'Таможня',
+        'Доставка до Владивостока',
+        'Таможенные платежи',
         'НДС',
         'Утилизационный сбор',
         'Брокер / СВХ / Лаб.',
-        'Москва',
-        'Страховка авто'
+        'Доставка до Москвы',
+        'Страховка автомобиля'
     ]
     data = data['customs_rows'] + data['delivery_options'] + data['upfront_rows'] 
     for row in data:
@@ -516,3 +517,63 @@ def final_price3(data):
             rub_counter+=int(row['rub'])
             usd_counter+=int(row['usd'])
     return {'rub': rub_counter, 'usd': usd_counter}
+
+
+def count_asia_fee(data, currency='rub'):
+    if float(data['asia_services']) > 100:
+        if currency == 'rub':
+            return int(float(data['asia_services']))
+        else:
+            return round(int(float(data['asia_services'])) / float(data['rate']))
+        
+    else:
+        all_sum = int(float(data['korean_price'])) + int(float(data['delivery_cost_vladi'])) + usd_nominalo(int(data['delivery_cost_msk']), 'rub', data['rate'])
+        if currency == 'rub':
+            return round(all_sum * float(data['rate']) * float(data['asia_services']) / 100)
+        else:
+            return round(all_sum * float(data['asia_services']) / 100)
+        
+
+
+def count_agent_fee(data, currency='rub'):
+    if float(data['payment_agent_services']) > 100:
+        if currency == 'rub':
+            return int(float(data['payment_agent_services']))
+        else:
+            return round(int(float(data['payment_agent_services'])) / float(data['rate']))
+        
+    else:
+        all_sum = int(float(data['korean_price'])) + int(float(data['delivery_cost_vladi'])) + int(float(data['dealer_services']))
+        if currency == 'rub':
+            return round(all_sum * float(data['rate']) * float(data['payment_agent_services']) / 100)
+        else:
+            return round(all_sum * float(data['payment_agent_services']) / 100)
+        
+
+def count_insurance(data, currency='rub'):
+    if float(data['car_insurance']) > 100:
+        if currency == 'rub':
+            return int(float(data['car_insurance']))
+        else:
+            return round(int(float(data['car_insurance'])) / float(data['rate']))
+        
+    else:
+        all_sum = int(float(data['korean_price']))
+        if currency == 'rub':
+            return round(all_sum * float(data['rate']) * float(data['car_insurance']) / 100)
+        else:
+            return round(all_sum * float(data['car_insurance']) / 100)
+
+def count_nds(data, currency='rub'):
+    if float(data['nds']) > 100:
+        if currency == 'rub':
+            return int(float(data['nds']))
+        else:
+            return round(int(float(data['nds'])) / float(data['rate']))
+        
+    else:
+        all_sum = int(float(data['korean_price'])) + usd_nominalo(int(data['customs_fee']), 'rub', data['rate'])
+        if currency == 'rub':
+            return round(all_sum * float(data['rate']) * float(data['nds']) / 100)
+        else:
+            return round(all_sum * float(data['nds']) / 100)
