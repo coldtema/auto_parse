@@ -85,7 +85,6 @@ class AsyncCarClearer():
                 if attempt < 2:
                     await asyncio.sleep(random.uniform(1.0, 2.5))
                     continue
-                print(traceback.format_exc())
                 return ad_id, False
 
 
@@ -117,7 +116,7 @@ class AsyncCarClearer():
                                         )
                                     })
         response = self.session.get(''.join(current_api_url_list))
-        number_of_cars = response.json()['Count'] #чтобы усли что встало на ошибке и не пошло все подряд удалять
+        number_of_cars = response.json()['Count'] #чтобы если что встало на ошибке и не пошло все подряд удалять
         print('код:', response.status_code)
         print('текст', response.text[:20])
 
@@ -141,7 +140,7 @@ class AsyncCarClearer():
                 cars_to_update[i].price = car_ids_to_update_price[i][1]
         Car.objects.bulk_update(fields=['price'], objs=cars_to_update)
         if self.cars_ids_to_delete:
-            print(self.cars_ids_to_delete)
+            print('машин удалено:', len(self.cars_ids_to_delete))
             Car.objects.filter(encar_id__in=self.cars_ids_to_delete).delete()
         self.results = []
 
