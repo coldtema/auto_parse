@@ -9,6 +9,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.utils import ImageReader
 import requests
 from reportlab.lib.enums import TA_RIGHT
+import os
 
 
 
@@ -198,7 +199,11 @@ def generate_pdf2(data):
 
     for url in photo_urls:
         try:
-            response = requests.get(url, timeout=20)
+            proxy = {
+                'http':os.getenv('PROXY_URL'),
+                'https':os.getenv('PROXY_URL')
+            }
+            response = requests.get(url, proxies=proxy, timeout=20)
         except:
             continue
         img_data = BytesIO(response.content)

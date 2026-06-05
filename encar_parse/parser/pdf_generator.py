@@ -358,6 +358,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.utils import ImageReader
 import requests
 from reportlab.lib.enums import TA_RIGHT
+import os
 
 
 
@@ -446,7 +447,11 @@ def draw_footer_photos(canvas, doc, photo_urls):
 
     for i, url in enumerate(photo_urls):
         try:
-            response = requests.get(url)
+            proxy = {
+                'http':os.getenv('PROXY_URL'),
+                'https':os.getenv('PROXY_URL')
+            }
+            response = requests.get(url, proxies=proxy, timeout=20)
             img_data = BytesIO(response.content)
             img_reader = ImageReader(img_data)
             x = start_x + i*(img_width + spacing)
@@ -542,10 +547,11 @@ def generate_pdf(data):
     img_height = 30*mm  # высота каждой картинки
 
     for url in photo_urls:
-        try:
-            response = requests.get(url, timeout=20)
-        except:
-            continue
+        proxy = {
+                'http':os.getenv('PROXY_URL'),
+                'https':os.getenv('PROXY_URL')
+            }
+        response = requests.get(url, proxies=proxy, timeout=20)
         img_data = BytesIO(response.content)
         img = Image(img_data, width=img_width, height=img_height)
         images.append(img)
