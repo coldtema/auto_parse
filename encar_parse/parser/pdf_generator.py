@@ -542,7 +542,10 @@ def generate_pdf(data):
     img_height = 30*mm  # высота каждой картинки
 
     for url in photo_urls:
-        response = requests.get(url)
+        try:
+            response = requests.get(url, timeout=20)
+        except:
+            continue
         img_data = BytesIO(response.content)
         img = Image(img_data, width=img_width, height=img_height)
         images.append(img)
