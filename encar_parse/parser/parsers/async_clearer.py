@@ -59,10 +59,10 @@ class AsyncCarClearer():
         list_api_urls = []
         for car in self.batch:
             list_api_urls.append(f'{self.encar_api_url}{car.encar_id}')
-        print(f'Запуск {self.counter}')
         self.counter += 1
         if self.counter % 10 == 0:
             time.sleep(random.randint(1, 10))
+            print(f'Запуск {self.counter}')
         self.results = asyncio.run(self.get_info(list_api_urls))
         
     async def fetch(self, session, url):
@@ -140,7 +140,7 @@ class AsyncCarClearer():
                 cars_to_update[i].price = car_ids_to_update_price[i][1]
         Car.objects.bulk_update(fields=['price'], objs=cars_to_update)
         if self.cars_ids_to_delete:
-            print(f'машин удалено: {len(self.cars_ids_to_delete)}')
+            # print(f'машин удалено: {len(self.cars_ids_to_delete)}')
             Car.objects.filter(encar_id__in=self.cars_ids_to_delete).delete()
         self.results = []
 
