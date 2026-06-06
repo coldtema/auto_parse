@@ -252,6 +252,7 @@ def generate_pdf3(data):
 
 
 def draw_pages(canvas, doc):
+    print('draw_pages')
     if doc.page == 1:
         draw_page_1(canvas, doc)
 
@@ -275,6 +276,7 @@ def draw_pages(canvas, doc):
 
 
 def draw_page_1(canvas, doc):
+    print('draw_page 1')
     width, height = A4
     canvas.drawImage(
         BACKGROUND_IMAGE,
@@ -314,6 +316,7 @@ def draw_page_1(canvas, doc):
 
 
 def draw_complectation(canvas, doc, background_image, comp_dict):
+    print('draw_complectation')
     canvas.saveState()
 
     width, height = A4
