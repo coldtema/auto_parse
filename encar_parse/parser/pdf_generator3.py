@@ -306,7 +306,7 @@ def draw_page_1(canvas, doc):
             #     'https':os.getenv('PROXY_URL')
             # }
             proxy = None
-            response = requests.get(url, proxies=proxy, timeout=3)
+            response = requests.get(url, proxies=proxy, timeout=(3, 10))
         except:
             print(traceback.format_exc())
             continue
