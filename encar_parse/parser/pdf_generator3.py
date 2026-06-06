@@ -227,7 +227,12 @@ def draw_page_1(canvas, doc):
 
     photo_urls = [ doc.photo1, doc.photo2, doc.photo3, doc.photo4 ]
 
-    images = download_images(photo_urls)
+    images = []
+    raw_images = download_images(photo_urls)
+
+    for image in raw_images:
+        if image:
+            images.append(image)
 
     if len(images) != 0 and len(images) <= 4:
         while len(images) != 4:
