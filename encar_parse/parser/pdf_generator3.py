@@ -287,6 +287,8 @@ def draw_page_1(canvas, doc):
         mask='auto'
     )
 
+    print('фон создан')
+
     photo_urls = [ doc.photo1, doc.photo2, doc.photo3, doc.photo4, ]
 
     canvas.saveState()
@@ -299,16 +301,20 @@ def draw_page_1(canvas, doc):
     y = 0  # прям от низа листа
 
     for i, img in enumerate(photo_urls):
-        x = i * img_width
-        canvas.drawImage(
-            img,
-            x,
-            y,
-            width=img_width,
-            height=img_height,
-            preserveAspectRatio=False,  # ВАЖНО
-            mask="auto"
-        )
+        if img:  # если успешно скачалось
+            x = i * img_width
+            try:
+                canvas.drawImage(
+                    img,
+                    x,
+                    y,
+                    width=img_width,
+                    height=img_height,
+                    preserveAspectRatio=False,
+                    mask="auto"
+                )
+            except Exception as e:
+                print(f"[DRAW FAIL] image {i}: {e}")
 
     canvas.restoreState()
 
