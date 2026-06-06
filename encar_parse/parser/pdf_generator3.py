@@ -325,6 +325,10 @@ def draw_page_1(canvas, doc):
 
     y = 0  # прям от низа листа
 
+    if len(images) != 0 and len(images) <= 4:
+        while len(images) != 4:
+            images.append(images[0])
+
     for i, img in enumerate(images):
         if img:  # если успешно скачалось
             x = i * img_width
