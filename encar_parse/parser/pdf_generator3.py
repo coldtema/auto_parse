@@ -11,6 +11,7 @@ import requests
 from reportlab.lib.enums import TA_RIGHT
 import os
 import traceback
+from reportlab.lib.utils import ImageReader
 
 
 
@@ -289,18 +290,35 @@ def draw_page_1(canvas, doc):
 
     print('фон создан')
 
-    photo_urls = [ doc.photo1, doc.photo2, doc.photo3, doc.photo4, ]
-
-    canvas.saveState()
-
     PAGE_WIDTH, PAGE_HEIGHT = A4
 
     img_width = PAGE_WIDTH / 4
     img_height = 30 * mm
 
+    photo_urls = [ doc.photo1, doc.photo2, doc.photo3, doc.photo4 ]
+
+    images = []
+
+    for url in photo_urls:
+        try:
+            # proxy = {
+            #     'http':os.getenv('PROXY_URL'),
+            #     'https':os.getenv('PROXY_URL')
+            # }
+            proxy = None
+            response = requests.get(url, proxies=proxy, timeout=3)
+        except:
+            print(traceback.format_exc())
+            continue
+        img_data = ImageReader(BytesIO(response.content))
+        # img = Image(img_data, width=img_width, height=img_height)
+        images.append(img_data)
+
+    canvas.saveState()
+
     y = 0  # прям от низа листа
 
-    for i, img in enumerate(photo_urls):
+    for i, img in enumerate(images):
         if img:  # если успешно скачалось
             x = i * img_width
             try:
