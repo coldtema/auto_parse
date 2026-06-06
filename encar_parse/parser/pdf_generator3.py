@@ -199,11 +199,12 @@ def generate_pdf3(data):
 
     for url in photo_urls:
         try:
-            proxy = {
-                'http':os.getenv('PROXY_URL'),
-                'https':os.getenv('PROXY_URL')
-            }
-            response = requests.get(url, proxies=proxy, timeout=20)
+            # proxy = {
+            #     'http':os.getenv('PROXY_URL'),
+            #     'https':os.getenv('PROXY_URL')
+            # }
+            proxy = None
+            response = requests.get(url, proxies=proxy, timeout=3)
         except:
             print(traceback.format_exc())
             continue
