@@ -10,6 +10,7 @@ from reportlab.lib.utils import ImageReader
 import requests
 from reportlab.lib.enums import TA_RIGHT
 import os
+import traceback
 
 
 
@@ -109,6 +110,7 @@ def draw_footer_photos(canvas, doc, photo_urls):
 
 
 def generate_pdf3(data):
+    print('pdf started')
 
     car_name = data['full_name']
     rates = data['rates']
@@ -186,6 +188,8 @@ def generate_pdf3(data):
     elements.append(price_table("ОПЛАТА ПРИ ТАМОЖНЕ", customs_rows+total))
     elements.append(Spacer(1, 20))
 
+    print('таблица сформировалась')
+
     photo_urls = [data["photo1"], data["photo2"], data["photo3"], data["photo4"]]
 
     # подготовка Image объектов
@@ -201,10 +205,13 @@ def generate_pdf3(data):
             }
             response = requests.get(url, proxies=proxy, timeout=20)
         except:
+            print(traceback.format_exc())
             continue
         img_data = BytesIO(response.content)
         img = Image(img_data, width=img_width, height=img_height)
         images.append(img)
+
+    print('фото получены')
 
     # можно сделать row через Table, чтобы ровно выстроились
     # table = Table([images], colWidths=[img_width]*4)
@@ -229,6 +236,8 @@ def generate_pdf3(data):
     elements.append(PageBreak())
     elements.append(Spacer(1, 1))
 
+    print('фото закреплены')
+
 
     doc.build(
         elements,
@@ -236,6 +245,8 @@ def generate_pdf3(data):
         onLaterPages=draw_pages,
     )
     buffer.seek(0)
+
+    print('отдается буфер')
     return buffer
 
 
