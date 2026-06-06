@@ -67,7 +67,7 @@ class CarParser():
     def go_through_all_mileages(self):
         '''Функция прохода через все пробеги легковых машин'''
         print('пачка пробегов началась')
-        for mileage in range(0, 10000, 5000):
+        for mileage in range(0, 1000000, 5000):
             self.current_api_url_list[1] = str(mileage)
             self.current_api_url_list[3] = str(mileage + 5000)
             if mileage % 100000 == 0:
