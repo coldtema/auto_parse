@@ -228,17 +228,12 @@ def draw_page_1(canvas, doc):
 
     for url in photo_urls:
         try:
-            proxy = None
-            response = requests.get(url, proxies=proxy, timeout=(3, 5))
+            response = requests.get(url, timeout=(3, 5))
         except:
             try:
-                proxy = {
-                    'http':os.getenv('PROXY_URL'),
-                    'https':os.getenv('PROXY_URL')
-                }
-                response = requests.get(url, proxies=proxy, timeout=(3, 5))
+                response = requests.get(url, timeout=(3, 5))
             except:
-                print(traceback.format_exc())
+                print('фото не загрузилось')
                 continue
         img_data = ImageReader(BytesIO(response.content))
         images.append(img_data)
