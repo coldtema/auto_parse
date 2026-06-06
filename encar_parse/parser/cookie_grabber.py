@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import requests
+import os
 
 
 # def get_new_encar_cookies():
@@ -31,6 +32,10 @@ def get_new_encar_cookies():
         "Chrome/126.0.6478.127 Safari/537.36"
     )
 
+    proxy = {
+        "server": os.getenv("PROXY_URL"),
+    }
+
     # виртуальный дисплей для Linux сервера
     with Display(visible=0, size=(1920, 1080)):
         with sync_playwright() as p:
@@ -40,6 +45,7 @@ def get_new_encar_cookies():
                 viewport={"width": 1920, "height": 1080},
                 locale="en-US",
                 timezone_id="Asia/Seoul",
+                proxy=proxy
             )
 
             page = context.new_page()
