@@ -306,14 +306,14 @@ def draw_page_1(canvas, doc):
             #     'https':os.getenv('PROXY_URL')
             # }
             proxy = None
-            response = requests.get(url, proxies=proxy, timeout=(3, 10))
+            response = requests.get(url, proxies=proxy, timeout=(3, 5))
         except:
             try:
                 proxy = {
                     'http':os.getenv('PROXY_URL'),
                     'https':os.getenv('PROXY_URL')
                 }
-                response = requests.get(url, proxies=proxy, timeout=(3, 10))
+                response = requests.get(url, proxies=proxy, timeout=(3, 5))
             except:
                 print(traceback.format_exc())
                 continue
