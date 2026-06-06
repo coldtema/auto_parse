@@ -308,8 +308,15 @@ def draw_page_1(canvas, doc):
             proxy = None
             response = requests.get(url, proxies=proxy, timeout=(3, 10))
         except:
-            print(traceback.format_exc())
-            continue
+            try:
+                proxy = {
+                    'http':os.getenv('PROXY_URL'),
+                    'https':os.getenv('PROXY_URL')
+                }
+                response = requests.get(url, proxies=proxy, timeout=(3, 10))
+            except:
+                print(traceback.format_exc())
+                continue
         img_data = ImageReader(BytesIO(response.content))
         # img = Image(img_data, width=img_width, height=img_height)
         images.append(img_data)
