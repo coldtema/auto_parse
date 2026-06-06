@@ -79,37 +79,6 @@ TEXT_STYLE = ParagraphStyle(
 )
 
 
-def draw_background(canvas, doc):
-    width, height = A4
-    canvas.drawImage(
-        BACKGROUND_IMAGE,
-        0,
-        0,
-        width=width,
-        height=height,
-        mask='auto'
-    )
-
-def draw_footer_photos(canvas, doc, photo_urls):
-    page_width, page_height = A4
-    img_width = 45*mm
-    img_height = 30*mm
-    spacing = 5*mm  # расстояние между картинками
-    start_x = (page_width - (img_width*4 + spacing*3)) / 2  # центрируем ряд
-    y = 5*mm  # отступ от низа страницы
-
-    for i, url in enumerate(photo_urls):
-        try:
-            response = requests.get(url)
-            img_data = BytesIO(response.content)
-            img_reader = ImageReader(img_data)
-            x = start_x + i*(img_width + spacing)
-            canvas.drawImage(img_reader, x, y, width=img_width, height=img_height,
-                                preserveAspectRatio=True, mask='auto')
-        except Exception as e:
-            print(f"Ошибка при загрузке фото {url}: {e}")
-
-
 def generate_pdf3(data):
     print('pdf started')
 
@@ -191,41 +160,6 @@ def generate_pdf3(data):
 
     print('таблица сформировалась')
 
-    photo_urls = [data["photo1"], data["photo2"], data["photo3"], data["photo4"]]
-
-    # подготовка Image объектов
-    images = []
-    img_width = 52*mm  # ширина каждой картинки
-    img_height = 30*mm  # высота каждой картинки
-
-    for url in photo_urls:
-        try:
-            # proxy = {
-            #     'http':os.getenv('PROXY_URL'),
-            #     'https':os.getenv('PROXY_URL')
-            # }
-            proxy = None
-            response = requests.get(url, proxies=proxy, timeout=3)
-        except:
-            print(traceback.format_exc())
-            continue
-        img_data = BytesIO(response.content)
-        img = Image(img_data, width=img_width, height=img_height)
-        images.append(img)
-
-    print('фото получены')
-
-    # можно сделать row через Table, чтобы ровно выстроились
-    # table = Table([images], colWidths=[img_width]*4)
-    # table.setStyle(TableStyle([
-    #     ("VALIGN", (0,0), (-1,-1), "MIDDLE"),
-    #     ("ALIGN", (0,0), (-1,-1), "CENTER"),
-    # ]))
-
-    # # добавляем в конец элементов
-    # elements.append(Spacer(1, 25))
-    # elements.append(table)
-
     doc.photo1 = data["photo1"]
     doc.photo2 = data["photo2"]
     doc.photo3 = data["photo3"]
@@ -237,9 +171,6 @@ def generate_pdf3(data):
 
     elements.append(PageBreak())
     elements.append(Spacer(1, 1))
-
-    print('фото закреплены')
-
 
     doc.build(
         elements,
@@ -274,8 +205,6 @@ def draw_pages(canvas, doc):
         )
 
 
-
-
 def draw_page_1(canvas, doc):
     print('draw_page 1')
     width, height = A4
@@ -301,10 +230,6 @@ def draw_page_1(canvas, doc):
 
     for url in photo_urls:
         try:
-            # proxy = {
-            #     'http':os.getenv('PROXY_URL'),
-            #     'https':os.getenv('PROXY_URL')
-            # }
             proxy = None
             response = requests.get(url, proxies=proxy, timeout=(3, 5))
         except:
@@ -318,7 +243,6 @@ def draw_page_1(canvas, doc):
                 print(traceback.format_exc())
                 continue
         img_data = ImageReader(BytesIO(response.content))
-        # img = Image(img_data, width=img_width, height=img_height)
         images.append(img_data)
 
     canvas.saveState()
@@ -330,7 +254,7 @@ def draw_page_1(canvas, doc):
             images.append(images[0])
 
     for i, img in enumerate(images):
-        if img:  # если успешно скачалось
+        if img:
             x = i * img_width
             try:
                 canvas.drawImage(

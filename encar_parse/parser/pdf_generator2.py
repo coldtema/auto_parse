@@ -10,6 +10,7 @@ from reportlab.lib.utils import ImageReader
 import requests
 from reportlab.lib.enums import TA_RIGHT
 import os
+import traceback
 
 
 
@@ -75,37 +76,6 @@ TEXT_STYLE = ParagraphStyle(
     fontSize=20,
     textColor=colors.white,
 )
-
-
-def draw_background(canvas, doc):
-    width, height = A4
-    canvas.drawImage(
-        BACKGROUND_IMAGE,
-        0,
-        0,
-        width=width,
-        height=height,
-        mask='auto'
-    )
-
-def draw_footer_photos(canvas, doc, photo_urls):
-    page_width, page_height = A4
-    img_width = 45*mm
-    img_height = 30*mm
-    spacing = 5*mm  # расстояние между картинками
-    start_x = (page_width - (img_width*4 + spacing*3)) / 2  # центрируем ряд
-    y = 5*mm  # отступ от низа страницы
-
-    for i, url in enumerate(photo_urls):
-        try:
-            response = requests.get(url)
-            img_data = BytesIO(response.content)
-            img_reader = ImageReader(img_data)
-            x = start_x + i*(img_width + spacing)
-            canvas.drawImage(img_reader, x, y, width=img_width, height=img_height,
-                                preserveAspectRatio=True, mask='auto')
-        except Exception as e:
-            print(f"Ошибка при загрузке фото {url}: {e}")
 
 
 def generate_pdf2(data):
@@ -190,37 +160,6 @@ def generate_pdf2(data):
     elements.append(price_table("ВЫЕЗД В МОСКВУ", customs_rows+total))
     elements.append(Spacer(1, 20))
 
-    photo_urls = [data["photo1"], data["photo2"], data["photo3"], data["photo4"]]
-
-    # подготовка Image объектов
-    images = []
-    img_width = 52*mm  # ширина каждой картинки
-    img_height = 30*mm  # высота каждой картинки
-
-    for url in photo_urls:
-        try:
-            proxy = {
-                'http':os.getenv('PROXY_URL'),
-                'https':os.getenv('PROXY_URL')
-            }
-            response = requests.get(url, proxies=proxy, timeout=20)
-        except:
-            continue
-        img_data = BytesIO(response.content)
-        img = Image(img_data, width=img_width, height=img_height)
-        images.append(img)
-
-    # можно сделать row через Table, чтобы ровно выстроились
-    # table = Table([images], colWidths=[img_width]*4)
-    # table.setStyle(TableStyle([
-    #     ("VALIGN", (0,0), (-1,-1), "MIDDLE"),
-    #     ("ALIGN", (0,0), (-1,-1), "CENTER"),
-    # ]))
-
-    # # добавляем в конец элементов
-    # elements.append(Spacer(1, 25))
-    # elements.append(table)
-
     doc.photo1 = data["photo1"]
     doc.photo2 = data["photo2"]
     doc.photo3 = data["photo3"]
@@ -264,9 +203,8 @@ def draw_pages(canvas, doc):
         )
 
 
-
-
 def draw_page_1(canvas, doc):
+    print('draw_page 1')
     width, height = A4
     canvas.drawImage(
         BACKGROUND_IMAGE,
@@ -277,7 +215,33 @@ def draw_page_1(canvas, doc):
         mask='auto'
     )
 
-    photo_urls = [ doc.photo1, doc.photo2, doc.photo3, doc.photo4, ]
+    print('фон создан')
+
+    PAGE_WIDTH, PAGE_HEIGHT = A4
+
+    img_width = PAGE_WIDTH / 4
+    img_height = 30 * mm
+
+    photo_urls = [ doc.photo1, doc.photo2, doc.photo3, doc.photo4 ]
+
+    images = []
+
+    for url in photo_urls:
+        try:
+            proxy = None
+            response = requests.get(url, proxies=proxy, timeout=(3, 5))
+        except:
+            try:
+                proxy = {
+                    'http':os.getenv('PROXY_URL'),
+                    'https':os.getenv('PROXY_URL')
+                }
+                response = requests.get(url, proxies=proxy, timeout=(3, 5))
+            except:
+                print(traceback.format_exc())
+                continue
+        img_data = ImageReader(BytesIO(response.content))
+        images.append(img_data)
 
     canvas.saveState()
 
@@ -301,9 +265,6 @@ def draw_page_1(canvas, doc):
         )
 
     canvas.restoreState()
-
-
-
 
 def draw_complectation(canvas, doc, background_image, comp_dict):
     canvas.saveState()
@@ -331,8 +292,6 @@ def draw_complectation(canvas, doc, background_image, comp_dict):
             canvas.drawString(x, y, "✔")
 
     canvas.restoreState()
-
-
 
 
 COMPLECTATION_DICT_PAGE1 = {
