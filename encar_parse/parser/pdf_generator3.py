@@ -6,12 +6,13 @@ from reportlab.lib import colors
 from reportlab.lib.units import mm
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.lib.utils import ImageReader
 import requests
 from reportlab.lib.enums import TA_RIGHT
 import os
 import traceback
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from reportlab.lib.utils import ImageReader
+
 
 
 
@@ -226,27 +227,15 @@ def draw_page_1(canvas, doc):
 
     photo_urls = [ doc.photo1, doc.photo2, doc.photo3, doc.photo4 ]
 
-    images = []
-
-    for url in photo_urls:
-        try:
-            response = requests.get(url, timeout=(3, 5))
-        except:
-            try:
-                response = requests.get(url, timeout=(3, 5))
-            except:
-                print('фото не загрузилось')
-                continue
-        img_data = ImageReader(BytesIO(response.content))
-        images.append(img_data)
-
-    canvas.saveState()
-
-    y = 0  # прям от низа листа
+    images = download_images(photo_urls)
 
     if len(images) != 0 and len(images) <= 4:
         while len(images) != 4:
             images.append(images[0])
+
+    canvas.saveState()
+
+    y = 0  # прям от низа листа
 
     for i, img in enumerate(images):
         if img:
@@ -296,6 +285,37 @@ def draw_complectation(canvas, doc, background_image, comp_dict):
             canvas.drawString(x, y, "✔")
 
     canvas.restoreState()
+
+
+def download_images(urls):
+    images = [None] * len(urls)
+
+    with ThreadPoolExecutor(max_workers=5) as executor:
+        future_to_index = {
+            executor.submit(fetch_image, url): i
+            for i, url in enumerate(urls)
+            if url
+        }
+
+        for future in as_completed(future_to_index):
+            i = future_to_index[future]
+            images[i] = future.result()
+
+    return images
+
+def fetch_image(url):
+    try:
+        r = requests.get(
+            url,
+            timeout=(2, 6)
+        )
+        r.raise_for_status()
+
+        return ImageReader(BytesIO(r.content))
+
+    except Exception as e:
+        print(f"[IMG FAIL] {url} -> {e}")
+        return None
 
 
 
