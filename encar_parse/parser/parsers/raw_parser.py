@@ -69,9 +69,10 @@ class CarParser():
         for mileage in range(0, 1000000, 5000):
             self.current_api_url_list[1] = str(mileage)
             self.current_api_url_list[3] = str(mileage + 5000)
-            print(f'Пробег: от {self.current_api_url_list[1]} до {self.current_api_url_list[3]}')
+            # print(f'Пробег: от {self.current_api_url_list[1]} до {self.current_api_url_list[3]}')
             self.go_through_all_pages_of_mileage()
             self.save_to_db()
+        print('пачка пробегов завершилась')
         self.current_api_url_list[1] = '0'
         self.current_api_url_list[3] = '5000'
 

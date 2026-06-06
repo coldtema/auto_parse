@@ -57,9 +57,9 @@ class AsyncCarDiagParser():
         list_api_urls = []
         for car in self.batch:
             list_api_urls.append(f'{self.encar_api_url}{car.dummy_id}')
-        print(f'Запуск {self.counter}')
         self.counter += 1
         if self.counter % 10 == 0:
+            print(f'Запуск {self.counter}')
             time.sleep(random.randint(1, 10))
         self.results = asyncio.run(self.get_info(list_api_urls))
         
